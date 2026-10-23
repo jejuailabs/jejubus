@@ -1,0 +1,12 @@
+node_modules/
+.npm-cache/
+.env
+.env.*
+!.env.example
+web/data/
+web/artifacts/
+*.log
+*-firebase-adminsdk-*.json
+service-account*.json
+firebase-admin*.json
+.vercel/

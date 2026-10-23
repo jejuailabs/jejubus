@@ -1,0 +1,46 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createApp} from '../server.mjs';
+import {createStore} from '../lib/store.mjs';
+test('API verifies owner/admin permissions, persistent provider context and local setup protection',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'jeju-api-')),store=createStore(':memory:',{seed:false});
+ const app=await createApp({store,settingsFile:join(dir,'.env'),env:{APP_ORIGIN:'http://localhost:3000',ADMIN_GOOGLE_SUBS:'admin'},fetchImpl:()=>{throw Error('No live network allowed');}});
+ await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base=`http://localhost:${app.server.address().port}`;app.config.origin=base;
+ const request=(path,{token,headers,...options}={})=>fetch(base+path,{...options,headers:{Origin:base,'Content-Type':'application/json',...(token?{Cookie:`jeju_session=${token}`} : {}),...headers}});
+ try{
+  assert.equal((await (await request('/api/posts')).json()).posts.length,0);
+  assert.equal((await request('/api/routes?q=101')).status,503);
+  assert.equal((await request('/api/arrivals?id=test')).status,503);
+  assert.equal((await request('/api/routes?q=')).status,400);
+  const a=store.createSession('google:a','Owner'),b=store.createSession('google:b','Other'),admin=store.createSession('google:admin','Admin');
+  store.rememberContext({id:'route:test',name:'101',type:'route'});
+  const payload={title:'Real question',body:'Test body for transit community',category:'question',route:'route:test',requestId:'fixed-request-id'};
+  const post=await request('/api/posts',{method:'POST',token:a,body:JSON.stringify(payload)});assert.equal(post.status,201);const {id}=await post.json();
+  assert.equal((await(await request('/api/posts',{method:'POST',token:a,body:JSON.stringify(payload)})).json()).id,id);
+  assert.equal((await(await request('/api/posts')).json()).posts[0].contextName,'101');
+  assert.equal((await request(`/api/posts/${id}`,{method:'PATCH',token:b,body:JSON.stringify(payload)})).status,403);
+  assert.equal((await request(`/api/posts/${id}`,{method:'DELETE',token:b})).status,403);
+  assert.equal((await request(`/api/posts/${id}`,{method:'PATCH',token:a,body:JSON.stringify({...payload,title:'Updated title'})})).status,200);
+  assert.equal((await request(`/api/posts/${id}/replies`,{method:'POST',token:a,body:JSON.stringify({body:'Test reply'})})).status,201);
+  const reply=(await(await request(`/api/posts/${id}/replies`,{token:a})).json()).replies[0];assert.equal(reply.owned,true);
+  assert.equal((await request(`/api/replies/${reply.id}`,{method:'DELETE',token:b})).status,403);
+  assert.equal((await request(`/api/replies/${reply.id}`,{method:'DELETE',token:a})).status,200);
+  assert.equal((await request('/api/admin/reports',{token:b})).status,403);
+  const report=await(await request(`/api/posts/${id}/report`,{method:'POST',token:b,body:JSON.stringify({reason:'Test report'})})).json();
+  assert.equal((await(await request('/api/admin/reports',{token:admin})).json()).reports.length,1);
+  assert.equal((await request(`/api/admin/reports/${report.id}`,{method:'POST',token:b,body:JSON.stringify({hide:true})})).status,403);
+  assert.equal((await request(`/api/admin/reports/${report.id}`,{method:'POST',token:admin,body:JSON.stringify({hide:true})})).status,200);
+  assert.equal((await request(`/api/posts/${id}/replies`)).status,404);
+  const setup=await(await request('/api/setup')).json();assert.ok(setup.token);assert.equal(setup.google,false);
+  assert.equal((await request('/api/setup',{method:'POST',body:'{}'})).status,403);
+  assert.equal((await request('/api/setup',{method:'POST',headers:{'X-Setup-Token':setup.token},body:JSON.stringify({UNSUPPORTED:'x'})})).status,400);
+  assert.equal((await request('/api/setup',{method:'POST',headers:{'X-Setup-Token':setup.token},body:JSON.stringify({GOOGLE_CLIENT_ID:'fixture.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'super-secret'})})).status,200);
+  const status=await(await request('/api/status')).json();assert.equal(status.googleConfigured,true);assert.equal(JSON.stringify(status).includes('super-secret'),false);
+  assert.match(await readFile(join(dir,'.env'),'utf8'),/super-secret/);
+  assert.equal((await request('/.env')).status,404);
+  app.config.setupAllowed=false;assert.equal((await request('/api/setup')).status,404);assert.equal((await request('/setup')).status,404);
+ }finally{await new Promise(r=>app.server.close(r));store.close();await rm(dir,{recursive:true,force:true});}
+});
