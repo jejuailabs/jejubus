@@ -1,4 +1,12 @@
 export const strings={
+ positionUnavailable:['차량 위치를 수신하지 못했습니다.','Vehicle positions could not be received.','无法接收车辆位置。','車両位置を受信できませんでした。'],
+ liveMap:['실시간 버스 위치','Live bus positions','实时公交位置','バスの現在位置'],
+ liveRouteHelp:['노선을 검색하고 방향을 선택하면 실제 버스 위치를 볼 수 있어요.','Search a route and select its direction to see bus positions.','搜索线路并选择方向，查看公交位置。','路線を検索して方向を選ぶと、バスの位置を確認できます。'],
+ chooseLiveRoute:['노선 선택·변경','Choose / change route','选择或更改线路','路線を選択・変更'],
+ busLegend:['파란 버스 = 차량 위치','Blue bus = vehicle position','蓝色公交 = 车辆位置','青いバス = 車両位置'],
+ stopLegend:['회색 점 = 정류장','Grey dot = stop','灰点 = 车站','灰色の点 = 停留所'],
+ liveRefreshHelp:['화면을 보는 동안 20초마다 자동 갱신','Updates every 20 seconds while this view is visible','查看此页面时每20秒自动更新','画面の表示中は20秒ごとに自動更新'],
+ liveMapHelp:['TAGO가 제공한 최근 차량 좌표입니다. 수신 시각과 실제 운행 상황에 따라 차이가 있을 수 있어요.','Latest vehicle coordinates provided by TAGO. Data may lag actual operations.','TAGO提供的最新车辆坐标，可能与实际运行有延迟。','TAGO提供の最新の車両座標です。実際の運行状況と遅れがある場合があります。'],
  placeSuggestions:['{place} 장소 추천','{place} suggestions','{place}地点建议','{place}の候補'],suggestionCount:['장소 {n}개 · 방향키와 Enter로 선택','{n} places · use arrows and Enter','{n}个地点 · 方向键及回车选择','{n}件・矢印とEnterで選択'],
  tagoQuota:['공식 포털: 무료. 이 앱은 하루 1,000회 이내로 제한합니다. 제주 제공 여부는 도시 목록과 실제 응답으로 확인해야 합니다.','Official portal: free. App limit: 1,000/day. Jeju coverage requires live verification.','官方平台免费。本应用限制每日1,000次，济州支持需通过城市列表和实际响应验证。','公式ポータルは無料。本アプリは1日1,000回までです。済州の対応は都市一覧と実際の応答で確認します。'],
  kakaoQuota:['첫 활성화 앱만 무료 쿼터 적용. 새 앱의 무료 사용을 가정하지 마세요. 이 앱 제한: 장소 100회/일, 경로 100회/일. 다른 앱의 사용량은 확인할 수 없습니다.','Only the first activated app gets free quota. Do not assume a new app is free. App limits: places 100/day, routes 100/day. Other app usage is not visible here.','仅首个激活应用有免费额度，请勿假设新应用免费。本应用每日限制地点100次、路线100次，无法查看其他应用用量。','最初に有効化したアプリのみ無料枠があります。新しいアプリが無料とは限りません。本アプリは場所・経路各100回/日。他アプリの使用量は確認できません。'],
