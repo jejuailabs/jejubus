@@ -55,7 +55,14 @@ export function updateMapData(data={},t,onStop){
   for(const line of data.lines||[]){if(line.length<2)continue;const pts=line.map(p=>[p.lat,p.lng]);L.polyline(pts,{color:'#2167ff',weight:5,opacity:.8}).addTo(overlay);bounds.push(...pts);}
   // A render can recreate the map immediately after a live update. Finish the
   // bounds change synchronously so its saved viewport includes the whole route.
-  if(bounds.length&&data.focusKey&&focusKey!==data.focusKey){focusKey=data.focusKey;map.fitBounds(L.latLngBounds(bounds),{paddingTopLeft:[35,data.live?235:80],paddingBottomRight:[35,80],maxZoom:16,animate:false});}
+  if(bounds.length&&data.focusKey&&focusKey!==data.focusKey){
+    focusKey=data.focusKey;
+    const card=document.querySelector('.live-map-card'),size=map.getSize();
+    const cardHeight=card?.getBoundingClientRect().height||0;
+    const top=Math.min(cardHeight?cardHeight+24:32,Math.max(24,size.y*.4));
+    const side=Math.min(35,size.x*.08),bottom=Math.min(55,size.y*.15);
+    map.fitBounds(L.latLngBounds(bounds),{paddingTopLeft:[side,top],paddingBottomRight:[side,bottom],maxZoom:16,animate:false});
+  }
 }
 function drawLocation(t){
   if(!map||!currentLocation)return;

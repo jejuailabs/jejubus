@@ -13,3 +13,29 @@
 /* Six mobile destinations, including the driving experiment. */
 .nav-item[href]{text-decoration:none}
 @media(max-width:760px){.mobile-nav .nav-item{min-width:0;flex:1 1 0;padding-inline:1px;font-size:9px}.mobile-nav .nav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.desktop-nav{gap:18px}}
+.workspace{height:calc(100dvh - 82px)}
+@media(max-width:760px),(max-width:1020px) and (max-height:500px){
+ .workspace{height:auto}
+ .view-map.mobile-search{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(140px,42%) minmax(0,1fr)}
+ .view-map.mobile-search>.search-panel{display:flex;min-height:0;padding:12px 16px;border-bottom:1px solid var(--line)}
+ .view-map.mobile-search>.map-panel{display:block;height:100%;min-height:0}
+ .view-map.mobile-search .search-intro,.view-map.mobile-search .start-card,.view-map.mobile-search .search-footer,.view-map.mobile-search .map-panel>.live-map-card{display:none}
+ .view-map.mobile-search .search-fields{margin:0}
+ .view-map.mobile-search #search-form{display:flex;gap:8px;flex-shrink:0}
+ .view-map.mobile-search #search-form .search-fields{flex:1;min-width:0}
+ .view-map.mobile-search #search-form .search-button{width:74px;margin:0;align-self:center}
+ .view-map.mobile-search #search-form .search-button>.icon{display:none}
+ .view-map.mobile-search .search-actions{margin:4px 0;flex-shrink:0}
+ .view-map.mobile-search .journey-list{padding-top:0}
+ .view-map.mobile-search .journey-card{margin-bottom:6px}
+ .view-map.mobile-search .journey-main{padding:10px}
+ .view-map .map-panel>.map-note,.view-map .live-map-card>p,.view-map .live-map-card>small{display:none}
+ .view-map .live-map-card{top:10px;left:10px;max-width:calc(100% - 68px);width:290px;padding:10px 12px}
+ .view-map #map-live-summary{gap:2px}
+ .view-map #map-live-summary strong{font-size:15px}
+ .view-map #map-live-summary span{font-size:11px;line-height:1.5}
+ .view-map .live-map-card>button{padding:6px 0 0;min-height:36px}
+ .view-map .map-controls{bottom:42px;right:12px}
+ .search-fields input:focus-visible{outline:none}
+ .search-fields label:focus-within{box-shadow:inset 3px 0 0 var(--blue);background:var(--surface-blue)}
+}
