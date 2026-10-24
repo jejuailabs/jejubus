@@ -1,6 +1,7 @@
 import {locales,translate} from './i18n.js';
 import {icon} from './icons.js';
 import {mapMarkup,destroyMap,mountMap,mapAction,locateOnMap,updateMapData} from './map.js';
+import {createPlaceLookup,attachPlaceAutocomplete} from './place-autocomplete.js';
 const read=(k,v)=>{try{return JSON.parse(localStorage.getItem(k))??v;}catch{return v;}};
 const state={locale:read('jejubus.locale','ko'),favorites:read('jejubus.savedRoutes',[]),view:'explore',pane:'search',mode:'destination',sort:'fastest',query:'',origin:'',from:null,to:null,category:'all',posts:[],status:{},results:null,route:null,stop:null,routeStops:[],vehicles:[],arrivals:[],paths:[],path:null,lines:[],error:null,busy:false,context:'general',communityQuery:'',communityError:false,noTransfers:false,liveError:null,liveAt:null,focusKey:null};
 if(!locales[state.locale])state.locale='ko';if(!Array.isArray(state.favorites))state.favorites=[];
@@ -9,9 +10,11 @@ const t=(key,values)=>translate(state.locale,key,values),e=v=>String(v??'').repl
 const local=v=>v&&typeof v==='object'?(v[state.locale]||v.ko):v;
 const app=document.querySelector('#app'),dialog=document.querySelector('#dialog');
 let toastTimer,detailPost,postDraft,searchVersion=0,selectionVersion=0,polling=false;
+let disposePlaceAutocomplete=()=>{};
 function persist(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{toast(t('storageError'));}}
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 async function api(url,options={}){const res=await fetch(url,{...options,headers:{'Content-Type':'application/json',...options.headers}});const body=await res.json();if(!res.ok)throw Object.assign(Error(body.error),{key:body.error,status:res.status});return body;}
+const lookupPlaces=createPlaceLookup(async query=>(await api(`/api/places?q=${encodeURIComponent(query)}`)).places);
 const postOptions=body=>({method:'POST',body:JSON.stringify(body)});
 const setupLink=()=>state.status.setupAvailable?`<a class="text-btn" href="/setup">${t('setup')} ${icon('arrow')}</a>`:'';
 const errorBox=key=>`<div class="notice error-card" role="alert">${icon('info')}<p>${e(t(key||'connectionError'))}</p>${setupLink()}<button class="text-btn" data-action="retry-search">${t('retry')}</button></div>`;
@@ -39,6 +42,8 @@ function filteredPosts(){const q=state.communityQuery.toLocaleLowerCase();return
 function communityMarkup(){const items=filteredPosts();return `<div class="community-heading"><span class="eyebrow">COMMUNITY</span><div><h2>${t(state.context==='general'?'latestTalk':'activeContext')}</h2><button class="compose" data-action="reload-posts" aria-label="${t('refresh')}">${icon('refresh')}</button><button class="compose" data-action="compose" aria-label="${t('write')}">${icon('pencil')}</button></div><p>${e(contextName(state.context))} · ${t('talkSub')}</p><label class="sr-only" for="community-query">${t('searchCommunity')}</label><input id="community-query" placeholder="${t('searchCommunity')}" value="${e(state.communityQuery)}"><select id="context-filter" aria-label="${t('context')}">${contexts().map(c=>`<option value="${e(c)}" ${state.context===c?'selected':''}>${e(contextName(c))}</option>`).join('')}</select></div><div class="community-tabs">${['all','question','update','concern','tip'].map(c=>`<button class="${state.category===c?'active':''}" data-category="${c}">${t(c)}</button>`).join('')}</div><div class="post-list">${state.communityError?errorBox('communityError'):items.length?items.map(p=>postCard(p,state.view==='community')).join(''):`<div class="empty-state">${icon('chat')}<h3>${t('noPosts')}</h3><p>${t('firstPost')}</p></div>`}</div><div class="community-bottom"><p>${icon('info')}${t('communityNote')}</p><button class="write-button" data-action="compose">${icon('plus')}${t('write')}</button>${state.status.user?.admin?`<button class="text-btn" data-action="admin">${t('admin')}</button>`:''}${state.view!=='community'?`<button class="text-btn" data-view="community">${t('more')}${icon('arrow')}</button>`:''}</div>`;}
 function mapData(){return {stops:state.routeStops.length?state.routeStops:state.results?.kind==='stops'?state.results.items:state.stop?[state.stop]:[],vehicles:state.vehicles,lines:state.lines,from:state.mode==='destination'?state.from:null,to:state.mode==='destination'?state.to:null,focusKey:state.focusKey};}
 function render(){
+ const focused=document.activeElement,editing=focused&&['origin-input','search-input'].includes(focused.id)?{id:focused.id,start:focused.selectionStart,end:focused.selectionEnd}:null;
+ disposePlaceAutocomplete();disposePlaceAutocomplete=()=>{};
  destroyMap();document.documentElement.lang=state.locale==='zh'?'zh-CN':state.locale;document.title=`${t('brand')} · ${t('tagline')}`;const dark=document.documentElement.dataset.theme==='dark';
  app.innerHTML=`<header class="site-header"><a class="brand" href="/"><span class="brand-icon">${icon('bus')}</span><span>${t('brand')}<small>JEJU BUS</small></span></a><nav class="desktop-nav">${navMarkup()}</nav><div class="header-tools"><button class="theme-toggle" role="switch" aria-checked="${dark}" aria-label="${t('themeLabel')}" data-action="theme"><span class="toggle-track"><span class="toggle-thumb">${icon(dark?'moon':'sun')}</span></span></button><label class="language-picker">${icon('globe')}<span class="sr-only">${t('language')}</span><select id="language">${Object.entries(locales).map(([id,name])=>`<option value="${id}" ${id===state.locale?'selected':''}>${name}</option>`).join('')}</select>${icon('down')}</label><button class="login-button" aria-label="${e(state.status.user?.name||t('login'))}" data-action="${state.status.user?'account':'login'}">${state.status.user?icon('user'):'<span class="google-mark">G</span>'}<span>${e(state.status.user?.name||t('login'))}</span></button></div></header>
  <div class="preview-strip"><span class="preview-pill"><span></span>${t('demo')}</span><p>${t('demoDetail')}</p><button data-action="reference">${t('reference')}${icon('external')}</button></div>
@@ -51,12 +56,24 @@ function render(){
  document.querySelector('#search-form').addEventListener('submit',ev=>{ev.preventDefault();search();});
  document.querySelector('#search-input').addEventListener('input',ev=>{state.query=ev.target.value;state.to=null;});
  document.querySelector('#origin-input')?.addEventListener('input',ev=>{state.origin=ev.target.value;state.from=null;});
+ if(state.mode==='destination'){
+  const disposers=[['origin','#origin-input'],['destination','#search-input']].map(([target,selector])=>attachPlaceAutocomplete(document.querySelector(selector),{target,t,lookup:lookupPlaces,isSelected:()=>!!state[target==='origin'?'from':'to'],onSelect:place=>selectSuggestedPlace(target,place)}));
+  disposePlaceAutocomplete=()=>disposers.forEach(dispose=>dispose());
+ }
  document.querySelector('#direct-only').addEventListener('change',async ev=>{state.noTransfers=ev.target.checked;await selectPath(sorted()[0],false);render();});
  document.querySelector('#context-filter').addEventListener('change',ev=>{state.context=ev.target.value;render();});
  document.querySelector('#community-query').addEventListener('input',ev=>{state.communityQuery=ev.target.value;const items=filteredPosts();document.querySelector('.post-list').innerHTML=items.length?items.map(p=>postCard(p,state.view==='community')).join(''):`<div class="empty-state">${t('noPosts')}</div>`;});
  mountMap({t,data:mapData(),onPick:pickPoint,onStop:chooseStop});
+ if(editing){const input=document.getElementById(editing.id);if(input){input.focus({preventScroll:true});input.setSelectionRange(editing.start,editing.end);}}
 }
 const coordinateText=q=>{const match=String(q).match(/^\s*(33(?:\.\d+)?|34(?:\.\d+)?)\s*,\s*(12[567](?:\.\d+)?)\s*$/);return match?{lat:Number(match[1]),lng:Number(match[2]),name:q}:null;};
+function selectSuggestedPlace(target,place){
+ ++searchVersion;++selectionVersion;state.busy=false;state.error=null;state.results=null;state.paths=[];state.path=null;state.lines=[];state.route=null;state.stop=null;state.routeStops=[];state.vehicles=[];state.arrivals=[];
+ if(target==='origin'){state.from=place;state.origin=place.name;}else{state.to=place;state.query=place.name;}
+ state.focusKey=`place-${Date.now()}`;
+ if(state.from&&state.to){search();return;}
+ render();document.querySelector(target==='origin'?'#search-input':'#origin-input')?.focus();
+}
 async function placesFor(query,target,version){const point=coordinateText(query);if(point){if(target==='origin'){state.from=point;state.origin=point.name;}else{state.to=point;state.query=point.name;}return true;}const result=await api(`/api/places?q=${encodeURIComponent(query)}`);if(version!==searchVersion)return false;state.results={kind:'places',target,query,page:result.page,hasMore:result.hasMore,items:result.places};return false;}
 async function search(target){
  const version=++searchVersion;state.error=null;state.busy=true;state.view='explore';state.pane='search';render();
