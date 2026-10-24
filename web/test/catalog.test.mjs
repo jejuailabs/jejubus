@@ -9,6 +9,13 @@ import {join} from 'node:path';
 const response=data=>({ok:true,json:async()=>data});
 const tago=items=>response({response:{header:{resultCode:'00'},body:{items:{item:items},totalCount:Array.isArray(items)?items.length:1}}});
 import {kakaoFixture} from './fixtures.mjs';
+
+test('TAGO retries one transient failure within the same free provider and accounts for both attempts',async()=>{
+  let calls=0,charged=0;
+  const catalog=createCatalog({tagoKey:'fixture',cityCode:'39'},{consume:()=>{charged++;},fetchImpl:async()=>++calls===1?{ok:false,status:503}:tago([{routeid:'real-id',routeno:'201'}])});
+  assert.equal((await catalog.routes('201')).routes[0].id,'real-id');
+  await catalog.routes('201');assert.equal(calls,2);assert.equal(charged,2);
+});
 test('provider units, bus-only paths, geometry and ranking are normalized correctly',()=>{
  const paths=normalizeKakao(kakaoFixture);assert.equal(paths[0].totalMinutes,20);assert.equal(paths[0].walkingMeters,100);assert.equal(paths[0].legs[0].minutes,2);assert.equal(paths[0].legs[1].points[0].lat,33.501);assert.equal(sortPaths(paths,'walking')[0].id,'journey-1');assert.equal(sortPaths(paths,'fastest')[0].id,'journey-0');assert.equal(sortPaths(paths,'transfers')[0].id,'journey-0');
  assert.equal(normalizeKakao({routes:[{properties:{type:'SUBWAY',totalTime:10}}]}).length,0);

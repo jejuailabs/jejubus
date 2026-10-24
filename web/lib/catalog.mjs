@@ -1,3 +1,5 @@
+import {setTimeout as delay} from 'node:timers/promises';
+
 export class ServiceError extends Error {
   constructor(key,status=503){super(key);this.key=key;this.status=status;}
 }
@@ -71,12 +73,17 @@ export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},now=Date.no
     if(!config.tagoKey)throw new ServiceError('tagoNotConfigured');
     const cacheKey=`tago:${service}:${operation}:${JSON.stringify(params)}`;
     return cached(cacheKey,ttl,async()=>{
-      await consume('tago',config.tagoDailyLimit||1000);
       const url=new URL(`https://apis.data.go.kr/1613000/${service}/${operation}`);
       url.search=new URLSearchParams({serviceKey:config.tagoKey,_type:'json',numOfRows:'100',pageNo:'1',...params});
-      const data=await request(url);
-      const code=String(data.response?.header?.resultCode);
-      if(!['00','0'].includes(code))throw new ServiceError(['20','30','31'].includes(code)?'providerPermission':['22','23'].includes(code)?'quotaReached':'providerUnavailable');
+      let data;
+      for(let attempt=0;attempt<2;attempt++){
+        await consume('tago',config.tagoDailyLimit||1000);
+        try{
+          data=await request(url);const code=String(data.response?.header?.resultCode);
+          if(!['00','0'].includes(code))throw new ServiceError(['20','30','31'].includes(code)?'providerPermission':['22','23'].includes(code)?'quotaReached':'providerUnavailable');
+          break;
+        }catch(error){if(error.key!=='providerUnavailable'||attempt===1)throw error;await delay(250);}
+      }
       return {items:asArray(data.response?.body?.items?.item),total:Number(data.response?.body?.totalCount||0),receivedAt:new Date().toISOString()};
     });
   }
