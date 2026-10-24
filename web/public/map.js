@@ -43,7 +43,9 @@ export function updateMapData(data={},t,onStop){
   for(const vehicle of data.vehicles||[])point(vehicle,'#2167ff',9,`${vehicle.number||''} · ${vehicle.id} · ${vehicle.stop||''}`);
   point(data.from,'#20a078',8,t('origin'));point(data.to,'#ff785c',8,t('destination'));
   for(const line of data.lines||[]){if(line.length<2)continue;const pts=line.map(p=>[p.lat,p.lng]);L.polyline(pts,{color:'#2167ff',weight:5,opacity:.8}).addTo(overlay);bounds.push(...pts);}
-  if(bounds.length&&data.focusKey&&focusKey!==data.focusKey){focusKey=data.focusKey;map.fitBounds(L.latLngBounds(bounds),{padding:[35,80],maxZoom:16});}
+  // A render can recreate the map immediately after a live update. Finish the
+  // bounds change synchronously so its saved viewport includes the whole route.
+  if(bounds.length&&data.focusKey&&focusKey!==data.focusKey){focusKey=data.focusKey;map.fitBounds(L.latLngBounds(bounds),{padding:[35,80],maxZoom:16,animate:false});}
 }
 function drawLocation(t){
   if(!map||!currentLocation)return;
