@@ -53,6 +53,19 @@ test('AI approval cap is shared across instances and does not reset at the next 
  assert.equal((await a.usage()).find(r=>r.day==='approval:fixed').count,2);
 });
 
+test('Firestore member status, session revocation, API controls and token metrics are shared atomically',async()=>{
+ const client=memoryClient(),a=createFirestoreStore(client),b=createFirestoreStore(client);
+ const first=await a.createSession('google:member','Member',{email:'verified@example.com'});assert.equal((await b.user(first)).email,'verified@example.com');
+ await a.adminUserUpdate('google:member',{action:'promote',role:'admin',actor:'google:owner'});
+ const second=await b.createSession('google:member','New name');assert.equal((await a.user(second)).role,'admin');
+ await b.adminUserUpdate('google:member',{action:'revoke',actor:'google:owner'});assert.equal(await a.user(first),null);assert.equal(await a.user(second),null);
+ await a.adminUserUpdate('google:member',{action:'suspend',status:'suspended',actor:'google:owner'});await assert.rejects(b.createSession('google:member','Member'),{key:'accountSuspended'});
+ await b.adminUserUpdate('google:member',{action:'restore',status:'active',actor:'google:owner'});const restored=await a.createSession('google:member','Member');assert.ok(await b.user(restored));assert.equal(await b.user(second),null);
+ await a.setControl('ai',{enabled:false,dailyLimit:2,periodLimit:10},'google:owner');assert.equal((await b.control('ai')).enabled,false);
+ await Promise.all([a.recordMetric({provider:'ai',period:'one',ok:true,usage:{input_tokens:100,output_tokens:10}}),b.recordMetric({provider:'ai',period:'one',ok:true,usage:{input_tokens:200,output_tokens:20}})]);
+ const metric=(await a.metrics())[0];assert.equal(metric.requests,2);assert.equal(metric.inputTokens,300);assert.equal(metric.outputTokens,30);assert.equal(metric.estimatedMicroUsd,360);assert.equal((await b.audit()).length,5);
+});
+
 test('serverless OAuth persists state before redirect and consumes it through another instance',async()=>{
   const client=memoryClient(),stateA=createFirestoreStore(client),stateB=createFirestoreStore(client),config={origin:'https://jejubus.example',googleClientId:'fixture',googleClientSecret:'fixture-secret'};
   const a=createGoogleAuth(config,{stateStore:stateA}),b=createGoogleAuth(config,{stateStore:stateB,fetchImpl:async()=>{throw Error('token endpoint intentionally unavailable');}});

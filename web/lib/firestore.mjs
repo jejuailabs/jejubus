@@ -1,3 +1,4 @@
+import {metricEvent,accumulateMetric} from './telemetry.mjs';
 import {readFile} from 'node:fs/promises';
 import {createHash,randomBytes,randomUUID,sign} from 'node:crypto';
 import {setTimeout as delay} from 'node:timers/promises';
@@ -53,8 +54,8 @@ export function createFirestoreStore(client,{now=Date.now}={}){
   async function changePost(uid,id,update){return client.atomic(async()=>{const prior=await client.get('posts',id);if(!prior||prior.data.user_id!==uid||prior.data.status!=='published')return false;await client.commit([write('posts',id,{...prior.data,...update},prior)]);return true;});}
   async function blocked(uid){return new Set(uid?(await client.list('blocks',{field:'user_id',value:uid,limit:500})).map(b=>b.blocked_id):[]);}
   return {
-    async user(token){if(!token)return null;const s=await get('sessions',hash(token));return s&&s.expires>now()?{id:s.user_id,name:s.name}:null;},
-    async createSession(id,name){name=String(name).slice(0,80);await put('users',id,{id,name});const token=randomBytes(32).toString('base64url');await put('sessions',hash(token),{user_id:id,name,expires:now()+7*86400000});return token;},
+    async user(token){if(!token)return null;const s=await get('sessions',hash(token));if(!s||s.expires<=now())return null;const u=await get('users',s.user_id);return u&&u.status!=='suspended'&&(s.authVersion||0)===(u.authVersion||0)?{id:u.id,name:u.name,...(u.email?{email:u.email}:{}),role:u.role||'member'}:null;},
+    async createSession(id,name,profile={}){name=String(name).slice(0,80);let authVersion=0;await client.atomic(async()=>{const prior=await client.get('users',id);if(prior?.data.status==='suspended')throw failure('accountSuspended',403);authVersion=prior?.data.authVersion||0;await client.commit([write('users',id,{...prior?.data,id,name,...(profile.email?{email:profile.email}:{}),role:prior?.data.role||'member',status:'active',authVersion,created:prior?.data.created||now(),lastLogin:now()},prior)]);});const token=randomBytes(32).toString('base64url');await put('sessions',hash(token),{user_id:id,name,authVersion,expires:now()+7*86400000});return token;},
     async destroySession(token){if(!token)return;await client.atomic(async()=>{const prior=await client.get('sessions',hash(token));if(prior)await client.commit([{collection:'sessions',id:hash(token),remove:true,prior}]);});},
     seedSamples(){throw failure('productionSamplesDisabled');},
     async rememberContext(c){const prior=await client.get('contexts',c.id);if(prior?.data.name===c.name&&prior?.data.type===c.type)return;await put('contexts',c.id,c);},
@@ -82,7 +83,15 @@ export function createFirestoreStore(client,{now=Date.now}={}){
     listReports:()=>client.list('reports',{order:'created',limit:200}),
     async moderate(reportId,hide){return client.atomic(async()=>{const r=await client.get('reports',reportId);if(!r)return false;const p=hide?await client.get('posts',r.data.postId):null;await client.commit([write('reports',reportId,{...r.data,status:'resolved'},r),...(p?[write('posts',r.data.postId,{...p.data,status:'hidden'},p)]:[])]);return true;});},
     async consumeApi(provider,limit,period){const day=period||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now())),id=`${provider}:${day}`;return client.atomic(async()=>{const prior=await client.get('usage',id),count=prior?.data.count||0;if(count>=limit)throw failure('quotaReached',429);await client.commit([write('usage',id,{provider,day,count:count+1},prior)]);});},
-    usage:()=>client.list('usage',{order:'day',limit:20}),
+    usage:(limit=20)=>client.list('usage',{order:'day',limit:Math.min(500,limit)}),
+    async recordMetric(event){const e=metricEvent(event,now()),id=`${e.provider}:${e.day}:${e.period}`;await client.atomic(async()=>{const prior=await client.get('metrics',id);await client.commit([write('metrics',id,accumulateMetric(prior?.data,e),prior)]);});},
+    metrics:()=>client.list('metrics',{order:'day',limit:500}),
+    adminUsers:()=>client.list('users',{limit:500}),
+    async adminUserUpdate(id,update){await client.atomic(async()=>{const prior=await client.get('users',id);if(!prior)throw failure('notFound',404);const {action,actor,...patch}=update;await client.commit([write('users',id,{...prior.data,...patch,...(action==='revoke'||patch.status==='suspended'?{authVersion:(prior.data.authVersion||0)+1}:{}),updated:now()},prior),write('audit',randomUUID(),{actor,target:id,action:action||'userUpdate',changes:patch,created:now()},null)]);});},
+    control:provider=>get('controls',provider),
+    controls:()=>client.list('controls',{limit:20}),
+    async setControl(provider,value,actor){await client.atomic(async()=>{const prior=await client.get('controls',provider);await client.commit([write('controls',provider,{...value,provider,updated:now()},prior),write('audit',randomUUID(),{actor,target:provider,action:'apiControl',changes:value,created:now()},null)]);});},
+    audit:()=>client.list('audit',{order:'created',limit:50}),
     close(){}
   };
 }

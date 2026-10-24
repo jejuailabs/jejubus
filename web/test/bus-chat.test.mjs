@@ -24,7 +24,7 @@ test('chat requires fresh provider data, preserves direction choices and cites o
  const calls=[],consumed=[];let lookups=0;
  const catalog={routes:async q=>{lookups++;assert.equal(q,'201');return {source:'TAGO',receivedAt:'2026-10-24T02:00:00Z',total:2,routes:[{id:'R-UP',number:'201',start:'A',end:'B'},{id:'R-DOWN',number:'201',start:'B',end:'A'}]};},positions:()=>{throw Error('Must not guess direction');}};
  const chat=createBusChat(config,{catalog,consume:async(...args)=>consumed.push(args),fetchImpl:async(url,options)=>{
-  assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(options.body);calls.push(body);return response(calls.length===1?call('route_status',{query:'201',routeId:null}):answer('운행 방향을 선택해주세요.'));
+  assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(options.body);calls.push(body);return response(calls.length===1?call('route_status',{query:'201번 버스',routeId:null}):answer('운행 방향을 선택해주세요.'));
  }});
  const result=await chat.answer(input);assert.equal(lookups,1);assert.equal(result.choices.length,2);assert.equal(result.sources[0].provider,'TAGO');assert.equal(result.sources[0].receivedAt,'2026-10-24T02:00:00Z');
  assert.match(calls[1].input.at(-1).output,/R-DOWN/);assert.equal(calls[0].store,false);assert.equal(calls[0].max_output_tokens,900);assert.equal(calls[0].parallel_tool_calls,false);assert.equal(calls[0].reasoning.effort,'none');assert.equal(calls[0].tool_choice,'required');
@@ -34,7 +34,7 @@ test('chat requires fresh provider data, preserves direction choices and cites o
 test('selected route refreshes positions and stops, failed live query is never replaced by invented positions',async()=>{
  let requests=0;const catalog={positions:async id=>{assert.equal(id,'R-UP');throw Object.assign(Error(),{key:'providerUnavailable'});},routeStops:async()=>({source:'TAGO',receivedAt:'2026-10-24T02:00:00Z',stops:[{id:'S-A',name:'실제 정류장'}]})};
  const chat=createBusChat(config,{catalog,consume:async()=>{},fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);requests++;if(requests===1)return response(call('route_status',{query:'201',routeId:'R-UP'}));const evidence=JSON.parse(body.input.at(-1).output);assert.equal(evidence.sources[0].data.error,'providerUnavailable');assert.equal('vehicles' in evidence.sources[0].data,false);assert.equal(evidence.sources[1].data.stops[0].name,'실제 정류장');return response(answer('차량 위치는 현재 조회하지 못했습니다.',['S1','S2']));}});
- assert.match((await chat.answer(input)).answer,/조회하지 못/);
+ assert.match((await chat.answer({...input,context:{route:{id:'R-UP',name:'201'}}})).answer,/조회하지 못/);
 });
 
 test('journey tool respects ambiguous places and only uses verified endpoint coordinates for routing',async()=>{

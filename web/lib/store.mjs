@@ -1,3 +1,4 @@
+import {metricEvent,accumulateMetric} from './telemetry.mjs';
 import { DatabaseSync } from 'node:sqlite';
 import { randomBytes, createHash, randomUUID } from 'node:crypto';
 import { seedPosts } from '../public/data.js';
@@ -15,9 +16,14 @@ export function createStore(path=':memory:',{seed=true}={}) {
     CREATE TABLE IF NOT EXISTS blocks(user_id TEXT NOT NULL REFERENCES users(id),blocked_id TEXT NOT NULL REFERENCES users(id),PRIMARY KEY(user_id,blocked_id));
     CREATE TABLE IF NOT EXISTS request_keys(user_id TEXT NOT NULL,request_id TEXT NOT NULL,post_id TEXT NOT NULL,PRIMARY KEY(user_id,request_id));
     CREATE TABLE IF NOT EXISTS api_usage(provider TEXT NOT NULL,day TEXT NOT NULL,count INTEGER NOT NULL,PRIMARY KEY(provider,day));
-    CREATE TABLE IF NOT EXISTS contexts(id TEXT PRIMARY KEY,name TEXT NOT NULL,type TEXT NOT NULL);`);
+    CREATE TABLE IF NOT EXISTS contexts(id TEXT PRIMARY KEY,name TEXT NOT NULL,type TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS metrics(id TEXT PRIMARY KEY,data TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS controls(provider TEXT PRIMARY KEY,data TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,data TEXT NOT NULL);`);
   db.exec('PRAGMA busy_timeout=5000');
   for(const table of ['posts','replies'])if(!db.prepare(`PRAGMA table_info(${table})`).all().some(c=>c.name==='status'))db.exec(`ALTER TABLE ${table} ADD COLUMN status TEXT NOT NULL DEFAULT 'published'`);
+  for(const [name,type]of Object.entries({email:"TEXT",role:"TEXT NOT NULL DEFAULT 'member'",status:"TEXT NOT NULL DEFAULT 'active'",auth_version:"INTEGER NOT NULL DEFAULT 0",created:"INTEGER",last_login:"INTEGER"}))if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name===name))db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);
+  if(!db.prepare('PRAGMA table_info(sessions)').all().some(c=>c.name==='auth_version'))db.exec('ALTER TABLE sessions ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 0');
   const encode = x=>JSON.stringify(x);
   const decode = x=>{try{return JSON.parse(x);}catch{return x;}};
   const upsertUser = (id,name)=>db.prepare('INSERT INTO users(id,name) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name').run(id,name);
@@ -35,13 +41,15 @@ export function createStore(path=':memory:',{seed=true}={}) {
   if(seed)seedSamples();
   const user = reqToken => {
     if (!reqToken) return null;
-    return db.prepare('SELECT u.id,u.name FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires>?').get(hash(reqToken),Date.now()) || null;
+    return db.prepare("SELECT u.id,u.name,u.email,u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires>? AND u.status='active' AND s.auth_version=u.auth_version").get(hash(reqToken),Date.now()) || null;
   };
-  function createSession(id,name) {
+  function createSession(id,name,profile={}) {
+    if(db.prepare('SELECT status FROM users WHERE id=?').get(id)?.status==='suspended')throw Object.assign(Error('accountSuspended'),{key:'accountSuspended',status:403});
     upsertUser(id,String(name).slice(0,80));
+    db.prepare('UPDATE users SET email=coalesce(?,email),created=coalesce(created,?),last_login=? WHERE id=?').run(profile.email||null,Date.now(),Date.now(),id);
     const token=randomBytes(32).toString('base64url');
     db.prepare('DELETE FROM sessions WHERE expires<=?').run(Date.now());
-    db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(hash(token),id,Date.now()+7*86400000);
+    db.prepare('INSERT INTO sessions VALUES(?,?,?,?)').run(hash(token),id,Date.now()+7*86400000,db.prepare('SELECT auth_version FROM users WHERE id=?').get(id).auth_version);
     return token;
   }
   const listPosts = (uid,{includeSamples=true}={}) => db.prepare(`SELECT p.*,u.name AS author,
@@ -75,7 +83,15 @@ export function createStore(path=':memory:',{seed=true}={}) {
     listReports:()=>db.prepare('SELECT r.id,r.post_id AS postId,r.reason,r.status,r.created,p.title FROM reports r JOIN posts p ON p.id=r.post_id ORDER BY r.created DESC LIMIT 200').all().map(r=>({...r,title:decode(r.title)})),
     moderate:(reportId,hide)=>{const r=db.prepare('SELECT post_id FROM reports WHERE id=?').get(reportId);if(!r)return false;db.exec('BEGIN IMMEDIATE');try{if(hide)db.prepare("UPDATE posts SET status='hidden' WHERE id=?").run(r.post_id);db.prepare("UPDATE reports SET status='resolved' WHERE id=?").run(reportId);db.exec('COMMIT');return true;}catch(error){db.exec('ROLLBACK');throw error;}},
     consumeApi:(provider,limit,period)=>{const day=period||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const result=db.prepare('INSERT INTO api_usage VALUES(?,?,1) ON CONFLICT(provider,day) DO UPDATE SET count=count+1 WHERE count<?').run(provider,day,limit);if(!result.changes)throw Object.assign(new Error('quotaReached'),{key:'quotaReached',status:429});},
-    usage:()=>db.prepare('SELECT provider,day,count FROM api_usage ORDER BY day DESC LIMIT 20').all(),
+    usage:(limit=20)=>db.prepare('SELECT provider,day,count FROM api_usage ORDER BY day DESC LIMIT ?').all(Math.min(500,limit)),
+    recordMetric:event=>{const e=metricEvent(event),id=`${e.provider}:${e.day}:${e.period}`,prior=db.prepare('SELECT data FROM metrics WHERE id=?').get(id);db.prepare('INSERT INTO metrics VALUES(?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(id,encode(accumulateMetric(prior?decode(prior.data):{},e)));},
+    metrics:()=>db.prepare('SELECT data FROM metrics ORDER BY id DESC LIMIT 500').all().map(r=>decode(r.data)),
+    adminUsers:()=>db.prepare('SELECT id,name,email,role,status,created,last_login AS lastLogin FROM users WHERE id NOT LIKE ? ORDER BY last_login DESC LIMIT 500').all('sample:%'),
+    adminUserUpdate:(id,{action,actor,...patch})=>{if(!db.prepare('SELECT id FROM users WHERE id=?').get(id))throw Object.assign(Error('notFound'),{key:'notFound',status:404});db.exec('BEGIN IMMEDIATE');try{if(patch.status)db.prepare('UPDATE users SET status=? WHERE id=?').run(patch.status,id);if(patch.role)db.prepare('UPDATE users SET role=? WHERE id=?').run(patch.role,id);if(action==='revoke'||patch.status==='suspended')db.prepare('UPDATE users SET auth_version=auth_version+1 WHERE id=?').run(id);db.prepare('INSERT INTO audit VALUES(?,?)').run(randomUUID(),encode({actor,target:id,action:action||'userUpdate',changes:patch,created:Date.now()}));db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}},
+    control:provider=>{const r=db.prepare('SELECT data FROM controls WHERE provider=?').get(provider);return r?decode(r.data):null;},
+    controls:()=>db.prepare('SELECT data FROM controls').all().map(r=>decode(r.data)),
+    setControl:(provider,value,actor)=>{const data={...value,provider,updated:Date.now()};db.prepare('INSERT INTO controls VALUES(?,?) ON CONFLICT(provider) DO UPDATE SET data=excluded.data').run(provider,encode(data));db.prepare('INSERT INTO audit VALUES(?,?)').run(randomUUID(),encode({actor,target:provider,action:'apiControl',changes:value,created:Date.now()}));},
+    audit:()=>db.prepare('SELECT data FROM audit ORDER BY rowid DESC LIMIT 50').all().map(r=>decode(r.data)),
     toggleLike:(uid,id)=>{
       if(db.prepare('SELECT 1 FROM likes WHERE post_id=? AND user_id=?').get(id,uid)) db.prepare('DELETE FROM likes WHERE post_id=? AND user_id=?').run(id,uid);
       else db.prepare('INSERT INTO likes VALUES(?,?)').run(id,uid);

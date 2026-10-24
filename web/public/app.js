@@ -132,7 +132,7 @@ async function handleClick(ev){const el=ev.target.closest('button,a[data-action]
  case 'theme':{const dark=document.documentElement.dataset.theme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';persist('jejubus.theme',dark?'light':'dark');render();break;}
  case 'ai-chat':busChatUI.open();break;
  case 'login':showLogin();break;case 'close':dialog.close();break;
- case 'account':showModal(`<div class="login-modal"><h2>${e(t('hello',{name:state.status.user.name}))}</h2>${setupLink()}${state.status.user.admin?`<button class="text-btn" data-action="admin">${t('admin')}</button>`:''}<button class="primary" data-action="logout">${t('logout')}</button></div>`);break;
+ case 'account':showModal(`<div class="login-modal"><h2>${e(t('hello',{name:state.status.user.name}))}</h2>${setupLink()}${state.status.user.admin?`<a class="text-btn" href="/admin">${t('dashboard')}</a>`:''}${state.status.user.admin?`<button class="text-btn" data-action="admin">${t('admin')}</button>`:''}<button class="primary" data-action="logout">${t('logout')}</button></div>`);break;
  case 'logout':await api('/api/logout',postOptions({}));state.status.user=null;dialog.close();await reloadPosts();break;
  case 'compose':showCompose();break;case 'admin':await showAdmin();break;
  case 'clear-search':state.query='';state.to=null;document.querySelector('#search-input').value='';document.querySelector('#search-input').focus();break;

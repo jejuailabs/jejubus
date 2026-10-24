@@ -54,7 +54,7 @@ export function normalizeKakao(data){
   }).filter(Boolean);
 }
 
-export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},now=Date.now}={}){
+export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},observe=async()=>{},now=Date.now}={}){
   const cache=new Map(),inflight=new Map();
   async function cached(key,ttl,run){
     if(cache.get(key)?.expires>now())return cache.get(key).value;
@@ -63,11 +63,13 @@ export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},now=Date.no
     inflight.set(key,promise);try{return await promise;}finally{inflight.delete(key);}
   }
   async function request(url,options={}){
+    const started=now(),provider=url.hostname==='apis.data.go.kr'?'tago':url.hostname==='api.odsay.com'?'odsay':url.pathname.includes('/routing/')?'kakao-routing':'kakao';let ok=false;
     try{
       const response=await fetchImpl(url,{...options,signal:AbortSignal.timeout(10000)});
       if(!response.ok)throw new ServiceError(response.status===429?'quotaReached':response.status===401||response.status===403?'providerPermission':'providerUnavailable');
-      return await response.json();
+      const result=await response.json();ok=provider==='tago'?['00','0'].includes(String(result.response?.header?.resultCode)):true;return result;
     }catch(error){console.warn(JSON.stringify({kind:'providerFailure',provider:url.hostname,operation:url.pathname,status:error.status||null,code:error.cause?.code||error.name}));if(error instanceof ServiceError)throw error;throw new ServiceError('providerUnavailable');}
+    finally{try{await observe({provider,operation:url.pathname,ok,durationMs:now()-started});}catch{console.warn(JSON.stringify({kind:'usageRecordingFailed',provider}));}}
   }
   async function tago(service,operation,params={},ttl=15000){
     if(!config.tagoKey)throw new ServiceError('tagoNotConfigured');

@@ -6,6 +6,7 @@ import {createFirestoreClient,createFirestoreStore} from './lib/firestore.mjs';
 import {createGoogleAuth} from './lib/auth.mjs';
 import {createCatalog,ServiceError,coordinate} from './lib/catalog.mjs';
 import {configuration,createSettings} from './lib/settings.mjs';
+import {createAdminService,adminOf} from './lib/admin.mjs';
 import {createBusChat} from './lib/bus-chat.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
@@ -27,17 +28,18 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   }
   const authOptions={fetchImpl,stateStore:store.putOAuth?store:null};
   let auth=createGoogleAuth(config,authOptions);
-  let catalog=createCatalog(config,{fetchImpl,consume:store.consumeApi});
-  let busChat=createBusChat(config,{catalog,consume:store.consumeApi,fetchImpl});
+  const administration=createAdminService(config,store);
+  let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
+  let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
-    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:store.consumeApi});busChat=createBusChat(config,{catalog,consume:store.consumeApi,fetchImpl});
+    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   }});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
   function throttle(key,max){const now=Date.now();for(const [k,l]of limits)if(l.until<now)limits.delete(k);const l=limits.get(key)||{count:0,until:now+60000};l.count++;limits.set(key,l);if(l.count>max)fail('rateLimited',429);}
   const cookie=(name,value,age)=>`${name}=${value}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${age}${config.origin.startsWith('https:')?'; Secure':''}`;
-  const admin=user=>!!user&&config.adminSubjects.includes(user.id.replace(/^google:/,''));
+  const admin=user=>adminOf(config,user);
   async function validatePost(p){
     if(!p||typeof p.title!=='string'||typeof p?.body!=='string'||p.title.trim().length<2||p.title.trim().length>100||p.body.trim().length<5||p.body.trim().length>2000||!categories.includes(p.category)||typeof p.route!=='string'||p.route.length>120)fail('titleValidation');
     if(!contexts.has(p.route)&&!await store.context(p.route)&&!(config.showSamples&&['r01','r02','r03'].includes(p.route)))fail('selectContext');
@@ -70,7 +72,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         const result=await auth.start();res.setHeader('Set-Cookie',cookie('jeju_oauth',result.binding,600));return redirect(result.url);
       }
       if(path==='/auth/google/callback'&&method==='GET'){
-        try{const identity=await auth.finish({state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding:cookies(req).jeju_oauth});if(token)await store.destroySession(token);const session=await store.createSession(identity.id,identity.name);res.setHeader('Set-Cookie',[cookie('jeju_session',session,7*86400),cookie('jeju_oauth','',0)]);return redirect('/');}
+        try{const identity=await auth.finish({state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding:cookies(req).jeju_oauth});if(token)await store.destroySession(token);const session=await store.createSession(identity.id,identity.name,{email:identity.email});res.setHeader('Set-Cookie',[cookie('jeju_session',session,7*86400),cookie('jeju_oauth','',0)]);return redirect('/');}
         catch{res.setHeader('Set-Cookie',cookie('jeju_oauth','',0));return redirect('/?auth=failed');}
       }
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
@@ -90,7 +92,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
       if(path==='/api/intent'&&method==='POST'){const p=await jsonBody(req);if(typeof p?.input!=='string'||!p.input.trim()||p.input.length>500)fail('queryRequired');return send(200,await catalog.intent(p.input));}
-      if(path==='/api/chat'&&method==='POST'){if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,4);return send(200,await busChat.answer(await jsonBody(req)));}
+      if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,4);return send(200,await busChat.answer(await jsonBody(req)));}
       if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,contextName:(await store.context(p.route))?.name||null})))});
       if(path==='/api/posts'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);const p=await validatePost(await jsonBody(req));return send(201,{id:await store.createPost(user.id,p)});}
       const post=path.match(/^\/api\/posts\/([\w-]+)(?:\/(replies|like|report|block))?$/);
@@ -112,12 +114,17 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       const reply=path.match(/^\/api\/replies\/([\w-]+)$/);
       if(reply&&method==='DELETE'){if(!user)fail('loginRequired',401);if(!await store.deleteReply(user.id,reply[1]))fail('forbidden',403);return send(200,{ok:true});}
+      if(path==='/api/admin/dashboard'&&method==='GET')return send(200,await administration.dashboard(user));
+      const member=path.match(/^\/api\/admin\/users\/(.+)$/);
+      if(member&&method==='POST')return send(200,await administration.updateUser(user,decodeURIComponent(member[1]),await jsonBody(req)));
+      const provider=path.match(/^\/api\/admin\/providers\/([\w-]+)$/);
+      if(provider&&method==='PUT')return send(200,await administration.updateProvider(user,provider[1],await jsonBody(req)));
       if(path==='/api/admin/reports'&&method==='GET'){if(!admin(user))fail('forbidden',403);return send(200,{reports:await store.listReports()});}
       const report=path.match(/^\/api\/admin\/reports\/([\w-]+)$/);
       if(report&&method==='POST'){if(!admin(user))fail('forbidden',403);const p=await jsonBody(req);if(typeof p?.hide!=='boolean')fail('invalidRequest');if(!await store.moderate(report[1],p.hide))fail('notFound',404);return send(200,{ok:true});}
       if(path.startsWith('/api/'))fail('notFound',404);
       if(!['GET','HEAD'].includes(method))fail('methodNotAllowed',405);
-      const pathname=path==='/'?'/index.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
+      const pathname=path==='/'?'/index.html':path==='/admin'?'/admin.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);

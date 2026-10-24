@@ -46,7 +46,7 @@ export function createGoogleAuth(config,{fetchImpl=fetch,stateStore=null}={}) {
       const header=JSON.parse(Buffer.from(String(result.id_token).split('.')[0],'base64url'));
       if(!cachedKeys.keys.some(k=>k.kid===header.kid)) cachedKeys={...(await getJson('https://www.googleapis.com/oauth2/v3/certs')),expires:Date.now()+3600000};
       const claims=verifyIdToken(result.id_token,cachedKeys.keys,{audience:config.googleClientId,nonce:request.nonce});
-      return {id:`google:${claims.sub}`,name:String(claims.name||'Jeju rider').slice(0,80)};
+      return {id:`google:${claims.sub}`,name:String(claims.name||'Jeju rider').slice(0,80),...(claims.email_verified===true&&typeof claims.email==='string'?{email:claims.email.toLowerCase().slice(0,254)}:{})};
     }
   };
 }
