@@ -7,8 +7,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server.mjs",
-    "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server.mjs",
+    "dev": "node --env-file-if-exists=.env --env-file-if-exists=.env.local dev.mjs",
+    "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local dev.mjs",
     "test": "node --test test/*.test.mjs",
     "check": "node check.mjs"
   },

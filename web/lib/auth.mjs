@@ -13,7 +13,7 @@ export function verifyIdToken(jwt,keys,{audience,nonce,now=Date.now()}) {
   if(!['https://accounts.google.com','accounts.google.com'].includes(claims.iss)||!audiences.includes(audience)||(audiences.length>1&&claims.azp!==audience)||!Number.isFinite(claims.exp)||claims.exp<=now/1000||!Number.isFinite(claims.iat)||claims.iat>now/1000+60||claims.nonce!==nonce||typeof claims.sub!=='string'||!claims.sub||claims.sub.length>255) throw new Error('Invalid claims');
   return claims;
 }
-export function createGoogleAuth(config,{fetchImpl=fetch}={}) {
+export function createGoogleAuth(config,{fetchImpl=fetch,stateStore=null}={}) {
   const pending=new Map();
   const enabled=!!(config.googleClientId&&config.googleClientSecret);
   const redirectUri=`${config.origin}/auth/google/callback`;
@@ -30,12 +30,14 @@ export function createGoogleAuth(config,{fetchImpl=fetch}={}) {
       for(const [key,p] of pending) if(p.expires<Date.now()) pending.delete(key);
       if(pending.size>1000) throw new Error('Too many sign-in requests');
       const state=token(),binding=token(),nonce=token(),verifier=token();
-      pending.set(state,{binding,nonce,verifier,expires:Date.now()+600000});
+      const request={binding,nonce,verifier,expires:Date.now()+600000};
+      if(!stateStore)pending.set(state,request);
       const query=new URLSearchParams({client_id:config.googleClientId,redirect_uri:redirectUri,response_type:'code',scope:'openid profile email',state,nonce,code_challenge:createHash('sha256').update(verifier).digest('base64url'),code_challenge_method:'S256',prompt:'select_account'});
-      return {url:`https://accounts.google.com/o/oauth2/v2/auth?${query}`,binding};
+      const result={url:`https://accounts.google.com/o/oauth2/v2/auth?${query}`,binding};
+      return stateStore?stateStore.putOAuth(state,request).then(()=>result):result;
     },
     async finish({state,code,binding}){
-      const request=pending.get(state);
+      const request=stateStore?await stateStore.takeOAuth(state,binding):pending.get(state);
       if(!request||request.expires<Date.now()||request.binding!==binding||!code) throw new Error('Invalid OAuth state');
       pending.delete(state);
       const result=await getJson('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:config.googleClientId,client_secret:config.googleClientSecret,code,grant_type:'authorization_code',redirect_uri:redirectUri,code_verifier:request.verifier})});

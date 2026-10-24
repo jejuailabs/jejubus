@@ -1,0 +1,9 @@
+.git
+.vercel
+node_modules
+web/node_modules
+web/data
+web/artifacts
+web/.env
+web/.env.*
+**/*firebase-adminsdk*.json

@@ -19,4 +19,4 @@ npm run dev
 
 GitHub: https://github.com/jejuailabs/jejubus
 
-Vercel 자동 배포 연결은 사용자가 준비한 프로젝트를 사용합니다. 로컬 SQLite는 Vercel의 영속 DB로 사용할 수 없으므로 배포 전 외부 DB 연결과 환경변수를 검증해야 합니다. 키 인식과 실제 공급자 호출 성공은 구분합니다.
+Vercel 자동 배포 연결은 사용자가 준비한 프로젝트를 사용합니다. 운영은 승인된 기존 Firebase Firestore를 사용하고, 로컬 개발용 SQLite는 배포에서 분리합니다. Google OAuth 상태·세션과 API 사용량은 Firestore에서 서버 간 공유합니다. 환경변수 27개 등록 및 실제 DB/교통 API/로컬 Google 로그인을 검증했습니다. 배포와 운영 검증 기록은 [환경변수 연결 현황](내MVP_설계문서/10_환경변수_연결현황.md)에 있습니다.

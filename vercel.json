@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": "web/public/**",
+      "excludeFiles": "web/data/**",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [{"source": "/:path*", "destination": "/api/index?__jeju_path=/:path*"}]
+}

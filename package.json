@@ -1,0 +1,11 @@
+{
+  "name": "jejubus",
+  "private": true,
+  "type": "module",
+  "engines": {"node": "22.x"},
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "test": "npm --prefix web test",
+    "check": "npm --prefix web run check"
+  }
+}

@@ -10,3 +10,5 @@ web/artifacts/
 service-account*.json
 firebase-admin*.json
 .vercel/
+
+.vercel
