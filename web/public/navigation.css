@@ -6,4 +6,8 @@
 @media(max-width:760px),(max-width:1020px) and (max-height:500px){.drive-page .mobile-nav{position:fixed;bottom:0;left:0;right:0}.drive-fields input{font-size:16px}.drive-page .mobile-nav .nav-item span{white-space:normal;overflow:visible;line-height:1.2}.drive-page .drive-row button{min-height:44px}}
 
 #drive-form>.drive-row{display:grid;grid-template-columns:1fr 1fr}#drive-priority{grid-column:1/-1;width:100%}#drive-form .drive-row .text-btn{width:100%;justify-content:center;min-height:36px;margin:0}
+.drive-page .drive-fields input:focus-visible{outline:none}
+.drive-fields .place-field:first-child>label{border-radius:11px 11px 0 0}
+.drive-fields .place-field:last-child>label{border-radius:0 0 11px 11px}
+.drive-fields .place-field:focus-within>label{background:var(--surface-blue);box-shadow:inset 3px 0 0 var(--blue)}
 @media(max-width:1020px) and (max-height:500px){.drive-map-wrap{height:190px;min-height:190px}.drive-turn{padding:9px;min-height:60px}.drive-demo-badge{top:86px}}
