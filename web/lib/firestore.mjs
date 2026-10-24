@@ -1,5 +1,6 @@
 import {readFile} from 'node:fs/promises';
 import {createHash,randomBytes,randomUUID,sign} from 'node:crypto';
+import {setTimeout as delay} from 'node:timers/promises';
 
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const failure=(key='storageUnavailable',status=503)=>Object.assign(Error(key),{key,status});
@@ -29,7 +30,7 @@ export async function createFirestoreClient(env,{fetchImpl=fetch,now=Date.now}={
   async function request(suffix,body){
     const response=await fetchImpl(base+suffix,{method:body===undefined?'GET':'POST',signal:AbortSignal.timeout(10000),headers:{Authorization:`Bearer ${await accessToken()}`,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});
     if(response.status===404&&body===undefined)return null;
-    if(!response.ok){const error=failure();error.retryable=[409,412].includes(response.status);try{error.providerCode=(await response.json()).error?.status;}catch{}throw error;}return response.json();
+    if(!response.ok){const error=failure();error.retryable=[409,412].includes(response.status);try{error.providerCode=(await response.json()).error?.status;}catch{}if(suffix===':commit'&&error.providerCode==='FAILED_PRECONDITION')error.retryable=true;throw error;}return response.json();
   }
   const collection=name=>`${namespace}_${name}`;
   const path=(name,id)=>`${collection(name)}/${hash(String(id))}`;
@@ -39,7 +40,7 @@ export async function createFirestoreClient(env,{fetchImpl=fetch,now=Date.now}={
     async getMany(name,ids){const rows=await request(':batchGet',{documents:ids.map(id=>`${database}/documents/${path(name,id)}`)});const byPath=new Map(rows.filter(x=>x.found).map(x=>[x.found.name,unpack(x.found)]));return ids.map(id=>byPath.get(`${database}/documents/${path(name,id)}`)||null);},
     async list(name,{field,value,order,limit=100}={}){const query={from:[{collectionId:collection(name)}],limit};if(field)query.where={fieldFilter:{field:{fieldPath:field},op:'EQUAL',value:encode(value)}};if(order)query.orderBy=[{field:{fieldPath:order},direction:'DESCENDING'}];return (await request(':runQuery',{structuredQuery:query})).filter(x=>x.document).map(x=>unpack(x.document).data);},
     async commit(writes){if(!writes.length)return;await request(':commit',{writes:writes.map(w=>w.remove?{delete:`${database}/documents/${path(w.collection,w.id)}`,currentDocument:w.prior?{updateTime:w.prior.version}:{exists:false}}:{update:{name:`${database}/documents/${path(w.collection,w.id)}`,fields:Object.fromEntries(Object.entries(w.data).map(([k,v])=>[k,encode(v)]))},currentDocument:w.prior?{updateTime:w.prior.version}:{exists:false}})});},
-    async atomic(run){for(let attempt=0;attempt<5;attempt++){try{return await run();}catch(error){if(!error.retryable||attempt===4)throw error;}}}
+    async atomic(run){for(let attempt=0;attempt<5;attempt++){try{return await run();}catch(error){if(!error.retryable||attempt===4)throw error;await delay(50*2**attempt+Math.floor(Math.random()*50));}}}
   };return client;
 }
 

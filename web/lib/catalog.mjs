@@ -65,7 +65,7 @@ export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},now=Date.no
       const response=await fetchImpl(url,{...options,signal:AbortSignal.timeout(10000)});
       if(!response.ok)throw new ServiceError(response.status===429?'quotaReached':response.status===401||response.status===403?'providerPermission':'providerUnavailable');
       return await response.json();
-    }catch(error){if(error instanceof ServiceError)throw error;throw new ServiceError('providerUnavailable');}
+    }catch(error){console.warn(JSON.stringify({kind:'providerFailure',provider:url.hostname,operation:url.pathname,status:error.status||null,code:error.cause?.code||error.name}));if(error instanceof ServiceError)throw error;throw new ServiceError('providerUnavailable');}
   }
   async function tago(service,operation,params={},ttl=15000){
     if(!config.tagoKey)throw new ServiceError('tagoNotConfigured');

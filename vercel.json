@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "framework": null,
+  "regions": ["icn1"],
   "functions": {
     "api/index.mjs": {
       "includeFiles": "web/public/**",
@@ -9,5 +10,8 @@
       "maxDuration": 30
     }
   },
-  "rewrites": [{"source": "/:path*", "destination": "/api/index?__jeju_path=/:path*"}]
+  "rewrites": [
+    {"source": "/", "destination": "/api/index?__jeju_path=/"},
+    {"source": "/:path*", "destination": "/api/index?__jeju_path=/:path*"}
+  ]
 }

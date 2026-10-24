@@ -118,7 +118,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);
-    }catch(error){send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
+    }catch(error){if((error.status||500)>=500&&error.code!=='ENOENT')console.warn(JSON.stringify({kind:'serviceFailure',key:error.key||'serverError',providerCode:error.providerCode||null}));send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
   };
   const server=http.createServer(handler);
   return {server,handler,store,config};
