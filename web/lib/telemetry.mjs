@@ -1,7 +1,7 @@
 export const koreaDay=(at=Date.now())=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(at));
 const int=value=>Number.isFinite(Number(value))?Math.max(0,Math.floor(Number(value))):0;
 export function metricEvent(event,at=Date.now()){
- if(!['tago','kakao','kakao-routing','odsay','ai'].includes(event.provider))throw Error('Invalid metric provider');
+ if(!['tago','kakao','kakao-routing','kakao-driving','odsay','ai'].includes(event.provider))throw Error('Invalid metric provider');
  const inputTokens=int(event.usage?.input_tokens),outputTokens=int(event.usage?.output_tokens),cachedTokens=Math.min(inputTokens,int(event.usage?.input_tokens_details?.cached_tokens));
  return {provider:event.provider,day:koreaDay(at),period:event.period||'',operation:String(event.operation||'request').replace(/[^\w/-]/g,'').slice(0,100),ok:event.ok===true,reported:!!event.usage,inputTokens,outputTokens,cachedTokens,
   estimatedMicroUsd:event.provider==='ai'?Math.ceil((inputTokens-cachedTokens)*.75+cachedTokens*.075+outputTokens*4.5):0,durationMs:int(event.durationMs),at};

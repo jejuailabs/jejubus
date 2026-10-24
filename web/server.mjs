@@ -8,6 +8,7 @@ import {createCatalog,ServiceError,coordinate} from './lib/catalog.mjs';
 import {configuration,createSettings} from './lib/settings.mjs';
 import {createAdminService,adminOf} from './lib/admin.mjs';
 import {createBusChat} from './lib/bus-chat.mjs';
+import {createNavigation} from './lib/navigation.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -29,6 +30,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const authOptions={fetchImpl,stateStore:store.putOAuth?store:null};
   let auth=createGoogleAuth(config,authOptions);
   const administration=createAdminService(config,store);
+  const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
@@ -58,7 +60,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       const token=cookies(req).jeju_session,user=path.startsWith('/api/')||path.startsWith('/auth/')?await store.user(token):null;
       if(['POST','PUT','PATCH','DELETE'].includes(method)&&req.headers.origin!==config.origin)fail('invalidOrigin',403);
       if(path.startsWith('/api/')||path.startsWith('/auth/'))throttle(`ip:${req.socket.remoteAddress}`,120);
-      if(path==='/api/status'&&method==='GET'){const capabilities={...catalog.capabilities(),ai:busChat.enabled()};return send(200,{googleConfigured:auth.enabled,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user)}:null});}
+      if(path==='/api/status'&&method==='GET'){const capabilities={...catalog.capabilities(),ai:busChat.enabled(),navigation:navigation.enabled()};return send(200,{googleConfigured:auth.enabled,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user)}:null});}
+      if(path==='/api/navigation/route'&&method==='POST'){throttle(`drive:${req.socket.remoteAddress}`,10);return send(200,{route:await navigation.route(await jsonBody(req))});}
+      if(path==='/api/navigation/recommend'&&method==='POST'){throttle(`spots:${req.socket.remoteAddress}`,2);return send(200,await navigation.recommend(await jsonBody(req)));}
       if(path.startsWith('/api/setup')){
         if(!config.setupAllowed||!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress))fail('notFound',404);
         if(path==='/api/setup'&&method==='GET')return send(200,{token:settings.token,...settings.status(),usage:await store.usage(),callback:`${config.origin}/auth/google/callback`});
@@ -124,7 +128,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(report&&method==='POST'){if(!admin(user))fail('forbidden',403);const p=await jsonBody(req);if(typeof p?.hide!=='boolean')fail('invalidRequest');if(!await store.moderate(report[1],p.hide))fail('notFound',404);return send(200,{ok:true});}
       if(path.startsWith('/api/'))fail('notFound',404);
       if(!['GET','HEAD'].includes(method))fail('methodNotAllowed',405);
-      const pathname=path==='/'?'/index.html':path==='/admin'?'/admin.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
+      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);

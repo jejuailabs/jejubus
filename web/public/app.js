@@ -1,5 +1,6 @@
 import {locales,translate} from './i18n.js';
 import {icon} from './icons.js';
+import {navigationText} from './navigation-copy.js';
 import {mapMarkup,destroyMap,mountMap,mapAction,locateOnMap,updateMapData} from './map.js';
 import {createBusChatUI} from './bus-chat.js';
 import {createPlaceLookup,attachPlaceAutocomplete} from './place-autocomplete.js';
@@ -22,7 +23,7 @@ const errorBox=key=>`<div class="notice error-card" role="alert">${icon('info')}
 const time=at=>at?new Date(at).toLocaleTimeString(state.locale,{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'—';
 const sorted=()=>[...state.paths].filter(p=>!state.noTransfers||p.transfers===0).sort((a,b)=>(state.sort==='distance'?(a.totalMeters??Infinity)-(b.totalMeters??Infinity):state.sort==='walking'?a.walkingMeters-b.walkingMeters:state.sort==='transfers'?a.transfers-b.transfers:a.totalMinutes-b.totalMinutes)||a.totalMinutes-b.totalMinutes);
 const busChatUI=createBusChatUI({dialog,t,request:api,getStatus:()=>state.status,getContext:()=>({...(state.route?{route:{id:state.route.id,name:state.route.number}}:{}),...(state.stop?{stop:{id:state.stop.id,name:state.stop.name}}:{}),...(state.from?{from:state.from}:{}),...(state.to?{to:state.to}:{})}),onLogin:showLogin,onRoute:async(id,number)=>{state.route={id,number:number||id};state.view='map';state.mode='route';await selectRoute(id);}});
-function navMarkup(){return ['explore','liveMap','community','myBus'].map((key,i)=>`<button class="nav-item ${state.view===['explore','map','community','favorites'][i]?'active':''}" data-view="${['explore','map','community','favorites'][i]}">${icon(['search','bus','chat','star'][i])}<span>${t(key)}</span></button>`).join('')+`<button class="nav-item" data-action="ai-chat">${icon('sparkles')}<span>${t('aiChat')}</span></button>`;}
+function navMarkup(){return ['explore','liveMap','community','myBus'].map((key,i)=>`<button class="nav-item ${state.view===['explore','map','community','favorites'][i]?'active':''}" data-view="${['explore','map','community','favorites'][i]}">${icon(['search','bus','chat','star'][i])}<span>${t(key)}</span></button>${i===1?`<a class="nav-item" href="/navigation">${icon('locate')}<span>${navigationText(state.locale,'navigation')}</span></a>`:''}`).join('')+`<button class="nav-item" data-action="ai-chat">${icon('sparkles')}<span>${t('aiChat')}</span></button>`;}
 function contextName(value){if(value==='general')return t('general');if(value.startsWith('route:')){const r=[state.route,...state.favorites,...(state.results?.kind==='routes'?state.results.items:[])].find(r=>r&&`route:${r.id}`===value);return `${t('route')} ${r?.number||value.slice(6)}`;}return `${t('stopMode')} ${state.stop&&value===`stop:${state.stop.id}`?state.stop.name:value.slice(5)}`;}
 function contexts(){return [...new Set(['general',state.context,...state.favorites.map(r=>`route:${r.id}`),...(state.route?[`route:${state.route.id}`]:[]),...(state.stop?[`stop:${state.stop.id}`]:[])])];}
 function routeCard(r){const saved=state.favorites.some(s=>s.id===r.id);return `<article class="journey-card"><button class="journey-main" data-route="${e(r.id)}"><span class="route-chip">${e(r.number)}</span><h3>${e(r.start||'')} ${r.end?'→':''} ${e(r.end||'')}</h3><small>${e(r.type||'TAGO')}</small></button><button class="save-route ${saved?'is-saved':''}" data-save="${e(r.id)}" aria-label="${t(saved?'saved':'save')} ${e(r.number)}" aria-pressed="${saved}">${icon('star')}</button></article>`;}
@@ -153,5 +154,9 @@ document.addEventListener('click',handleClick);
 dialog.addEventListener('click',ev=>{if(ev.target===dialog){const r=dialog.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)dialog.close();}});
 setInterval(()=>{if(!document.hidden&&['explore','map'].includes(state.view)&&(state.route||state.stop))refreshLive();},20000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&['explore','map'].includes(state.view))refreshLive();});
+const entryView=new URLSearchParams(location.search).get('view');
+if(['explore','map','community','favorites'].includes(entryView)){state.view=entryView;state.pane=entryView==='community'?'community':entryView==='favorites'?'map':'search';if(entryView==='map')state.mode='route';}
 render();try{state.status=await api('/api/status');}catch{toast(t('connectionError'));}await reloadPosts();
 const authStatus=new URLSearchParams(location.search).get('auth');if(authStatus){history.replaceState({},'',location.pathname);if(authStatus==='not-configured')showLogin();else toast(t('loginFailed'));}
+
+if(entryView==='ai')busChatUI.open();

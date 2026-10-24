@@ -9,6 +9,8 @@ export function configuration(env){return {
   tagoKey:env.TAGO_SERVICE_KEY||'',cityCode:env.TAGO_CITY_CODE||'',stopId:env.TAGO_STOP_ID||'',transitMode:env.TAGO_SERVICE_KEY?'tago':env.TRANSIT_MODE||'demo',
   tagoDailyLimit:Math.min(1000,Math.max(1,Number(env.TAGO_DAILY_LIMIT)||1000)),
   kakaoKey:env.KAKAO_REST_KEY||'',kakaoEnabled:env.KAKAO_ENABLED==='true',kakaoDailyLimit:100,
+  navigationEnabled:env.NAVIGATION_ENABLED==='true'&&(env.NAVIGATION_FREE_QUOTA_VERIFIED==='true'||env.NAVIGATION_BILLING_APPROVED==='true'&&/^[\w-]{8,80}$/.test(env.NAVIGATION_APPROVAL_ID||'')&&Date.parse(env.NAVIGATION_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.NAVIGATION_APPROVAL_UNTIL)<=Date.now()+7*86400000),navigationDailyLimit:Math.min(50,Math.max(1,Number(env.NAVIGATION_DAILY_LIMIT)||50)),
+  navigationFreeVerified:env.NAVIGATION_FREE_QUOTA_VERIFIED==='true',navigationApprovalId:env.NAVIGATION_APPROVAL_ID||'',navigationApprovalUntil:env.NAVIGATION_APPROVAL_UNTIL||'',navigationPeriodLimit:Math.min(100,Math.max(1,Number(env.NAVIGATION_PERIOD_LIMIT)||100)),
   odsayKey:env.ODSAY_API_KEY||'',odsayEnabled:env.ODSAY_ENABLED==='true',odsayDailyLimit:Math.min(25,Math.max(1,Number(env.ODSAY_DAILY_LIMIT)||25)),
   aiKey:env.OPENAI_API_KEY||'',aiModel:env.OPENAI_MODEL||'',aiEnabled:env.AI_ENABLED==='true'&&env.AI_BILLING_APPROVED==='true'&&env.OPENAI_MODEL==='gpt-5.4-mini'&&/^[\w-]{8,80}$/.test(env.AI_APPROVAL_ID||'')&&Date.parse(env.AI_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.AI_APPROVAL_UNTIL)<=Date.now()+31*86400000,
   aiDailyLimit:Math.min(20,Math.max(1,Number(env.AI_DAILY_LIMIT)||20)),aiPeriodCalls:Math.min(100,Math.max(1,Number(env.AI_PERIOD_CALL_LIMIT)||100)),aiApprovalId:env.AI_APPROVAL_ID||'',aiApprovalUntil:env.AI_APPROVAL_UNTIL||'',

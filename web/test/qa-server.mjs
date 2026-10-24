@@ -8,7 +8,7 @@ const post=store.createPost('google:qa-owner',{title:'QA · 정류장 질문',bo
 store.createSession('google:qa-other','QA Other');store.reply('google:qa-other',post,'QA · 다른 사용자의 답변입니다.');
 const stops=[{nodeid:'QA-STOP-A',nodenm:'QA 출발 정류장',nodeno:'111',nodeord:1,gpslati:33.5,gpslong:126.52},{nodeid:'QA-STOP-B',nodenm:'QA 도착 정류장',nodeno:'112',nodeord:2,gpslati:33.51,gpslong:126.54}];
 const tago=items=>({response:{header:{resultCode:'00'},body:{items:{item:items},totalCount:items.length}}});
-const app=await createApp({store,env:{APP_ORIGIN:'http://localhost:3001',NODE_ENV:'production',TAGO_SERVICE_KEY:'OFFLINE-FIXTURE',TAGO_CITY_CODE:'QA',KAKAO_REST_KEY:'OFFLINE-FIXTURE',KAKAO_ENABLED:'true',ADMIN_GOOGLE_SUBS:'qa-owner',OPENAI_API_KEY:'OFFLINE-FIXTURE',OPENAI_MODEL:'gpt-5.4-mini',AI_ENABLED:'true',AI_BILLING_APPROVED:'true',AI_APPROVAL_ID:'offline-qa-fixture',AI_APPROVAL_UNTIL:new Date(Date.now()+86400000).toISOString()},fetchImpl:async(input,options={})=>{
+const app=await createApp({store,env:{APP_ORIGIN:'http://localhost:3001',NODE_ENV:'production',TAGO_SERVICE_KEY:'OFFLINE-FIXTURE',TAGO_CITY_CODE:'QA',KAKAO_REST_KEY:'OFFLINE-FIXTURE',KAKAO_ENABLED:'true',NAVIGATION_ENABLED:'true',NAVIGATION_FREE_QUOTA_VERIFIED:'true',ADMIN_GOOGLE_SUBS:'qa-owner',OPENAI_API_KEY:'OFFLINE-FIXTURE',OPENAI_MODEL:'gpt-5.4-mini',AI_ENABLED:'true',AI_BILLING_APPROVED:'true',AI_APPROVAL_ID:'offline-qa-fixture',AI_APPROVAL_UNTIL:new Date(Date.now()+86400000).toISOString()},fetchImpl:async(input,options={})=>{
  const u=new URL(input);let data;
  if(u.host==='api.openai.com'){
   const body=JSON.parse(options.body);
@@ -19,7 +19,8 @@ const app=await createApp({store,env:{APP_ORIGIN:'http://localhost:3001',NODE_EN
   else if(u.pathname.endsWith('getSttnAcctoArvlPrearngeInfoList'))data=tago([{routeid:'QA-ROUTE',routeno:'QA-101',arrtime:120,arrprevstationcnt:2,nodeid:'QA-STOP-A'}]);
   else if(u.pathname.endsWith('getRouteAcctoBusLcList'))data=tago([{vehicleno:'QA-BUS',routeno:'QA-101',nodenm:'QA 출발 정류장',gpslati:33.505,gpslong:126.53}]);
   else data=tago(stops);
- }else if(u.host==='dapi.kakao.com')data=u.pathname.includes('/routing/')?kakaoFixture:{documents:[{id:'QA-PLACE',place_name:u.searchParams.get('query'),address_name:'QA · offline fixture',y:u.searchParams.get('query').includes('출발')?'33.5':'33.51',x:u.searchParams.get('query').includes('출발')?'126.52':'126.54'}]};
+ }else if(u.host==='apis-navi.kakaomobility.com')data={routes:[{result_code:0,summary:{distance:2000,duration:300},sections:[{distance:2000,duration:300,roads:[{vertexes:[126.52,33.5,126.53,33.5,126.53,33.51,126.54,33.51]}],guides:[{x:126.53,y:33.5,road_index:0,type:1,guidance:'QA · 모의 좌회전'}]}]}]};
+ else if(u.host==='dapi.kakao.com')data=u.pathname.includes('/routing/')?kakaoFixture:{documents:[{id:'QA-PLACE',place_name:u.searchParams.get('query'),address_name:'QA · offline fixture',y:u.searchParams.get('query').includes('출발')?'33.5':'33.51',x:u.searchParams.get('query').includes('출발')?'126.52':'126.54'}]};
  else throw Error('External network forbidden in QA');
  return {ok:true,json:async()=>data};
 }});
