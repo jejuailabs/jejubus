@@ -81,7 +81,7 @@ export function createFirestoreStore(client,{now=Date.now}={}){
     async blockPostAuthor(uid,id){const p=await get('posts',id);if(p&&p.user_id!==uid)await put('blocks',`${uid}:${p.user_id}`,{user_id:uid,blocked_id:p.user_id});},
     listReports:()=>client.list('reports',{order:'created',limit:200}),
     async moderate(reportId,hide){return client.atomic(async()=>{const r=await client.get('reports',reportId);if(!r)return false;const p=hide?await client.get('posts',r.data.postId):null;await client.commit([write('reports',reportId,{...r.data,status:'resolved'},r),...(p?[write('posts',r.data.postId,{...p.data,status:'hidden'},p)]:[])]);return true;});},
-    async consumeApi(provider,limit){const day=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now())),id=`${provider}:${day}`;return client.atomic(async()=>{const prior=await client.get('usage',id),count=prior?.data.count||0;if(count>=limit)throw failure('quotaReached',429);await client.commit([write('usage',id,{provider,day,count:count+1},prior)]);});},
+    async consumeApi(provider,limit,period){const day=period||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now())),id=`${provider}:${day}`;return client.atomic(async()=>{const prior=await client.get('usage',id),count=prior?.data.count||0;if(count>=limit)throw failure('quotaReached',429);await client.commit([write('usage',id,{provider,day,count:count+1},prior)]);});},
     usage:()=>client.list('usage',{order:'day',limit:20}),
     close(){}
   };

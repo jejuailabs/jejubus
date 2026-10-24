@@ -6,6 +6,7 @@ import {createFirestoreClient,createFirestoreStore} from './lib/firestore.mjs';
 import {createGoogleAuth} from './lib/auth.mjs';
 import {createCatalog,ServiceError,coordinate} from './lib/catalog.mjs';
 import {configuration,createSettings} from './lib/settings.mjs';
+import {createBusChat} from './lib/bus-chat.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -27,9 +28,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const authOptions={fetchImpl,stateStore:store.putOAuth?store:null};
   let auth=createGoogleAuth(config,authOptions);
   let catalog=createCatalog(config,{fetchImpl,consume:store.consumeApi});
+  let busChat=createBusChat(config,{catalog,consume:store.consumeApi,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
-    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:store.consumeApi});
+    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:store.consumeApi});busChat=createBusChat(config,{catalog,consume:store.consumeApi,fetchImpl});
   }});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
@@ -50,11 +52,11 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     try{
       if(req.headers.host!==new URL(config.origin).host)return send(403,{error:'invalidHost'});
       const url=new URL(req.url,config.origin),path=url.pathname,method=req.method;
-      if(['/api/status','/api/setup','/auth/google'].includes(path))await settings.reload();
+      if(['/api/status','/api/setup','/api/chat','/auth/google'].includes(path))await settings.reload();
       const token=cookies(req).jeju_session,user=path.startsWith('/api/')||path.startsWith('/auth/')?await store.user(token):null;
       if(['POST','PUT','PATCH','DELETE'].includes(method)&&req.headers.origin!==config.origin)fail('invalidOrigin',403);
       if(path.startsWith('/api/')||path.startsWith('/auth/'))throttle(`ip:${req.socket.remoteAddress}`,120);
-      if(path==='/api/status'&&method==='GET'){const capabilities=catalog.capabilities();return send(200,{googleConfigured:auth.enabled,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user)}:null});}
+      if(path==='/api/status'&&method==='GET'){const capabilities={...catalog.capabilities(),ai:busChat.enabled()};return send(200,{googleConfigured:auth.enabled,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user)}:null});}
       if(path.startsWith('/api/setup')){
         if(!config.setupAllowed||!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress))fail('notFound',404);
         if(path==='/api/setup'&&method==='GET')return send(200,{token:settings.token,...settings.status(),usage:await store.usage(),callback:`${config.origin}/auth/google/callback`});
@@ -88,6 +90,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
       if(path==='/api/intent'&&method==='POST'){const p=await jsonBody(req);if(typeof p?.input!=='string'||!p.input.trim()||p.input.length>500)fail('queryRequired');return send(200,await catalog.intent(p.input));}
+      if(path==='/api/chat'&&method==='POST'){if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,4);return send(200,await busChat.answer(await jsonBody(req)));}
       if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,contextName:(await store.context(p.route))?.name||null})))});
       if(path==='/api/posts'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);const p=await validatePost(await jsonBody(req));return send(201,{id:await store.createPost(user.id,p)});}
       const post=path.match(/^\/api\/posts\/([\w-]+)(?:\/(replies|like|report|block))?$/);

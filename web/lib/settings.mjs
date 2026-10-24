@@ -10,7 +10,8 @@ export function configuration(env){return {
   tagoDailyLimit:Math.min(1000,Math.max(1,Number(env.TAGO_DAILY_LIMIT)||1000)),
   kakaoKey:env.KAKAO_REST_KEY||'',kakaoEnabled:env.KAKAO_ENABLED==='true',kakaoDailyLimit:100,
   odsayKey:env.ODSAY_API_KEY||'',odsayEnabled:env.ODSAY_ENABLED==='true',odsayDailyLimit:Math.min(25,Math.max(1,Number(env.ODSAY_DAILY_LIMIT)||25)),
-  aiKey:env.OPENAI_API_KEY||'',aiModel:env.OPENAI_MODEL||'',aiEnabled:env.AI_ENABLED==='true'&&env.AI_BILLING_APPROVED==='true',aiDailyLimit:Math.min(10,Math.max(1,Number(env.AI_DAILY_LIMIT)||10)),
+  aiKey:env.OPENAI_API_KEY||'',aiModel:env.OPENAI_MODEL||'',aiEnabled:env.AI_ENABLED==='true'&&env.AI_BILLING_APPROVED==='true'&&env.OPENAI_MODEL==='gpt-5.4-mini'&&/^[\w-]{8,80}$/.test(env.AI_APPROVAL_ID||'')&&Date.parse(env.AI_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.AI_APPROVAL_UNTIL)<=Date.now()+31*86400000,
+  aiDailyLimit:Math.min(20,Math.max(1,Number(env.AI_DAILY_LIMIT)||20)),aiPeriodCalls:Math.min(100,Math.max(1,Number(env.AI_PERIOD_CALL_LIMIT)||100)),aiApprovalId:env.AI_APPROVAL_ID||'',aiApprovalUntil:env.AI_APPROVAL_UNTIL||'',
   showSamples:env.SHOW_SAMPLE_POSTS==='true',adminSubjects:(env.ADMIN_GOOGLE_SUBS||'').split(',').map(v=>v.trim()).filter(Boolean),
   setupAllowed:env.NODE_ENV!=='production'&&(!env.HOST||['127.0.0.1','localhost','::1'].includes(env.HOST))&&/^http:\/\/localhost(?::\d+)?$/.test(env.APP_ORIGIN||`http://localhost:${Number(env.PORT)||3000}`)
 };}

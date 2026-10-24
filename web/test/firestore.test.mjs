@@ -44,6 +44,15 @@ test('shared quota is atomic and awaited before a provider network request',asyn
   await assert.rejects(catalog.cities(),e=>e.key==='quotaReached');assert.equal(calls,0);
 });
 
+test('AI approval cap is shared across instances and does not reset at the next midnight',async()=>{
+ const client=memoryClient(),dayOne=Date.UTC(2026,9,24),a=createFirestoreStore(client,{now:()=>dayOne}),b=createFirestoreStore(client,{now:()=>dayOne+86400000});
+ const results=await Promise.allSettled([a.consumeApi('ai_budget',2,'approval:fixed'),b.consumeApi('ai_budget',2,'approval:fixed'),a.consumeApi('ai_budget',2,'approval:fixed')]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,2);
+ await assert.rejects(b.consumeApi('ai_budget',2,'approval:fixed'),{key:'quotaReached'});
+ await b.consumeApi('ai_budget',2,'approval:new');
+ assert.equal((await a.usage()).find(r=>r.day==='approval:fixed').count,2);
+});
+
 test('serverless OAuth persists state before redirect and consumes it through another instance',async()=>{
   const client=memoryClient(),stateA=createFirestoreStore(client),stateB=createFirestoreStore(client),config={origin:'https://jejubus.example',googleClientId:'fixture',googleClientSecret:'fixture-secret'};
   const a=createGoogleAuth(config,{stateStore:stateA}),b=createGoogleAuth(config,{stateStore:stateB,fetchImpl:async()=>{throw Error('token endpoint intentionally unavailable');}});
