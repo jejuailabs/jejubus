@@ -15,6 +15,8 @@ import {createKakaoAlert} from './lib/kakao-alert.mjs';
 import {createBlog} from './lib/blog.mjs';
 import {createToss} from './lib/toss.mjs';
 import {createRouteAdmin} from './lib/route-admin.mjs';
+import {fileNetwork} from './lib/network.mjs';
+import {createBoard} from './lib/board.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -44,6 +46,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const blog=createBlog(config,{fetchImpl,consume:administration.consume});
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
+  const network=fileNetwork(join(root,'public/data/network.json'));
+  const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
@@ -122,6 +126,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/route-stops'){const result=await catalog.routeStops(itemId());await remember(result.stops,'stop');return send(200,result);}
         if(path==='/api/positions')return send(200,await catalog.positions(itemId()));
         if(path==='/api/arrivals')return send(200,await catalog.arrivals(itemId()));
+        if(path==='/api/board/stop'){const result=await board.stop(itemId());await remember(result.arrivals.map(a=>({id:a.routeId,number:a.number})),'route');return send(200,result);}
+        if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return send(200,result);}
+        if(path==='/api/board/places')return send(200,{stops:await network.searchStops(query())});
+        if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/geometry')return send(200,await catalog.geometry(url.searchParams.get('mapObject')));
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}

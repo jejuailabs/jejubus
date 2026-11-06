@@ -22,6 +22,19 @@ export function createRouteAdmin(config,store,{now=Date.now}={}){
    const today=koreaDay(now());
    return {notices:(await store.recordList('notices',{field:'context',value:context,limit:50})).filter(n=>live(n,today)).sort(newest).slice(0,5).map(({id,title,body,startsOn,endsOn,sourceUrl,created})=>({id,title,body,startsOn,endsOn,sourceUrl,created}))};
   },
+  // 공지는 변형 ID 하나에 올라가 있어도 같은 번호 전체에 보인다.
+  async noticesByNumber(numbers,stopId,numberOf){
+   const wanted=new Set(numbers),today=koreaDay(now()),out=new Map();
+   const list=(await store.recordList('notices',{limit:300})).filter(n=>live(n,today)).sort(newest);
+   for(const n of list){
+    const card={id:n.id,title:n.title,startsOn:n.startsOn,endsOn:n.endsOn,sourceUrl:n.sourceUrl,created:n.created};
+    if(n.context===`stop:${stopId}`){for(const no of wanted){if(!out.has(no))out.set(no,[]);out.get(no).push(card);}continue;}
+    if(!String(n.context).startsWith('route:'))continue;
+    const no=await numberOf(n.context.slice(6));
+    if(no&&wanted.has(no)){if(!out.has(no))out.set(no,[]);out.get(no).push(card);}
+   }
+   return out;
+  },
   async saveNotice(actor,body){
    guard(actor);
    const prior=body?.id?await store.recordGet('notices',String(body.id)):null;if(body?.id&&(!prior||prior.status==='deleted'))fail('notFound',404);
