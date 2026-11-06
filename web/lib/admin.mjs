@@ -6,7 +6,7 @@ export const ownerOf=(config,user)=>!!(user&&((config.adminSubjects||[]).include
 export const adminOf=(config,user)=>!!(user&&(ownerOf(config,user)||user.role==='admin'));
 
 export function createAdminService(config,store,{now=Date.now}={}){
- const cache=new Map();
+ const cache=new Map(),leases=new Map(),LEASE=10;
  const definitions=()=>[
   {id:'tago',name:'TAGO',configured:!!config.tagoKey,available:!!config.tagoKey,max:config.tagoDailyLimit},
   {id:'kakao',name:'Kakao Places',configured:!!config.kakaoKey,available:!!(config.kakaoKey&&config.kakaoEnabled),max:config.kakaoDailyLimit},
@@ -19,7 +19,7 @@ export function createAdminService(config,store,{now=Date.now}={}){
  async function control(id){const entry=cache.get(id);if(entry?.until>now())return entry.value;const value=await store.control?.(id)||{};cache.set(id,{value,until:now()+10000});return value;}
  return {
   async allowed(id){return (await control(id)).enabled!==false;},
-  async consume(provider,limit,period){const key=provider==='ai_budget'?'ai':provider==='navigation_budget'?'kakao-driving':provider,c=await control(key);if(c.enabled===false)fail('servicePaused',503);const effective=Math.min(limit,provider==='ai_budget'?c.periodLimit||limit:provider==='navigation_budget'?limit:c.dailyLimit||limit);return store.consumeApi(provider,effective,period);},
+  async consume(provider,limit,period){const key=provider==='ai_budget'?'ai':provider==='navigation_budget'?'kakao-driving':provider,c=await control(key);if(c.enabled===false)fail('servicePaused',503);const effective=Math.min(limit,provider==='ai_budget'?c.periodLimit||limit:provider==='navigation_budget'?limit:c.dailyLimit||limit);if(store.leasedQuota&&provider==='tago'){const day=koreaDay(now()),lease=leases.get(provider);if(lease?.day===day&&lease.left>0){lease.left--;return;}try{await store.consumeApi(provider,effective,period,LEASE);leases.set(provider,{day,left:LEASE-1});return;}catch(error){if(error.key!=='quotaReached')throw error;}}return store.consumeApi(provider,effective,period);},
   async dashboard(actor){
    if(!adminOf(config,actor))fail('forbidden',403);
    const [usage,metrics,users,controls,audit]=await Promise.all([store.usage(500),store.metrics(),store.adminUsers(),store.controls(),store.audit()]);

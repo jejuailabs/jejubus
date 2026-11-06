@@ -42,6 +42,7 @@ export function createNetwork(load){
  }
  return {
   async builtAt(){return (await net()).builtAt;},
+  async stats(){const n=await net();return {builtAt:n.builtAt,variants:n.byVariant.size,numbers:n.byNo.size,stops:n.stops.length};},
   async groupOf(variantId){
    const n=await net(),v=n.byVariant.get(variantId);if(!v)return null;
    return {no:v.no,key:`${v.no}|${v.firstName}→${v.lastName}`,variantIds:n.byNo.get(v.no).filter(o=>o.firstName===v.firstName&&o.lastName===v.lastName).map(o=>o.id)};

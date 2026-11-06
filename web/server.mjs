@@ -76,6 +76,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     const payPage=(req.url||'').split('?')[0]==='/my';
     res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org${payPage?' https://*.tosspayments.com':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
+    const shared=(data,seconds)=>{res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':`public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=10`});res.end(JSON.stringify(data));};
     const redirect=url=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store'});res.end();};
     try{
       if(req.headers.host!==new URL(config.origin).host)return send(403,{error:'invalidHost'});
@@ -132,13 +133,13 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/route-stops'){const result=await catalog.routeStops(itemId());await remember(result.stops,'stop');return send(200,result);}
         if(path==='/api/positions')return send(200,await catalog.positions(itemId()));
         if(path==='/api/arrivals')return send(200,await catalog.arrivals(itemId()));
-        if(path==='/api/live/route')return send(200,await liveRoute.route(itemId()));
+        if(path==='/api/live/route')return shared(await liveRoute.route(itemId()),25);
         if(path==='/api/field-reports/summary')return send(200,await fieldReports.summary(url.searchParams.get('stop')));
-        if(path==='/api/today'){if(todayCache.until<Date.now()){const [notices,log]=await Promise.all([routeAdmin.today(network.numberOf),fieldReports.changelog()]);todayCache={until:Date.now()+60000,value:{...notices,changes:log.changes}};}return send(200,todayCache.value);}
-        if(path==='/api/board/stop'){const result=await board.stop(itemId());await remember(result.arrivals.map(a=>({id:a.routeId,number:a.number})),'route');return send(200,result);}
-        if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return send(200,result);}
-        if(path==='/api/board/places')return send(200,{stops:await network.searchStops(query())});
-        if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return send(200,result);}
+        if(path==='/api/today'){if(todayCache.until<Date.now()){const [notices,log]=await Promise.all([routeAdmin.today(network.numberOf),fieldReports.changelog()]);todayCache={until:Date.now()+60000,value:{...notices,changes:log.changes}};}return shared(todayCache.value,60);}
+        if(path==='/api/board/stop'){const result=await board.stop(itemId());await remember(result.arrivals.map(a=>({id:a.routeId,number:a.number})),'route');return shared(result,25);}
+        if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return shared(result,3600);}
+        if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
+        if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return shared(result,3600);}
         if(path==='/api/geometry')return send(200,await catalog.geometry(url.searchParams.get('mapObject')));
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
@@ -181,7 +182,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/admin/field-reports'&&method==='GET')return send(200,await fieldReports.adminList(user));
       if(path==='/api/admin/field-reports'&&method==='POST'){const b=await jsonBody(req);return send(200,await fieldReports.closeGroup(user,b?.ids,b?.action));}
       if(path==='/api/admin/changelog'&&method==='POST'){const change=await fieldReports.saveChange(user,await jsonBody(req));todayCache.until=0;return send(200,change);}
-      if(path==='/api/admin/overview'&&method==='GET')return send(200,await routeAdmin.overview(user));
+      if(path==='/api/admin/overview'&&method==='GET')return send(200,{...await routeAdmin.overview(user),network:await network.stats().catch(()=>null)});
       if(path==='/api/admin/notices'&&method==='POST')return send(200,await routeAdmin.saveNotice(user,await jsonBody(req)));
       const adminNotice=path.match(/^\/api\/admin\/notices\/([a-f0-9]{32})$/);
       if(adminNotice&&method==='POST')return send(200,await routeAdmin.setNotice(user,adminNotice[1],(await jsonBody(req))?.action));
@@ -205,7 +206,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(report&&method==='POST'){if(!admin(user))fail('forbidden',403);const p=await jsonBody(req);if(typeof p?.hide!=='boolean')fail('invalidRequest');if(!await store.moderate(report[1],p.hide))fail('notFound',404);return send(200,{ok:true});}
       if(path.startsWith('/api/'))fail('notFound',404);
       if(!['GET','HEAD'].includes(method))fail('methodNotAllowed',405);
-      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
+      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/privacy'?'/privacy.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);
