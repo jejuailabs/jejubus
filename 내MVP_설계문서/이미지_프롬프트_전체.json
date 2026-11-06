@@ -1,0 +1,1026 @@
+[
+ {
+  "id": "A01",
+  "file": "ref/bus-mascot-sheet.png",
+  "size": "1536x1024",
+  "bg": "흰색",
+  "use": "전체 기준",
+  "prompt": "Character reference sheet of one bus mascot on a plain white background: front view, 3/4 view, side view and back view in a neat row, same proportions in every view. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "A02",
+  "file": "ref/expression-sheet.png",
+  "size": "1536x1024",
+  "bg": "흰색",
+  "use": "표정 기준",
+  "prompt": "Expression sheet of the same bus mascot in a 4 by 2 grid on plain white: calm alert, happy, excited, sleepy, confused, gently apologetic, sleeping, waving. Only eyes, mouth and small body tilt change. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "A03",
+  "file": "ref/icon-language-sheet.png",
+  "size": "1536x1024",
+  "bg": "흰색",
+  "use": "아이콘 기준",
+  "prompt": "Style reference grid of 12 simple object icons on plain white: bus stop sign, tangerine, map pin, bell, stamp, star, wind swirl, volcanic rock, stone wall, oreum hill, ticket, compass. Same viewing angle, same corner radius, same weight. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "A04",
+  "file": "ref/jeju-material-sheet.png",
+  "size": "1536x1024",
+  "bg": "흰색",
+  "use": "소재 기준",
+  "prompt": "Material reference sheet of Jeju motifs drawn in one style on plain white: tangerine with leaf, green oreum volcanic cone, dark porous basalt rock, curving black stone wall, gusts of wind, turquoise sea wave, canola flower field, camellia. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "B01",
+  "file": "bus/bus-express.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04, S05, S07",
+  "prompt": "The bus mascot with a red #E5484D body, calm alert expression, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "B02",
+  "file": "bus/bus-trunk.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04, S05, S07",
+  "prompt": "The bus mascot with a blue #2F6FED body, calm alert expression, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "B03",
+  "file": "bus/bus-branch.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04, S05, S07",
+  "prompt": "The bus mascot with a green #2FA36B body, calm alert expression, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "B04",
+  "file": "bus/bus-tour.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04, S05, S07",
+  "prompt": "The bus mascot with a warm yellow #F5B700 body, calm alert expression, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C01",
+  "file": "bus/face-normal.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "데이터 정상",
+  "prompt": "The bus mascot with a blue #2F6FED body: calm alert open eyes, tiny smile, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C02",
+  "file": "bus/face-soon.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "곧 도착",
+  "prompt": "The bus mascot with a blue #2F6FED body: bright excited eyes, leaning forward slightly, tiny motion lines, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C03",
+  "file": "bus/face-stale.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "졸린 눈",
+  "prompt": "The bus mascot with a blue #2F6FED body: sleepy half-closed eyes, one small floating sleep bubble without letters, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C04",
+  "file": "bus/face-lost.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "끊김. S25",
+  "prompt": "The bus mascot with a blue #2F6FED body: confused eyes, one simple question-mark-shaped curl above the head drawn as a plain symbol, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C05",
+  "file": "bus/face-done.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "운행 끝",
+  "prompt": "The bus mascot with a blue #2F6FED body: eyes closed, peacefully asleep under a small crescent moon, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C06",
+  "file": "bus/face-notoday.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "주말 미운행",
+  "prompt": "The bus mascot with a blue #2F6FED body: resting on a small calendar page, eyes closed, relaxed, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C07",
+  "file": "bus/face-before.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "첫차 전",
+  "prompt": "The bus mascot with a blue #2F6FED body: stretching and waking up with a small sunrise behind, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C08",
+  "file": "bus/face-sorry.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S11 플랜 B",
+  "prompt": "The bus mascot with a blue #2F6FED body: small apologetic eyes, slightly lowered body, no tears, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C09",
+  "file": "bus/face-happy.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S10 탔어요",
+  "prompt": "The bus mascot with a blue #2F6FED body: very happy closed-arc eyes, small bounce, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C10",
+  "file": "bus/face-cheer.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "큰 보상",
+  "prompt": "The bus mascot with a blue #2F6FED body: joyful open mouth, tiny confetti of tangerine and leaf shapes, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C11",
+  "file": "bus/face-thanks.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "고마워요",
+  "prompt": "The bus mascot with a blue #2F6FED body: warm smile holding a small heart with its wheel, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C12",
+  "file": "bus/face-wave.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S21 첫 안내",
+  "prompt": "The bus mascot with a blue #2F6FED body: friendly smile, one small wheel raised as a wave, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C13",
+  "file": "bus/face-fix.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S17 수리 소식",
+  "prompt": "The bus mascot with a blue #2F6FED body: tiny spanner beside it, proud small smile, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "C14",
+  "file": "bus/face-night.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S12 귀가선",
+  "prompt": "The bus mascot with a blue #2F6FED body: calm eyes, small headlights glowing softly, night blue tint, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "D01",
+  "file": "stamp/first-ride.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a small bus front with a sprout. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D02",
+  "file": "stamp/new-route.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a curving road line with a bus dot. Ink color blue #2F6FED, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D03",
+  "file": "stamp/new-stop.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a bus stop sign with a small star. Ink color green #2FA36B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D04",
+  "file": "stamp/first-bus.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a sunrise over the sea with a tiny bus. Ink color coral #F26B5B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D05",
+  "file": "stamp/sunset.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a large setting sun behind an oreum hill. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D06",
+  "file": "stamp/last-bus.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a crescent moon above a tiny bus with headlights. Ink color navy #27366B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D07",
+  "file": "stamp/east.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a sunrise crater ridge on the sea. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D08",
+  "file": "stamp/west.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: sea cliffs with a setting sun. Ink color coral #F26B5B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D09",
+  "file": "stamp/south.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a waterfall beside tangerine trees. Ink color green #2FA36B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D10",
+  "file": "stamp/north.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a harbour lighthouse and waves. Ink color blue #2F6FED, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D11",
+  "file": "stamp/fix-fairy.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a tiny spanner with a small sparkle. Ink color violet #6E56CF, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D12",
+  "file": "stamp/stop-keeper.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a bus stop sign with a small shield. Ink color basalt grey #4a4f57, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D13",
+  "file": "stamp/thanks.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a simple heart with a leaf. Ink color coral #F26B5B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D14",
+  "file": "stamp/three-day.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: three connected dots on a loop road. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D15",
+  "file": "stamp/four-way.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a compass rose made of tangerine segments. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D16",
+  "file": "stamp/winter.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a tangerine with a small snow cap. Ink color tangerine, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D17",
+  "file": "stamp/rest-week.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a small resting bus under a leaf canopy. Ink color green #2FA36B, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "D18",
+  "file": "stamp/goal.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Round stamp design like a soft hand-pressed ink station stamp, one circular badge with a thick soft rounded ink ring, gentle speckled grain, slightly imperfect pressed edges, two colors only, motif in plump rounded shapes. Motif: a small flag on an oreum hill. Ink color blue #2F6FED, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E01",
+  "file": "map/jeju-base-gray.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "Top-down illustrated map of Jeju Island as a wide oval, Hallasan in the center, gentle oreum bumps, coastline softly stylized, entirely in soft warm greys like an uncoloured paper cutout, no roads, no labels, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E02",
+  "file": "map/jeju-base-color.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "S18",
+  "prompt": "The same top-down illustrated Jeju Island, identical outline and composition, now fully coloured: green oreum, tangerine orchards, dark basalt coast, turquoise shallows, no roads, no labels, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E03",
+  "file": "map/jeju-east.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "권역 색칠",
+  "prompt": "Only the eastern third of the same illustrated Jeju Island in full colour, the rest fully transparent, identical position and scale. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E04",
+  "file": "map/jeju-west.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "권역 색칠",
+  "prompt": "Only the western third of the same illustrated Jeju Island in full colour, the rest fully transparent, identical position and scale. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E05",
+  "file": "map/jeju-south.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "권역 색칠",
+  "prompt": "Only the southern coast band of the same illustrated Jeju Island in full colour, the rest fully transparent, identical position and scale. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E06",
+  "file": "map/jeju-north.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "권역 색칠",
+  "prompt": "Only the northern coast band of the same illustrated Jeju Island in full colour, the rest fully transparent, identical position and scale. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E07",
+  "file": "map/stampbook-paper.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "S18",
+  "prompt": "Seamless warm recycled paper texture with very subtle fibres and faint grid of empty circular stamp places, muted sand tone, flat lighting. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "E08",
+  "file": "map/sea-paper.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S18",
+  "prompt": "Soft seamless paper-like sea background in pale sea mist blue with very faint hand-drawn wave lines. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F01",
+  "file": "board/stonewall.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing a low curving Jeju black basalt stone wall in simple shapes, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F02",
+  "file": "board/oreum.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing rolling soft green oreum hills, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F03",
+  "file": "board/sea.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing calm turquoise sea with simple wave lines, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F04",
+  "file": "board/orchard.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing rows of tangerine trees with small orange dots, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F05",
+  "file": "board/canola.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing a yellow canola flower field, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F06",
+  "file": "board/city.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing low simple Jeju town buildings in pale colors, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F07",
+  "file": "board/forest.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing a quiet camphor forest road, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F08",
+  "file": "board/night.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "S04",
+  "prompt": "Horizontally seamless wide background strip showing the same low coastline under a dark navy sky with few stars, low contrast and low saturation so a route line and small icons stay readable on top, simple shapes, nothing in the center band. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F09",
+  "file": "board/oreum-progress.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "S09",
+  "prompt": "A long thin progress bar shape following one gentle hill curve, flat green line with rounded ends, nothing else, transparent background. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F10",
+  "file": "board/stop-token.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04",
+  "prompt": "A round board-game style stop token made of dark porous basalt, top view, simple flat shape, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "F11",
+  "file": "board/my-stop-token.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S04",
+  "prompt": "A round board-game style stop token in bright tangerine with a small pin dent, top view, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G01",
+  "file": "scene/home-empty.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S01",
+  "prompt": "The bus mascot waiting beside an empty bus stop bench with a small tangerine on it, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G02",
+  "file": "scene/search-start.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S02",
+  "prompt": "The bus mascot peeking from behind a large round bus stop sign, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G03",
+  "file": "scene/no-result.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S02, S25",
+  "prompt": "The bus mascot looking at an empty road with a small question-shaped curl, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G04",
+  "file": "scene/no-favorites.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "내 버스",
+  "prompt": "A single bus stop sign with an empty star-shaped hanger, one fallen leaf, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G05",
+  "file": "scene/no-posts.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S15",
+  "prompt": "Small speech bubbles without any writing floating above a bus stop bench, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G06",
+  "file": "scene/no-reports.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S14",
+  "prompt": "A tidy empty mailbox beside a bus stop with a small flower, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G07",
+  "file": "scene/this-side.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "타도 돼 카드",
+  "prompt": "Top-down view of a two-lane road with a bus stop on the near side highlighted by a tangerine glow and a checkmark symbol, a soft arrow showing the bus direction, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G08",
+  "file": "scene/across-road.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "타도 돼 카드",
+  "prompt": "Top-down view of a two-lane road with a pedestrian crossing, a person dot on the near side and a highlighted bus stop on the far side, a dotted path across the crosswalk, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G09",
+  "file": "scene/today-off.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "타도 돼 카드",
+  "prompt": "A calendar page beside a closed bus stop sign and a resting bus mascot, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G10",
+  "file": "scene/service-ended.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "타도 돼 카드",
+  "prompt": "An empty bus stop at night under a street lamp with a crescent moon, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G11",
+  "file": "scene/before-first.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "타도 돼 카드",
+  "prompt": "A quiet bus stop at dawn with a pale pink sky and a thermos on the bench, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G12",
+  "file": "scene/signal-lost.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S25",
+  "prompt": "The bus mascot under a broken radio wave symbol, calm and not sad, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G13",
+  "file": "scene/quota-out.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S25",
+  "prompt": "The bus mascot resting beside a nearly empty fuel-gauge shape, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G14",
+  "file": "scene/plan-b.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S11",
+  "prompt": "A fork in the road with three small path markers, a bus, a walking person dot and a taxi icon, the bus mascot pointing gently, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G15",
+  "file": "scene/home-line.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "S12",
+  "prompt": "A long road toward a small lit house at dusk, last bus headlights on the horizon, warm tangerine sky turning navy, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G16",
+  "file": "scene/report-sheet.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S14",
+  "prompt": "The bus mascot holding a small clipboard with blank lines, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G17",
+  "file": "scene/repair-news.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S17",
+  "prompt": "A tiny repair bench with a spanner and a map pin being fixed by the bus mascot, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G18",
+  "file": "scene/ai-avatar.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S24",
+  "prompt": "The bus mascot head only, wearing a small headset, round avatar composition, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G19",
+  "file": "scene/login.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "로그인",
+  "prompt": "The bus mascot opening its door, soft light from inside, welcoming, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "G20",
+  "file": "scene/passport.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S20",
+  "prompt": "A small passport-style booklet with a tangerine emblem and a bus outline, closed, slight angle, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "G21",
+  "file": "scene/season-winter.png",
+  "size": "1536x1024",
+  "bg": "투명",
+  "use": "시즌",
+  "prompt": "Wide banner of tangerine trees in light snow with a small bus on a road, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "H01",
+  "file": "guide/raise-hand.png",
+  "size": "1024x1536",
+  "bg": "투명",
+  "use": "S21",
+  "prompt": "A person silhouette in simple shapes at a bus stop raising one hand as a bus approaches, the bus mascot noticing, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "H02",
+  "file": "guide/check-side.png",
+  "size": "1024x1536",
+  "bg": "투명",
+  "use": "S21",
+  "prompt": "A person at a bus stop looking at a sign with an arrow, the same stop mirrored across the road in faded grey, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "H03",
+  "file": "guide/official-vs-report.png",
+  "size": "1024x1536",
+  "bg": "투명",
+  "use": "S21",
+  "prompt": "Two cards side by side, one with a solid official seal shape, one with a speech bubble shape and small people dots, without any writing, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "H04",
+  "file": "guide/luggage.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S20",
+  "prompt": "A suitcase and a backpack beside a low bus entrance, simple shapes, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "H05",
+  "file": "guide/card-pay.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S20",
+  "prompt": "A transit card being tapped on a round reader, simple shapes, no brand marks, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "H06",
+  "file": "guide/game-off.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "설정",
+  "prompt": "A simple toggle switch beside the bus mascot, half of the mascot shown as a plain outline, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "I01",
+  "file": "icon/tab-home.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small dashboard card with a star, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I02",
+  "file": "icon/tab-find.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a magnifier over a bus stop sign, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I03",
+  "file": "icon/tab-board.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a line with three dots and a tiny bus, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I04",
+  "file": "icon/tab-map.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a folded map with a pin, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I05",
+  "file": "icon/tab-community.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of two overlapping speech bubbles, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I06",
+  "file": "icon/tab-jeju.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small island with a hill, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I07",
+  "file": "icon/stop.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a bus stop sign, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I08",
+  "file": "icon/direction.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a curved arrow on a road, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I09",
+  "file": "icon/transfer.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of two arrows crossing between two buses, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I10",
+  "file": "icon/walk.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a walking shoe, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I11",
+  "file": "icon/wait.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small bench with a clock face without digits, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I12",
+  "file": "icon/lastbus.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a crescent moon with a bus, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I13",
+  "file": "icon/notice.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a rounded warning triangle with a dot, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I14",
+  "file": "icon/report.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small flag on a pin, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I15",
+  "file": "icon/thanks.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a heart, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I16",
+  "file": "icon/share.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a card with an arrow, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I17",
+  "file": "icon/settings.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a gear, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I18",
+  "file": "icon/gameoff.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small dice with a slash, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I19",
+  "file": "icon/crowded.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a bus filled with small dots, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I20",
+  "file": "icon/passed.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a bus passing a stop with motion lines, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I21",
+  "file": "icon/notcome.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of an empty road with a dotted bus outline, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I22",
+  "file": "icon/official.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a round seal with a check shape, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I23",
+  "file": "icon/hotel.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small house with a bed, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "I24",
+  "file": "icon/airport.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "전체",
+  "prompt": "A single app icon of a small plane, chunky simple silhouette readable at 24 pixels, two flat colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J01",
+  "file": "reward/first-ride-bg.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "큰 보상",
+  "prompt": "Full screen celebratory background with soft tangerine rays and paper confetti of tangerine and leaf shapes, empty center area for a stamp. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J02",
+  "file": "reward/region-bg.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "큰 보상",
+  "prompt": "Full screen calm celebratory background with an ink wash spreading across paper in sea and green tones, empty center area. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J03",
+  "file": "reward/weekly-bg.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "큰 보상",
+  "prompt": "Full screen background of gentle oreum layers at sunrise, empty center area. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J04",
+  "file": "share/card-sea.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "S19",
+  "prompt": "Vertical share card background of layered turquoise sea and basalt coast in flat shapes, large empty area in the middle. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J05",
+  "file": "share/card-oreum.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "S19",
+  "prompt": "Vertical share card background of layered green oreum hills and pale sky, large empty area in the middle. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J06",
+  "file": "share/card-sunset.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "S19",
+  "prompt": "Vertical share card background of tangerine sunset over the sea with a tiny bus silhouette at the bottom, large empty area in the middle. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J07",
+  "file": "share/card-night.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "S19",
+  "prompt": "Vertical share card background of a navy night road with small warm lights, large empty area in the middle. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks."
+ },
+ {
+  "id": "J08",
+  "file": "share/type-east.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S19",
+  "prompt": "A character badge showing the bus mascot wearing a small sun visor beside a sunrise cliff, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "J09",
+  "file": "share/type-explorer.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S19",
+  "prompt": "A character badge showing the bus mascot with a small backpack on a narrow village road, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "J10",
+  "file": "share/type-night.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S19",
+  "prompt": "A character badge showing the bus mascot with a small lantern under the moon, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "J11",
+  "file": "share/type-west.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S19",
+  "prompt": "A character badge showing the bus mascot watching a sunset from a coastal road, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "J12",
+  "file": "share/type-commuter.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "S19",
+  "prompt": "A character badge showing the bus mascot with a small thermos at a morning bus stop, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K01",
+  "file": "brand/app-icon.png",
+  "size": "1024x1024",
+  "bg": "불투명",
+  "use": "PWA",
+  "prompt": "A bold app icon: the front of the bus mascot face cropped large on a solid tangerine background, simple, readable at 48 pixels, no sign text. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K02",
+  "file": "brand/app-icon-maskable.png",
+  "size": "1024x1024",
+  "bg": "불투명",
+  "use": "안드로이드",
+  "prompt": "The same bus mascot app icon with the character inside the central 60 percent safe zone on solid tangerine. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K03",
+  "file": "brand/mascot-splash.png",
+  "size": "1024x1536",
+  "bg": "불투명",
+  "use": "시작 화면",
+  "prompt": "Vertical splash screen: the bus mascot small and centered on a calm sand background with a thin horizon of sea and oreum at the bottom. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K04",
+  "file": "brand/og-cover.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "링크 미리보기",
+  "prompt": "Wide link preview image: a stylized Jeju coast road with the bus mascot on the left third, large empty calm area on the right for a title. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K05",
+  "file": "brand/presentation-hero.png",
+  "size": "1536x1024",
+  "bg": "불투명",
+  "use": "발표 자료",
+  "prompt": "Wide hero image of several bus mascots in the four route colors travelling along a coastal road around an oreum, charming and clean. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ },
+ {
+  "id": "K06",
+  "file": "brand/admin-empty.png",
+  "size": "1024x1024",
+  "bg": "투명",
+  "use": "/admin",
+  "prompt": "A tidy desk with a small map and a bus mascot figurine, muted colors, transparent background, centered, generous padding. Warm hand-made gouache and paper-cut illustration for a Jeju bus mobile app: no black outlines, plump rounded forms, every tip and corner softly rounded with no sharp points, very light grain on clean simple color, reads clearly at small size, light and airy, cozy but grown-up like a good Korean picture book. Palette: sunny tangerine #ff9a3c, soft sea blue #7fb8c4, fresh leaf green #8fb56a, warm sand #f6ecd8, soft basalt grey #6a6f78. Use soft basalt grey instead of black. No drop shadows, no ground shadows, no gradients unless stated, not sticker-like, not emoji, not clip art, not dark, not sharp, not an elegant poster. Absolutely no text, letters, numbers, logos or watermarks. The mascot is a plump small rounded-square city bus seen from the front at a slight 3/4 angle, drawn as one soft body shape with no separate roof and no black window frames. The upper two thirds of the front is one large blank pale cream rounded sign panel, big enough for a four-digit route number, so the app can print the number on it. Below it is a simple friendly face: two clear dot eyes and a curved mouth, large enough to read at 48 pixels, between two small soft round headlights. Short soft grey wheels."
+ }
+]
