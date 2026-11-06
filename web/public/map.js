@@ -12,7 +12,7 @@ export function mapMarkup({t,live=false,summary=''}) {
     <div class="map-controls"><button data-action="zoom-in" aria-label="${t('zoomIn')}">${icon('plus')}</button><button data-action="zoom-out" aria-label="${t('zoomOut')}">${icon('minus')}</button><span></span><button data-action="map-reset" aria-label="${t('resetMap')}">${icon('locate')}</button></div>`;
 }
 export function destroyMap(){
-  if(map){viewport={center:map.getCenter(),zoom:map.getZoom()};map.remove();}
+  if(map){viewport={center:map.getCenter(),zoom:map.getZoom()};map.eachLayer(layer=>{if(!(layer instanceof L.Renderer))map.removeLayer(layer);});map.remove();}
   observer?.disconnect();map=null;locationMarker=null;locationCircle=null;
 }
 export function mountMap({destination,t,data={},onPick,onStop,tilesUrl='https://tile.openstreetmap.org/{z}/{x}/{y}.png'}){

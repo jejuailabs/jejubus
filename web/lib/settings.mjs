@@ -14,6 +14,9 @@ export function configuration(env){return {
   odsayKey:env.ODSAY_API_KEY||'',odsayEnabled:env.ODSAY_ENABLED==='true',odsayDailyLimit:Math.min(25,Math.max(1,Number(env.ODSAY_DAILY_LIMIT)||25)),
   aiKey:env.OPENAI_API_KEY||'',aiModel:env.OPENAI_MODEL||'',aiEnabled:env.AI_ENABLED==='true'&&env.AI_BILLING_APPROVED==='true'&&env.OPENAI_MODEL==='gpt-5.4-mini'&&/^[\w-]{8,80}$/.test(env.AI_APPROVAL_ID||'')&&Date.parse(env.AI_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.AI_APPROVAL_UNTIL)<=Date.now()+31*86400000,
   aiDailyLimit:Math.min(20,Math.max(1,Number(env.AI_DAILY_LIMIT)||20)),aiPeriodCalls:Math.min(100,Math.max(1,Number(env.AI_PERIOD_CALL_LIMIT)||100)),aiApprovalId:env.AI_APPROVAL_ID||'',aiApprovalUntil:env.AI_APPROVAL_UNTIL||'',
+  kakaoLoginKey:env.KAKAO_LOGIN_REST_KEY||'',kakaoClientSecret:env.KAKAO_CLIENT_SECRET||'',kakaoLoginEnabled:env.KAKAO_LOGIN_ENABLED==='true',kakaoAlertEnabled:env.KAKAO_ALERT_ENABLED==='true',kakaoChannelId:/^_[A-Za-z0-9]{2,30}$/.test(env.KAKAO_CHANNEL_ID||'')?env.KAKAO_CHANNEL_ID:'',
+  naverLoginId:env.NAVER_LOGIN_CLIENT_ID||'',naverLoginSecret:env.NAVER_LOGIN_CLIENT_SECRET||'',naverLoginEnabled:env.NAVER_LOGIN_ENABLED==='true',
+  naverSearchId:env.NAVER_CLIENT_ID||'',naverSearchSecret:env.NAVER_CLIENT_SECRET||'',blogEnabled:env.BLOG_ENABLED==='true',blogDailyLimit:Math.min(1000,Math.max(1,Number(env.BLOG_DAILY_LIMIT)||100)),
   showSamples:env.SHOW_SAMPLE_POSTS==='true',adminSubjects:(env.ADMIN_GOOGLE_SUBS||'').split(',').map(v=>v.trim()).filter(Boolean),adminEmails:(env.ADMIN_GOOGLE_EMAILS||'').split(',').map(v=>v.trim().toLowerCase()).filter(Boolean),
   setupAllowed:env.NODE_ENV!=='production'&&(!env.HOST||['127.0.0.1','localhost','::1'].includes(env.HOST))&&/^http:\/\/localhost(?::\d+)?$/.test(env.APP_ORIGIN||`http://localhost:${Number(env.PORT)||3000}`)
 };}

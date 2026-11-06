@@ -55,7 +55,7 @@ export function createFirestoreStore(client,{now=Date.now}={}){
   async function blocked(uid){return new Set(uid?(await client.list('blocks',{field:'user_id',value:uid,limit:500})).map(b=>b.blocked_id):[]);}
   return {
     async user(token){if(!token)return null;const s=await get('sessions',hash(token));if(!s||s.expires<=now())return null;const u=await get('users',s.user_id);return u&&u.status!=='suspended'&&(s.authVersion||0)===(u.authVersion||0)?{id:u.id,name:u.name,...(u.email?{email:u.email}:{}),role:u.role||'member'}:null;},
-    async createSession(id,name,profile={}){name=String(name).slice(0,80);let authVersion=0;await client.atomic(async()=>{const prior=await client.get('users',id);if(prior?.data.status==='suspended')throw failure('accountSuspended',403);authVersion=prior?.data.authVersion||0;await client.commit([write('users',id,{...prior?.data,id,name,...(profile.email?{email:profile.email}:{}),role:prior?.data.role||'member',status:'active',authVersion,created:prior?.data.created||now(),lastLogin:now()},prior)]);});const token=randomBytes(32).toString('base64url');await put('sessions',hash(token),{user_id:id,name,authVersion,expires:now()+7*86400000});return token;},
+    async createSession(id,name,profile={}){name=String(name).slice(0,80);let authVersion=0;await client.atomic(async()=>{const prior=await client.get('users',id);if(prior?.data.status==='suspended')throw failure('accountSuspended',403);authVersion=prior?.data.authVersion||0;await client.commit([write('users',id,{...prior?.data,id,name,...(profile.email?{email:profile.email}:{}),role:prior?.data.role||'member',status:'active',authVersion,created:prior?.data.created||now(),lastLogin:now(),visits:(prior?.data.visits||0)+1},prior)]);});const token=randomBytes(32).toString('base64url');await put('sessions',hash(token),{user_id:id,name,authVersion,expires:now()+7*86400000});return token;},
     async destroySession(token){if(!token)return;await client.atomic(async()=>{const prior=await client.get('sessions',hash(token));if(prior)await client.commit([{collection:'sessions',id:hash(token),remove:true,prior}]);});},
     seedSamples(){throw failure('productionSamplesDisabled');},
     async rememberContext(c){const prior=await client.get('contexts',c.id);if(prior?.data.name===c.name&&prior?.data.type===c.type)return;await put('contexts',c.id,c);},
@@ -92,6 +92,16 @@ export function createFirestoreStore(client,{now=Date.now}={}){
     controls:()=>client.list('controls',{limit:20}),
     async setControl(provider,value,actor){await client.atomic(async()=>{const prior=await client.get('controls',provider);await client.commit([write('controls',provider,{...value,provider,updated:now()},prior),write('audit',randomUUID(),{actor,target:provider,action:'apiControl',changes:value,created:now()},null)]);});},
     audit:()=>client.list('audit',{order:'created',limit:50}),
+    recordGet:(kind,id)=>get(kind,id),
+    recordPut:(kind,id,data)=>put(kind,id,data),
+    async recordDelete(kind,id){await client.atomic(async()=>{const prior=await client.get(kind,id);if(prior)await client.commit([{collection:kind,id,remove:true,prior}]);});},
+    recordList:(kind,{field,value,limit=200}={})=>client.list(kind,{...(field?{field,value}:{}),limit}),
+    async accountOf(id){const u=await get('users',id);return u?{created:u.created||null,lastLogin:u.lastLogin||null,visits:u.visits||0}:null;},
+    async withdraw(id,name){
+     await client.atomic(async()=>{const prior=await client.get('users',id);if(!prior)throw failure('notFound',404);const {email,...rest}=prior.data;await client.commit([write('users',id,{...rest,name,status:'withdrawn',authVersion:(prior.data.authVersion||0)+1,updated:now()},prior),write('audit',randomUUID(),{actor:id,target:id,action:'withdraw',changes:{},created:now()},null)]);});
+     // 게시글과 답변에는 작성자 이름 사본이 있어 함께 바꾼다.
+     for(const kind of ['posts','replies'])for(const row of await client.list(kind,{field:'user_id',value:id,limit:400}))await client.atomic(async()=>{const prior=await client.get(kind,row.id);if(prior)await client.commit([write(kind,row.id,{...prior.data,author:name},prior)]);});
+    },
     close(){}
   };
 }

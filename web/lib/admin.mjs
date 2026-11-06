@@ -13,6 +13,7 @@ export function createAdminService(config,store,{now=Date.now}={}){
   {id:'kakao-routing',name:'Kakao Routing',configured:!!config.kakaoKey,available:!!(config.kakaoKey&&config.kakaoEnabled),max:100},
   {id:'kakao-driving',name:'Kakao Driving',configured:!!config.kakaoKey,available:!!(config.kakaoKey&&config.kakaoEnabled&&config.navigationEnabled&&(!config.navigationApprovalUntil||Date.parse(config.navigationApprovalUntil)>now())),max:config.navigationDailyLimit||50},
   {id:'odsay',name:'ODsay',configured:!!config.odsayKey,available:!!(config.odsayKey&&config.odsayEnabled),max:config.odsayDailyLimit},
+  {id:'blog',name:'Blog search',configured:!!(config.naverSearchId&&config.naverSearchSecret||config.kakaoKey),available:!!(config.blogEnabled&&(config.naverSearchId&&config.naverSearchSecret||config.kakaoKey&&config.kakaoEnabled)),max:config.blogDailyLimit||100},
   {id:'ai',name:'OpenAI',configured:!!config.aiKey,available:chatConfigured(config,now()),max:config.aiDailyLimit},
  ];
  async function control(id){const entry=cache.get(id);if(entry?.until>now())return entry.value;const value=await store.control?.(id)||{};cache.set(id,{value,until:now()+10000});return value;}

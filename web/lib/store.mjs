@@ -19,10 +19,11 @@ export function createStore(path=':memory:',{seed=true}={}) {
     CREATE TABLE IF NOT EXISTS contexts(id TEXT PRIMARY KEY,name TEXT NOT NULL,type TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS metrics(id TEXT PRIMARY KEY,data TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS controls(provider TEXT PRIMARY KEY,data TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,data TEXT NOT NULL);`);
+    CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,data TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS records(kind TEXT NOT NULL,id TEXT NOT NULL,data TEXT NOT NULL,PRIMARY KEY(kind,id));`);
   db.exec('PRAGMA busy_timeout=5000');
   for(const table of ['posts','replies'])if(!db.prepare(`PRAGMA table_info(${table})`).all().some(c=>c.name==='status'))db.exec(`ALTER TABLE ${table} ADD COLUMN status TEXT NOT NULL DEFAULT 'published'`);
-  for(const [name,type]of Object.entries({email:"TEXT",role:"TEXT NOT NULL DEFAULT 'member'",status:"TEXT NOT NULL DEFAULT 'active'",auth_version:"INTEGER NOT NULL DEFAULT 0",created:"INTEGER",last_login:"INTEGER"}))if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name===name))db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);
+  for(const [name,type]of Object.entries({email:"TEXT",role:"TEXT NOT NULL DEFAULT 'member'",status:"TEXT NOT NULL DEFAULT 'active'",auth_version:"INTEGER NOT NULL DEFAULT 0",created:"INTEGER",last_login:"INTEGER",visits:"INTEGER NOT NULL DEFAULT 0"}))if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name===name))db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);
   if(!db.prepare('PRAGMA table_info(sessions)').all().some(c=>c.name==='auth_version'))db.exec('ALTER TABLE sessions ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 0');
   const encode = x=>JSON.stringify(x);
   const decode = x=>{try{return JSON.parse(x);}catch{return x;}};
@@ -46,7 +47,7 @@ export function createStore(path=':memory:',{seed=true}={}) {
   function createSession(id,name,profile={}) {
     if(db.prepare('SELECT status FROM users WHERE id=?').get(id)?.status==='suspended')throw Object.assign(Error('accountSuspended'),{key:'accountSuspended',status:403});
     upsertUser(id,String(name).slice(0,80));
-    db.prepare('UPDATE users SET email=coalesce(?,email),created=coalesce(created,?),last_login=? WHERE id=?').run(profile.email||null,Date.now(),Date.now(),id);
+    db.prepare("UPDATE users SET email=coalesce(?,email),created=coalesce(created,?),last_login=?,visits=visits+1,status='active' WHERE id=?").run(profile.email||null,Date.now(),Date.now(),id);
     const token=randomBytes(32).toString('base64url');
     db.prepare('DELETE FROM sessions WHERE expires<=?').run(Date.now());
     db.prepare('INSERT INTO sessions VALUES(?,?,?,?)').run(hash(token),id,Date.now()+7*86400000,db.prepare('SELECT auth_version FROM users WHERE id=?').get(id).auth_version);
@@ -92,6 +93,12 @@ export function createStore(path=':memory:',{seed=true}={}) {
     controls:()=>db.prepare('SELECT data FROM controls').all().map(r=>decode(r.data)),
     setControl:(provider,value,actor)=>{const data={...value,provider,updated:Date.now()};db.prepare('INSERT INTO controls VALUES(?,?) ON CONFLICT(provider) DO UPDATE SET data=excluded.data').run(provider,encode(data));db.prepare('INSERT INTO audit VALUES(?,?)').run(randomUUID(),encode({actor,target:provider,action:'apiControl',changes:value,created:Date.now()}));},
     audit:()=>db.prepare('SELECT data FROM audit ORDER BY rowid DESC LIMIT 50').all().map(r=>decode(r.data)),
+    recordGet:(kind,id)=>{const r=db.prepare('SELECT data FROM records WHERE kind=? AND id=?').get(kind,id);return r?decode(r.data):null;},
+    recordPut:(kind,id,data)=>{db.prepare('INSERT INTO records VALUES(?,?,?) ON CONFLICT(kind,id) DO UPDATE SET data=excluded.data').run(kind,id,encode(data));},
+    recordDelete:(kind,id)=>{db.prepare('DELETE FROM records WHERE kind=? AND id=?').run(kind,id);},
+    recordList:(kind,{field,value,limit=200}={})=>db.prepare('SELECT data FROM records WHERE kind=?').all(kind).map(r=>decode(r.data)).filter(r=>!field||r[field]===value).slice(0,limit),
+    accountOf:id=>{const u=db.prepare('SELECT created,last_login AS lastLogin,visits FROM users WHERE id=?').get(id);return u?{...u}:null;},
+    withdraw:(id,name)=>{db.exec('BEGIN IMMEDIATE');try{db.prepare("UPDATE users SET name=?,email=NULL,status='withdrawn',auth_version=auth_version+1 WHERE id=?").run(name,id);db.prepare('DELETE FROM sessions WHERE user_id=?').run(id);db.prepare('INSERT INTO audit VALUES(?,?)').run(randomUUID(),encode({actor:id,target:id,action:'withdraw',changes:{},created:Date.now()}));db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}},
     toggleLike:(uid,id)=>{
       if(db.prepare('SELECT 1 FROM likes WHERE post_id=? AND user_id=?').get(id,uid)) db.prepare('DELETE FROM likes WHERE post_id=? AND user_id=?').run(id,uid);
       else db.prepare('INSERT INTO likes VALUES(?,?)').run(id,uid);

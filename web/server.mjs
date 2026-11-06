@@ -6,9 +6,13 @@ import {createFirestoreClient,createFirestoreStore} from './lib/firestore.mjs';
 import {createGoogleAuth} from './lib/auth.mjs';
 import {createCatalog,ServiceError,coordinate} from './lib/catalog.mjs';
 import {configuration,createSettings} from './lib/settings.mjs';
-import {createAdminService,adminOf} from './lib/admin.mjs';
+import {createAdminService,adminOf,ownerOf} from './lib/admin.mjs';
 import {createBusChat} from './lib/bus-chat.mjs';
 import {createNavigation} from './lib/navigation.mjs';
+import {createMemberService} from './lib/member.mjs';
+import {createSocialAuth} from './lib/social-auth.mjs';
+import {createKakaoAlert} from './lib/kakao-alert.mjs';
+import {createBlog} from './lib/blog.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -30,6 +34,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const authOptions={fetchImpl,stateStore:store.putOAuth?store:null};
   let auth=createGoogleAuth(config,authOptions);
   const administration=createAdminService(config,store);
+  const social=createSocialAuth(config,authOptions);
+  const kakaoAlert=createKakaoAlert(config,store,{fetchImpl});
+  const members=createMemberService(config,store,{notify:message=>kakaoAlert.send(message)});
+  const blog=createBlog(config,{fetchImpl,consume:administration.consume});
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
@@ -42,6 +50,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   function throttle(key,max){const now=Date.now();for(const [k,l]of limits)if(l.until<now)limits.delete(k);const l=limits.get(key)||{count:0,until:now+60000};l.count++;limits.set(key,l);if(l.count>max)fail('rateLimited',429);}
   const cookie=(name,value,age)=>`${name}=${value}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${age}${config.origin.startsWith('https:')?'; Secure':''}`;
   const admin=user=>adminOf(config,user);
+  const owner=user=>ownerOf(config,user);
   async function validatePost(p){
     if(!p||typeof p.title!=='string'||typeof p?.body!=='string'||p.title.trim().length<2||p.title.trim().length>100||p.body.trim().length<5||p.body.trim().length>2000||!categories.includes(p.category)||typeof p.route!=='string'||p.route.length>120)fail('titleValidation');
     if(!contexts.has(p.route)&&!await store.context(p.route)&&!(config.showSamples&&['r01','r02','r03'].includes(p.route)))fail('selectContext');
@@ -60,7 +69,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       const token=cookies(req).jeju_session,user=path.startsWith('/api/')||path.startsWith('/auth/')?await store.user(token):null;
       if(['POST','PUT','PATCH','DELETE'].includes(method)&&req.headers.origin!==config.origin)fail('invalidOrigin',403);
       if(path.startsWith('/api/')||path.startsWith('/auth/'))throttle(`ip:${req.socket.remoteAddress}`,120);
-      if(path==='/api/status'&&method==='GET'){const capabilities={...catalog.capabilities(),ai:busChat.enabled(),navigation:navigation.enabled()};return send(200,{googleConfigured:auth.enabled,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user)}:null});}
+      if(path==='/api/status'&&method==='GET'){const capabilities={...catalog.capabilities(),ai:busChat.enabled(),navigation:navigation.enabled(),blog:blog.enabled()};return send(200,{googleConfigured:auth.enabled,login:{google:auth.enabled,kakao:social.enabled('kakao'),naver:social.enabled('naver')},channelId:config.kakaoChannelId||null,transitConfigured:capabilities.transit,mapMode:'openstreetmap',journeyMode:capabilities.routing?'provider':'unavailable',capabilities,setupAvailable:config.setupAllowed,showSamples:config.showSamples,user:user?{name:user.name,admin:admin(user),visits:(await store.accountOf(user.id))?.visits||0}:null});}
       if(path==='/api/navigation/route'&&method==='POST'){throttle(`drive:${req.socket.remoteAddress}`,10);return send(200,{route:await navigation.route(await jsonBody(req))});}
       if(path==='/api/navigation/recommend'&&method==='POST'){throttle(`spots:${req.socket.remoteAddress}`,2);return send(200,await navigation.recommend(await jsonBody(req)));}
       if(path.startsWith('/api/setup')){
@@ -76,8 +85,23 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         const result=await auth.start();res.setHeader('Set-Cookie',cookie('jeju_oauth',result.binding,600));return redirect(result.url);
       }
       if(path==='/auth/google/callback'&&method==='GET'){
-        try{const identity=await auth.finish({state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding:cookies(req).jeju_oauth});if(token)await store.destroySession(token);const session=await store.createSession(identity.id,identity.name,{email:identity.email});res.setHeader('Set-Cookie',[cookie('jeju_session',session,7*86400),cookie('jeju_oauth','',0)]);return redirect('/');}
-        catch{res.setHeader('Set-Cookie',cookie('jeju_oauth','',0));return redirect('/?auth=failed');}
+        try{const identity=await auth.finish({state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding:cookies(req).jeju_oauth});if(token)await store.destroySession(token);const session=await store.createSession(identity.id,identity.name,{email:identity.email});res.setHeader('Set-Cookie',[cookie('jeju_session',session,7*86400),cookie('jeju_oauth','',0)]);return redirect('/?auth=ok');}
+        catch(error){res.setHeader('Set-Cookie',cookie('jeju_oauth','',0));return redirect(`/?auth=${error.key==='accountSuspended'?'suspended':'failed'}`);}
+      }
+      const socialRoute=path.match(/^\/auth\/(kakao|naver)(\/alert|\/callback)?$/);
+      if(socialRoute&&method==='GET'){
+        const [,name,step]=socialRoute;
+        if(step==='/callback'){
+          try{
+            const identity=await social.finish(name,{state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding:cookies(req).jeju_oauth});
+            if(identity.alert){if(!owner(user)||!identity.refreshToken)throw Error('Not allowed');await kakaoAlert.save(identity.refreshToken);await kakaoAlert.send('✅ 제주버스 관리자 알림이 연결됐어요');res.setHeader('Set-Cookie',cookie('jeju_oauth','',0));return redirect('/admin?alert=connected');}
+            if(token)await store.destroySession(token);const session=await store.createSession(identity.id,identity.name);res.setHeader('Set-Cookie',[cookie('jeju_session',session,7*86400),cookie('jeju_oauth','',0)]);return redirect('/?auth=ok');
+          }catch(error){res.setHeader('Set-Cookie',cookie('jeju_oauth','',0));return redirect(`/?auth=${error.key==='accountSuspended'?'suspended':'failed'}`);}
+        }
+        if(step==='/alert'&&(name!=='kakao'||!owner(user)||!kakaoAlert.ready()))fail('forbidden',403);
+        if(!social.enabled(name))return redirect('/?auth=not-configured');
+        throttle(`login:${req.socket.remoteAddress}`,15);
+        const result=await social.start(name,{alert:step==='/alert'});res.setHeader('Set-Cookie',cookie('jeju_oauth',result.binding,600));return redirect(result.url);
       }
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       const query=()=>{const q=url.searchParams.get('q')?.trim();if(!q||q.length>100)fail('queryRequired');return q;};
@@ -116,6 +140,25 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
           }
         }
       }
+      if(path==='/api/blog'&&method==='GET'){throttle(`blog:${req.socket.remoteAddress}`,20);return send(200,await blog.search(query()));}
+      if(path==='/api/reviews'&&method==='GET')return send(200,await members.reviews(url.searchParams.get('context'),user?.id));
+      if(path==='/api/reviews'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);return send(201,await members.saveReview(user,await jsonBody(req)));}
+      const reviewItem=path.match(/^\/api\/reviews\/([a-f0-9]{32})$/);
+      if(reviewItem&&['PATCH','DELETE'].includes(method)){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,20);return send(200,method==='DELETE'?await members.deleteReview(user,reviewItem[1]):await members.updateReview(user,reviewItem[1],await jsonBody(req)));}
+      if(path==='/api/inquiries'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,5);return send(201,await members.createInquiry(user,await jsonBody(req)));}
+      if(path==='/api/me'||path.startsWith('/api/me/')){
+        if(!user)fail('loginRequired',401);
+        if(path==='/api/me'&&method==='GET')return send(200,await members.me(user));
+        if(path==='/api/me/saved'&&method==='GET')return send(200,await members.saved(user));
+        if(path==='/api/me/saved'&&method==='POST'){throttle(`write:${user.id}`,30);return send(200,await members.toggleSaved(user,await jsonBody(req)));}
+        if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
+      }
+      if(path==='/api/admin/reviews'&&method==='GET')return send(200,await members.adminReviews(user));
+      const adminReview=path.match(/^\/api\/admin\/reviews\/([a-f0-9]{32})$/);
+      if(adminReview&&method==='POST')return send(200,await members.setReviewHidden(user,adminReview[1],(await jsonBody(req))?.hide));
+      if(path==='/api/admin/inquiries'&&method==='GET')return send(200,{...await members.adminInquiries(user),alert:{ready:kakaoAlert.ready(),connected:await kakaoAlert.connected(),owner:owner(user)}});
+      const adminInquiry=path.match(/^\/api\/admin\/inquiries\/(\w{1,20})$/);
+      if(adminInquiry&&method==='POST')return send(200,await members.answerInquiry(user,adminInquiry[1],await jsonBody(req)));
       const reply=path.match(/^\/api\/replies\/([\w-]+)$/);
       if(reply&&method==='DELETE'){if(!user)fail('loginRequired',401);if(!await store.deleteReply(user.id,reply[1]))fail('forbidden',403);return send(200,{ok:true});}
       if(path==='/api/admin/dashboard'&&method==='GET')return send(200,await administration.dashboard(user));
@@ -128,7 +171,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(report&&method==='POST'){if(!admin(user))fail('forbidden',403);const p=await jsonBody(req);if(typeof p?.hide!=='boolean')fail('invalidRequest');if(!await store.moderate(report[1],p.hide))fail('notFound',404);return send(200,{ok:true});}
       if(path.startsWith('/api/'))fail('notFound',404);
       if(!['GET','HEAD'].includes(method))fail('methodNotAllowed',405);
-      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
+      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);

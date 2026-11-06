@@ -39,3 +39,32 @@
  .search-fields input:focus-visible{outline:none}
  .search-fields label:focus-within{box-shadow:inset 3px 0 0 var(--blue);background:var(--surface-blue)}
 }
+
+/* 후기·문의·마이페이지 */
+.context-tools{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.context-tools button,.context-tools a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font-size:14px;font-weight:600;white-space:nowrap;text-decoration:none;cursor:pointer}
+.context-tools svg{width:16px;height:16px}
+.review-average{font-size:18px;font-weight:700;margin:4px 0 12px}
+.review-stars{color:#e8a200;letter-spacing:1px;font-weight:400}
+.review-list{margin-top:14px}
+.review-modal form{display:grid;gap:8px}
+.blog-post{display:grid;gap:2px;padding:10px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+.blog-post strong{color:var(--blue,#2167ff)}
+.kakao-signin{background:#fee500!important;color:#191600!important;border-color:#fee500!important}
+.naver-signin{background:#03c75a!important;color:#fff!important;border-color:#03c75a!important}
+.login-modal .google-signin+.google-signin{margin-top:8px}
+.my-section{margin-top:16px}
+.my-profile{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 12px}
+.my-profile dt{color:var(--muted,#667)}
+.my-profile dd{margin:0}
+.my-chips{display:flex;flex-wrap:wrap;gap:8px}
+.my-chips .route-chip{text-decoration:none}
+.my-review{display:grid;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+.my-review:first-of-type{border-top:0}
+.my-review p{margin:0}
+.my-review form,.my-review label{display:grid;gap:4px}
+.my-answer{padding:10px;border-radius:10px;background:color-mix(in srgb,var(--blue,#2167ff) 8%,transparent)}
+.my-login{display:grid;gap:8px;max-width:320px;margin-top:12px}
+.my-login a{text-align:center}
+.detail-tools a{align-self:center}
+#toast{z-index:2000}
