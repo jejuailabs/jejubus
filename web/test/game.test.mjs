@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {addRide,gameMarkup,newStamps,regionOf,stampsOf,titleOf} from '../public/game.js';
+import {addRide,gameMarkup,newStamps,regionOf,shareStats,stampsOf,titleOf} from '../public/game.js';
+import {createNetwork} from '../lib/network.mjs';
 import {boardMarkup,routeBoardMarkup,sideBest} from '../public/board.js';
 import {homeMarkup} from '../public/home.js';
 import {createAdminService} from '../lib/admin.mjs';
@@ -57,4 +58,11 @@ test('Firestore 사용량은 묶어서 쓰고 상한 근처에서는 한 건씩 
  const calls=[];let count=0;const limit=12,store={leasedQuota:true,control:async()=>({}),consumeApi:async(p,l,period,amount=1)=>{if(count+amount>l)throw Object.assign(Error(),{key:'quotaReached'});count+=amount;calls.push(amount);}};
  const admin=createAdminService({},store);for(let i=0;i<12;i++)await admin.consume('tago',limit);
  assert.deepEqual(calls,[10,1,1]);await assert.rejects(admin.consume('tago',limit),{key:'quotaReached'});
+});
+test('공유 카드 값에는 날짜와 정류장이 없다',()=>{
+ const stats=shareStats([{no:'1',stopId:'비밀정류장',region:'east',at:at('07',10)}]);assert.deepEqual(stats,{rides:1,routes:1,stamps:2,regions:['east']});assert.ok(!JSON.stringify(stats).includes('비밀정류장'));
+});
+test('길찾기 정류장 이름을 번호표 정류장으로 잇고 같은 이름은 가까운 쪽을 고른다',async()=>{
+ const n=createNetwork(()=>({stops:[['a','시청(동)','',33.5,126.5],['b','시청(서)','',33.5001,126.49],['c','유일','',33.4,126.4]],variants:[]}));
+ assert.equal((await n.stopByName('시청',{lat:33.5001,lng:126.491})).id,'b');assert.equal((await n.stopByName('시청(동)')).id,'a');assert.equal(await n.stopByName('없음'),null);
 });

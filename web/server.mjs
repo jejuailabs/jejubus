@@ -17,8 +17,10 @@ import {createToss} from './lib/toss.mjs';
 import {createRouteAdmin} from './lib/route-admin.mjs';
 import {fileNetwork} from './lib/network.mjs';
 import {createBoard} from './lib/board.mjs';
+import {fileTimetable} from './lib/timetable.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
+import {createNoticeWatch} from './lib/notice-watch.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -52,7 +54,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const liveRoute=createLiveRoute({positions:id=>catalog.positions(id),groupOf:network.groupOf});
   const fieldReports=createFieldReports(config,store);
   let todayCache={until:0,value:null};
-  const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
+  const noticeWatch=createNoticeWatch(config,store,{fetchImpl,knownNumber:no=>network.hasNumber(no)});
+  const timetable=fileTimetable(join(root,'public/data/timetable.json'));
+  const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,timetable,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
@@ -119,6 +123,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         throttle(`login:${req.socket.remoteAddress}`,15);
         const result=await social.start(name,{alert:step==='/alert'});res.setHeader('Set-Cookie',cookie('jeju_oauth',result.binding,600));return redirect(result.url);
       }
+      if(path==='/api/cron/notices'&&method==='GET'){if(!process.env.CRON_SECRET||req.headers.authorization!==`Bearer ${process.env.CRON_SECRET}`)fail('forbidden',403);return send(200,await noticeWatch.check());}
       if(path==='/api/field-reports'&&method==='POST'){throttle(`field:${req.socket.remoteAddress}`,6);return send(200,await fieldReports.submit(await jsonBody(req),user));}
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       const query=()=>{const q=url.searchParams.get('q')?.trim();if(!q||q.length>100)fail('queryRequired');return q;};
@@ -138,6 +143,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/today'){if(todayCache.until<Date.now()){const [notices,log]=await Promise.all([routeAdmin.today(network.numberOf),fieldReports.changelog()]);todayCache={until:Date.now()+60000,value:{...notices,changes:log.changes}};}return shared(todayCache.value,60);}
         if(path==='/api/board/stop'){const result=await board.stop(itemId());await remember(result.arrivals.map(a=>({id:a.routeId,number:a.number})),'route');return shared(result,25);}
         if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return shared(result,3600);}
+        if(path==='/api/board/find'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),point=Number.isFinite(lat)&&Number.isFinite(lng)&&url.searchParams.has('lat')?{lat,lng}:null,stop=await network.stopByName(query(),point);if(!stop)fail('notFound',404);return send(200,stop);}
+        if(path==='/api/board/home'){const result=await board.homeLine(itemId(),query());if(!result)fail('notFound',404);return shared(result,300);}
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
         if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return shared(result,3600);}
         if(path==='/api/geometry')return send(200,await catalog.geometry(url.searchParams.get('mapObject')));
@@ -145,7 +152,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
       if(path==='/api/intent'&&method==='POST'){const p=await jsonBody(req);if(typeof p?.input!=='string'||!p.input.trim()||p.input.length>500)fail('queryRequired');return send(200,await catalog.intent(p.input));}
       if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,4);return send(200,await busChat.answer(await jsonBody(req)));}
-      if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,contextName:(await store.context(p.route))?.name||null})))});
+      if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,routeNo:String(p.route).startsWith('route:')?await network.numberOf(p.route.slice(6)).catch(()=>null):null,contextName:(await store.context(p.route))?.name||null})))});
       if(path==='/api/posts'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);const p=await validatePost(await jsonBody(req));return send(201,{id:await store.createPost(user.id,p)});}
       const post=path.match(/^\/api\/posts\/([\w-]+)(?:\/(replies|like|report|block))?$/);
       if(post){
@@ -165,7 +172,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         }
       }
       if(path==='/api/blog'&&method==='GET'){throttle(`blog:${req.socket.remoteAddress}`,20);return send(200,await blog.search(query()));}
-      if(path==='/api/reviews'&&method==='GET')return send(200,await members.reviews(url.searchParams.get('context'),user?.id));
+      if(path==='/api/reviews'&&method==='GET'){const c=url.searchParams.get('context'),variants=typeof c==='string'&&c.startsWith('route:')?await network.variantsOf(c.slice(6)).catch(()=>[]):[];return send(200,await members.reviews(c,user?.id,variants.map(id=>`route:${id}`)));}
       if(path==='/api/reviews'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);return send(201,await members.saveReview(user,await jsonBody(req)));}
       const reviewItem=path.match(/^\/api\/reviews\/([a-f0-9]{32})$/);
       if(reviewItem&&['PATCH','DELETE'].includes(method)){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,20);return send(200,method==='DELETE'?await members.deleteReview(user,reviewItem[1]):await members.updateReview(user,reviewItem[1],await jsonBody(req)));}
@@ -179,6 +186,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/me/payments/confirm'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`pay:${user.id}`,10);return send(200,await members.confirmCard(user,await jsonBody(req)));}
       if(path==='/api/notices'&&method==='GET')return send(200,await routeAdmin.notices(url.searchParams.get('context')));
+      if(path==='/api/admin/notice-drafts'&&method==='GET')return send(200,await noticeWatch.drafts(user));
+      if(path==='/api/admin/notice-check'&&method==='POST'){if(!admin(user))fail('forbidden',403);return send(200,await noticeWatch.check());}
+      if(path==='/api/admin/notice-drafts'&&method==='POST'){const b=await jsonBody(req);const result=b?.dismiss?await noticeWatch.dismiss(user,b.id):await noticeWatch.publish(user,b);todayCache.until=0;return send(200,result);}
       if(path==='/api/admin/field-reports'&&method==='GET')return send(200,await fieldReports.adminList(user));
       if(path==='/api/admin/field-reports'&&method==='POST'){const b=await jsonBody(req);return send(200,await fieldReports.closeGroup(user,b?.ids,b?.action));}
       if(path==='/api/admin/changelog'&&method==='POST'){const change=await fieldReports.saveChange(user,await jsonBody(req));todayCache.until=0;return send(200,change);}

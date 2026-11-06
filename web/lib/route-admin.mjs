@@ -29,6 +29,7 @@ export function createRouteAdmin(config,store,{now=Date.now}={}){
    for(const n of list){
     const card={id:n.id,title:n.title,startsOn:n.startsOn,endsOn:n.endsOn,sourceUrl:n.sourceUrl,created:n.created};
     if(n.context===`stop:${stopId}`){for(const no of wanted){if(!out.has(no))out.set(no,[]);out.get(no).push(card);}continue;}
+    if(Array.isArray(n.routeNos)){for(const no of n.routeNos)if(wanted.has(no)){if(!out.has(no))out.set(no,[]);out.get(no).push(card);}continue;}
     if(!String(n.context).startsWith('route:'))continue;
     const no=await numberOf(n.context.slice(6));
     if(no&&wanted.has(no)){if(!out.has(no))out.set(no,[]);out.get(no).push(card);}
@@ -38,7 +39,7 @@ export function createRouteAdmin(config,store,{now=Date.now}={}){
   // 오늘 화면: 공개 중인 공지 전체. 공식 출처와 게시 시각을 그대로 준다.
   async today(numberOf){
    const day=koreaDay(now()),list=(await store.recordList('notices',{limit:300})).filter(n=>live(n,day)).sort(newest),notices=[];
-   for(const n of list){const route=String(n.context).startsWith('route:'),no=route?await numberOf(n.context.slice(6)):null;notices.push({id:n.id,title:n.title,body:n.body,numbers:no?[no]:[],stopName:route?'':n.routeName,startsOn:n.startsOn,endsOn:n.endsOn,sourceUrl:n.sourceUrl,created:n.created});}
+   for(const n of list){const route=String(n.context).startsWith('route:'),no=route?await numberOf(n.context.slice(6)):null,multi=Array.isArray(n.routeNos);notices.push({id:n.id,title:n.title,body:n.body,numbers:multi?n.routeNos:no?[no]:[],stopName:route||multi?'':n.routeName,startsOn:n.startsOn,endsOn:n.endsOn,sourceUrl:n.sourceUrl,created:n.created});}
    return {notices,day};
   },
   async saveNotice(actor,body){

@@ -22,8 +22,10 @@ export function createMemberService(config,store,{now=Date.now,notify=async()=>f
  const owned=async(user,id)=>{const r=await store.recordGet('reviews',id);if(!r||r.status==='deleted')fail('notFound',404);if(r.user_id!==user.id)fail('forbidden',403);return r;};
  const requireAdmin=actor=>{if(!adminOf(config,actor))fail('forbidden',403);};
  return {
-  async reviews(contextId,uid){
-   const rows=(await store.recordList('reviews',{field:'context',value:context(contextId),limit:300})).filter(r=>r.status==='published').sort(newest);
+  // 같은 번호의 변형 ID에 흩어진 후기를 저장값을 바꾸지 않고 읽을 때 합친다. 한 회원은 최신 후기 하나만 센다.
+  async reviews(contextId,uid,related=[]){
+   const ids=[...new Set([context(contextId),...related.map(context)])],lists=await Promise.all(ids.map(value=>store.recordList('reviews',{field:'context',value,limit:300}))),seen=new Set();
+   const rows=lists.flat().filter(r=>r.status==='published').sort(newest).filter(r=>!seen.has(r.user_id)&&seen.add(r.user_id));
    const total=rows.reduce((sum,r)=>sum+r.rating,0);
    return {summary:{count:rows.length,average:rows.length?Math.round(total/rows.length*10)/10:null},reviews:rows.slice(0,50).map(r=>({...review(r),owned:!!uid&&r.user_id===uid}))};
   },

@@ -111,3 +111,7 @@
 .legal-page{max-width:720px;margin:0 auto;padding:28px 18px 60px;font-size:15px}.legal-page table{width:100%;border-collapse:collapse;font-size:13px}.legal-page th,.legal-page td{border:1px solid var(--line);padding:7px;text-align:left}.legal-page a{color:var(--blue)}
 html[data-simple=on] body{font-size:16px}html[data-simple=on] .tado-min{font-size:32px}html[data-simple=on] .tado-dir,html[data-simple=on] .tado-after,html[data-simple=on] .home-row small,html[data-simple=on] .rb-name{font-size:15px}html[data-simple=on] .community-panel,html[data-simple=on] .rode,html[data-simple=on] .context-tools{display:none}
 @media(max-width:760px),(max-width:1020px) and (max-height:500px){.view-home .map-panel{display:block}.view-home .community-panel{display:none}}
+
+.rb-jump{display:flex;gap:10px;position:sticky;top:0;background:var(--panel);padding:5px 0;z-index:2}.rb-jump button{font-size:12px;color:var(--blue);font-weight:700;padding:3px 0}
+
+.home-line{margin:10px 0;padding:11px 12px;border-radius:12px;background:color-mix(in srgb,#27366b 9%,var(--panel));border:1px solid var(--line);font-size:13px}.home-line>strong{display:block;margin-bottom:6px}.home-line-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:3px 0}.home-line-row strong{font-size:17px}.home-line-row small{color:var(--soft);font-size:12px}.home-line-note{margin:3px 0 0;font-size:12px;color:var(--soft)}.home-hint{font-size:13px;color:var(--soft);margin:0 0 9px}.tado-plan{color:var(--soft)}.tado-off strong{color:#b4231f}

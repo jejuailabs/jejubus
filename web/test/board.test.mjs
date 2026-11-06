@@ -48,21 +48,16 @@ test('다음 정류장과 종점: 종점과 두 번 지나는 곳을 표시한�
  assert.equal((await n.directionFor('b','v1')).next,'다항구[동]');
 });
 
-const sat=Date.parse('2026-11-07T10:00:00+09:00'),tue=Date.parse('2026-11-10T10:00:00+09:00');
-const table={reviewed:true,sourceUrl:'https://bus.jeju.go.kr/x',effectiveDate:'2026-01-01',days:{weekday:['06:00','09:00','12:00','21:00'],saturday:[],sunday:[]}};
+const tue=Date.parse('2026-11-10T10:00:00+09:00');
 test('상태값 7종: 공지가 먼저, 근거가 없으면 단정하지 않는다',()=>{
- assert.equal(todayState({notice:{title:'우회'},arrival:{seconds:60},timetable:table,now:tue}).state,'changed');
- const coming=todayState({arrival:{seconds:61,remainingStops:2},now:tue});assert.deepEqual([coming.state,coming.minutes],['coming',2]);
- assert.equal(todayState({vehicleSeen:true,now:sat}).state,'running');
- assert.equal(todayState({now:tue}).state,'unknown');
- assert.equal(todayState({timetable:{...table,reviewed:false},now:tue}).state,'unknown');
- assert.equal(todayState({timetable:table,now:sat}).state,'notToday');
- const s=todayState({timetable:table,now:tue});assert.deepEqual([s.state,s.time],['scheduled','12:00']);
- assert.equal(todayState({timetable:table,now:Date.parse('2026-11-10T05:00:00+09:00')}).state,'beforeFirst');
- assert.equal(todayState({timetable:table,now:Date.parse('2026-11-10T22:00:00+09:00')}).state,'ended');
- assert.equal(todayState({timetable:{...table,holidays:['2026-11-10']},now:tue}).state,'unknown');
- assert.equal(todayState({timetable:{...table,effectiveTo:'2026-11-01'},now:tue}).state,'unknown');
- assert.equal(todayState({timetable:{...table,days:{weekday:table.days.weekday}},now:sat}).state,'unknown');
+ const plan=today=>({reviewed:true,today,kind:'saturday',sourceUrl:'https://x',effective:'(시행일 : 2026.1.1)',firstTime:'05:43',next:'12:00',interval:'15~22분',last:'21:35'});
+ assert.equal(todayState({notice:{title:'우회'},arrival:{seconds:60},plan:plan('running')}).state,'changed');
+ const coming=todayState({arrival:{seconds:61,remainingStops:2}});assert.deepEqual([coming.state,coming.minutes],['coming',2]);
+ assert.equal(todayState({vehicleSeen:true}).state,'running');
+ assert.equal(todayState({}).state,'unknown');assert.equal(todayState({plan:plan('unsure')}).state,'unknown');
+ assert.equal(todayState({plan:plan('off')}).state,'notToday');
+ assert.deepEqual((({state,time})=>[state,time])(todayState({plan:plan('running')})),['scheduled','12:00']);
+ assert.equal(todayState({plan:plan('before')}).state,'beforeFirst');assert.equal(todayState({plan:plan('ended')}).state,'ended');
 });
 test('정류장 보드는 도착을 번호로 묶고 공지를 번호 전체에 붙인다',async()=>{
  const catalog={arrivals:async()=>({receivedAt:'t',arrivals:[{routeId:'v2',number:'201',seconds:300,remainingStops:3},{routeId:'v1',number:'201',seconds:90,remainingStops:1}]})};

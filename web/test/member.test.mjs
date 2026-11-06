@@ -31,6 +31,14 @@ for(const [name,make]of Object.entries(stores)){
   const list=await m.reviews(route,a.id);assert.equal(list.summary.count,2);assert.equal(list.summary.average,2.5);
   assert.ok(list.reviews.every(r=>!('user_id'in r)&&r.nickname!=='가짜닉네임'));assert.equal(list.reviews.filter(r=>r.owned).length,1);
  });
+ test(`${name}: 같은 번호의 변형 후기는 합치고 회원당 최신 하나만 센다`,async()=>{
+  const store=make(),m=createMemberService(config,store);await store.createSession(a.id,a.name);await store.createSession(b.id,b.name);
+  await m.saveReview(a,{...body,context:'route:v1',rating:1});await m.saveReview(b,{...body,context:'route:v2',rating:5});
+  const merged=await m.reviews('route:v1',null,['route:v1','route:v2']);assert.equal(merged.summary.count,2);assert.equal(merged.summary.average,3);
+  await new Promise(r=>setTimeout(r,2));await m.saveReview(a,{...body,context:'route:v2',rating:3});
+  assert.equal((await m.reviews('route:v1',null,['route:v2'])).summary.count,2);
+  assert.equal((await m.reviews('route:v1')).summary.count,1);
+ });
  test(`${name}: 후기 입력 경계와 다른 회원의 수정·삭제를 막는다`,async()=>{
   const store=make(),m=createMemberService(config,store);
   await assert.rejects(m.saveReview(a,{...body,rating:0}),{key:'reviewRating'});await assert.rejects(m.saveReview(a,{...body,rating:6}),{key:'reviewRating'});await assert.rejects(m.saveReview(a,{...body,rating:4.5}),{key:'reviewRating'});

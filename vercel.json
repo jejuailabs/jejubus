@@ -3,6 +3,7 @@
   "version": 2,
   "framework": null,
   "regions": ["icn1"],
+  "crons": [{"path": "/api/cron/notices", "schedule": "0 22 * * *"}],
   "functions": {
     "api/index.mjs": {
       "includeFiles": "web/public/**",

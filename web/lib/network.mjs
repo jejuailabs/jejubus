@@ -42,6 +42,15 @@ export function createNetwork(load){
  }
  return {
   async builtAt(){return (await net()).builtAt;},
+  // 길찾기 결과의 정류장 이름을 번호표 정류장으로 잇는다. 같은 이름이면 좌표가 가까운 쪽을 고른다.
+  async stopByName(name,point=null){
+   const n=await net(),list=n.byBase.get(baseName(name))||[];if(!list.length)return null;
+   const exact=list.filter(s=>s.name===name),pool=exact.length?exact:list;
+   const best=point?[...pool].sort((a,b)=>distanceMeters(point,a)-distanceMeters(point,b))[0]:pool[0];
+   return {id:best.id,name:best.name,lat:best.lat,lng:best.lng,sure:pool.length===1||!!point};
+  },
+  async hasNumber(no){return (await net()).byNo.has(no);},
+  async variantsOf(variantId){const n=await net(),v=n.byVariant.get(variantId);return v?n.byNo.get(v.no).map(o=>o.id):[];},
   async stats(){const n=await net();return {builtAt:n.builtAt,variants:n.byVariant.size,numbers:n.byNo.size,stops:n.stops.length};},
   async groupOf(variantId){
    const n=await net(),v=n.byVariant.get(variantId);if(!v)return null;
