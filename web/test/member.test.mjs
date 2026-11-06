@@ -7,6 +7,7 @@ import {createApp} from '../server.mjs';
 import {createMemberService,WITHDRAWN_NAME} from '../lib/member.mjs';
 import {createKakaoAlert} from '../lib/kakao-alert.mjs';
 import {createBlog} from '../lib/blog.mjs';
+import {createRouteAdmin} from '../lib/route-admin.mjs';
 import {createSocialAuth} from '../lib/social-auth.mjs';
 import {configuration} from '../lib/settings.mjs';
 
@@ -162,6 +163,21 @@ test('결제 샘플: 금액은 서버 기록으로 검증하고, 본인 것만, 
  const live=configuration({TOSS_CLIENT_KEY:'live_ck_x',TOSS_SECRET_KEY:'live_sk_x'});assert.equal(live.tossClientKey,'');assert.equal(live.tossSecretKey,'');assert.equal(configuration({TOSS_CLIENT_KEY:'test_ck_x',TOSS_SECRET_KEY:'test_sk_x'}).tossSecretKey,'test_sk_x');
  store.close();
 });
+
+for(const [name,make]of Object.entries(stores)){
+ test(`${name}: 어드민 노선 안내는 기간과 공개 상태를 지키고 대시보드는 집계만 준다`,async()=>{
+  let now=Date.parse('2026-11-10T03:00:00Z');const store=make(),admin=createRouteAdmin(config,store,{now:()=>now}),m=createMemberService(config,store);await store.createSession(a.id,a.name);
+  const base={context:route,routeName:'201',title:'임시 우회 안내',body:'공사로 일부 정류장을 지나지 않습니다',startsOn:'2026-11-10',endsOn:'2026-11-12',sourceUrl:'https://bus.jeju.go.kr/notice'};
+  await assert.rejects(admin.saveNotice(a,base),{key:'forbidden'});await assert.rejects(admin.overview(a),{key:'forbidden'});
+  await assert.rejects(admin.saveNotice(owner,{...base,sourceUrl:'javascript:alert(1)'}),{key:'noticeSource'});await assert.rejects(admin.saveNotice(owner,{...base,endsOn:'2026-11-09'}),{key:'noticePeriod'});await assert.rejects(admin.saveNotice(owner,{...base,context:'x'}),{key:'noticeRoute'});await assert.rejects(admin.saveNotice(owner,{...base,title:'가'}),{key:'noticeTitle'});
+  const {id}=await admin.saveNotice(owner,base);assert.equal((await admin.notices(route)).notices.length,1);assert.ok(!('author'in(await admin.notices(route)).notices[0]));
+  now=Date.parse('2026-11-13T03:00:00Z');assert.equal((await admin.notices(route)).notices.length,0);now=Date.parse('2026-11-11T03:00:00Z');
+  await admin.setNotice(owner,id,'hide');assert.equal((await admin.notices(route)).notices.length,0);await admin.setNotice(owner,id,'show');await admin.saveNotice(owner,{...base,id,title:'수정한 안내'});assert.equal((await admin.notices(route)).notices[0].title,'수정한 안내');
+  await m.saveReview(a,body);await m.toggleSaved(a,{item:{id:'JEB405320111',number:'201'}});await m.createInquiry(a,{requestId:'request-0020',question:'막차 시간이 궁금합니다',context:route,contextName:'201'});
+  const o=await admin.overview(owner);assert.equal(o.counts.members,1);assert.equal(o.counts.openInquiries,1);assert.equal(o.counts.liveNotices,1);const r=o.routes[0];assert.deepEqual([r.name,r.saved,r.reviews,r.inquiries,r.notices,r.average],['201',1,1,1,1,5]);assert.ok(!JSON.stringify(o.routes).includes('google:a'));
+  await admin.setNotice(owner,id,'delete');assert.equal((await admin.overview(owner)).notices.length,0);await assert.rejects(admin.setNotice(owner,id,'show'),{key:'notFound'});
+ });
+}
 
 test('마이페이지에서만 토스 스크립트를 허용한다',async()=>{
  const s=await server();try{assert.ok((await s.call('/my')).headers.get('content-security-policy').includes('js.tosspayments.com'));assert.ok(!(await s.call('/')).headers.get('content-security-policy').includes('tosspayments'));assert.equal((await s.call('/api/me/payments/confirm',json({}))).status,401);assert.equal((await s.call('/api/admin/inquiries/Q12345678/payment',json({action:'cancel'}))).status,403);}finally{await s.close();}

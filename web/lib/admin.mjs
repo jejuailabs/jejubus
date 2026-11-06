@@ -30,7 +30,7 @@ export function createAdminService(config,store,{now=Date.now}={}){
    return {generatedAt:new Date(now()).toISOString(),today,actor:{id:actor.id,name:actor.name,owner:ownerOf(config,actor)},providers,metrics,usage,
     navigation:{expiresAt:config.navigationApprovalUntil,periodLimit:config.navigationPeriodLimit||100,periodCalls:usage.find(r=>r.provider==='navigation_budget'&&r.day===`approval:${config.navigationApprovalId}`)?.count||0,ceilingKrw:(config.navigationPeriodLimit||100)*8},
     ai:{model:CHAT_MODEL,approved:chatConfigured(config,now()),approvalId:config.aiApprovalId,expiresAt:config.aiApprovalUntil,periodLimit,periodCalls,remaining:Math.max(0,periodLimit-periodCalls),reservationMicroUsd:periodCalls*30000,approvedCeilingMicroUsd:config.aiPeriodCalls*30000,...stats},
-    users:users.filter(u=>!u.id.startsWith('sample:')).map(u=>({id:u.id,name:u.name,email:u.email||'',role:ownerOf(config,u)?'owner':u.role||'member',status:u.status||'active',created:u.created||null,lastLogin:u.lastLogin||null})),audit};
+    users:users.filter(u=>!u.id.startsWith('sample:')).map(u=>({id:u.id,name:u.name,email:u.email||'',role:ownerOf(config,u)?'owner':u.role||'member',status:u.status||'active',created:u.created||null,lastLogin:u.lastLogin||null,visits:u.visits||0,provider:String(u.id).split(':')[0]})),audit};
   },
   async updateUser(actor,id,body){
    if(!adminOf(config,actor))fail('forbidden',403);

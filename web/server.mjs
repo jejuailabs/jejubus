@@ -14,6 +14,7 @@ import {createSocialAuth} from './lib/social-auth.mjs';
 import {createKakaoAlert} from './lib/kakao-alert.mjs';
 import {createBlog} from './lib/blog.mjs';
 import {createToss} from './lib/toss.mjs';
+import {createRouteAdmin} from './lib/route-admin.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -38,6 +39,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const social=createSocialAuth(config,authOptions);
   const kakaoAlert=createKakaoAlert(config,store,{fetchImpl});
   const toss=createToss(config,{fetchImpl});
+  const routeAdmin=createRouteAdmin(config,store);
   const members=createMemberService(config,store,{notify:message=>kakaoAlert.send(message),toss});
   const blog=createBlog(config,{fetchImpl,consume:administration.consume});
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
@@ -158,6 +160,11 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       }
       if(path==='/api/me/payments/confirm'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`pay:${user.id}`,10);return send(200,await members.confirmCard(user,await jsonBody(req)));}
+      if(path==='/api/notices'&&method==='GET')return send(200,await routeAdmin.notices(url.searchParams.get('context')));
+      if(path==='/api/admin/overview'&&method==='GET')return send(200,await routeAdmin.overview(user));
+      if(path==='/api/admin/notices'&&method==='POST')return send(200,await routeAdmin.saveNotice(user,await jsonBody(req)));
+      const adminNotice=path.match(/^\/api\/admin\/notices\/([a-f0-9]{32})$/);
+      if(adminNotice&&method==='POST')return send(200,await routeAdmin.setNotice(user,adminNotice[1],(await jsonBody(req))?.action));
       if(path==='/api/admin/reviews'&&method==='GET')return send(200,await members.adminReviews(user));
       const adminReview=path.match(/^\/api\/admin\/reviews\/([a-f0-9]{32})$/);
       if(adminReview&&method==='POST')return send(200,await members.setReviewHidden(user,adminReview[1],(await jsonBody(req))?.hide));
