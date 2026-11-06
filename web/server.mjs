@@ -17,6 +17,8 @@ import {createToss} from './lib/toss.mjs';
 import {createRouteAdmin} from './lib/route-admin.mjs';
 import {fileNetwork} from './lib/network.mjs';
 import {createBoard} from './lib/board.mjs';
+import {createFieldReports} from './lib/field-reports.mjs';
+import {createLiveRoute} from './lib/live-route.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -47,6 +49,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   const network=fileNetwork(join(root,'public/data/network.json'));
+  const liveRoute=createLiveRoute({positions:id=>catalog.positions(id),groupOf:network.groupOf});
+  const fieldReports=createFieldReports(config,store);
+  let todayCache={until:0,value:null};
   const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
@@ -113,6 +118,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         throttle(`login:${req.socket.remoteAddress}`,15);
         const result=await social.start(name,{alert:step==='/alert'});res.setHeader('Set-Cookie',cookie('jeju_oauth',result.binding,600));return redirect(result.url);
       }
+      if(path==='/api/field-reports'&&method==='POST'){throttle(`field:${req.socket.remoteAddress}`,6);return send(200,await fieldReports.submit(await jsonBody(req),user));}
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       const query=()=>{const q=url.searchParams.get('q')?.trim();if(!q||q.length>100)fail('queryRequired');return q;};
       const page=()=>{const p=Number(url.searchParams.get('page')||1);if(!Number.isInteger(p)||p<1||p>45)fail('invalidRequest');return p;};
@@ -126,6 +132,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/route-stops'){const result=await catalog.routeStops(itemId());await remember(result.stops,'stop');return send(200,result);}
         if(path==='/api/positions')return send(200,await catalog.positions(itemId()));
         if(path==='/api/arrivals')return send(200,await catalog.arrivals(itemId()));
+        if(path==='/api/live/route')return send(200,await liveRoute.route(itemId()));
+        if(path==='/api/field-reports/summary')return send(200,await fieldReports.summary(url.searchParams.get('stop')));
+        if(path==='/api/today'){if(todayCache.until<Date.now()){const [notices,log]=await Promise.all([routeAdmin.today(network.numberOf),fieldReports.changelog()]);todayCache={until:Date.now()+60000,value:{...notices,changes:log.changes}};}return send(200,todayCache.value);}
         if(path==='/api/board/stop'){const result=await board.stop(itemId());await remember(result.arrivals.map(a=>({id:a.routeId,number:a.number})),'route');return send(200,result);}
         if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/board/places')return send(200,{stops:await network.searchStops(query())});
@@ -169,6 +178,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/me/payments/confirm'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`pay:${user.id}`,10);return send(200,await members.confirmCard(user,await jsonBody(req)));}
       if(path==='/api/notices'&&method==='GET')return send(200,await routeAdmin.notices(url.searchParams.get('context')));
+      if(path==='/api/admin/field-reports'&&method==='GET')return send(200,await fieldReports.adminList(user));
+      if(path==='/api/admin/field-reports'&&method==='POST'){const b=await jsonBody(req);return send(200,await fieldReports.closeGroup(user,b?.ids,b?.action));}
+      if(path==='/api/admin/changelog'&&method==='POST'){const change=await fieldReports.saveChange(user,await jsonBody(req));todayCache.until=0;return send(200,change);}
       if(path==='/api/admin/overview'&&method==='GET')return send(200,await routeAdmin.overview(user));
       if(path==='/api/admin/notices'&&method==='POST')return send(200,await routeAdmin.saveNotice(user,await jsonBody(req)));
       const adminNotice=path.match(/^\/api\/admin\/notices\/([a-f0-9]{32})$/);

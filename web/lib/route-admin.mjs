@@ -35,6 +35,12 @@ export function createRouteAdmin(config,store,{now=Date.now}={}){
    }
    return out;
   },
+  // 오늘 화면: 공개 중인 공지 전체. 공식 출처와 게시 시각을 그대로 준다.
+  async today(numberOf){
+   const day=koreaDay(now()),list=(await store.recordList('notices',{limit:300})).filter(n=>live(n,day)).sort(newest),notices=[];
+   for(const n of list){const route=String(n.context).startsWith('route:'),no=route?await numberOf(n.context.slice(6)):null;notices.push({id:n.id,title:n.title,body:n.body,numbers:no?[no]:[],stopName:route?'':n.routeName,startsOn:n.startsOn,endsOn:n.endsOn,sourceUrl:n.sourceUrl,created:n.created});}
+   return {notices,day};
+  },
   async saveNotice(actor,body){
    guard(actor);
    const prior=body?.id?await store.recordGet('notices',String(body.id)):null;if(body?.id&&(!prior||prior.status==='deleted'))fail('notFound',404);

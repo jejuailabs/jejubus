@@ -42,6 +42,10 @@ export function createNetwork(load){
  }
  return {
   async builtAt(){return (await net()).builtAt;},
+  async groupOf(variantId){
+   const n=await net(),v=n.byVariant.get(variantId);if(!v)return null;
+   return {no:v.no,key:`${v.no}|${v.firstName}→${v.lastName}`,variantIds:n.byNo.get(v.no).filter(o=>o.firstName===v.firstName&&o.lastName===v.lastName).map(o=>o.id)};
+  },
   async numberOf(variantId){return (await net()).byVariant.get(variantId)?.no||null;},
   async groups(no){
    const n=await net(),variants=n.byNo.get(no);if(!variants)return null;
