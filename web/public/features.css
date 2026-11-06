@@ -68,3 +68,9 @@
 .my-login a{text-align:center}
 .detail-tools a{align-self:center}
 #toast{z-index:2000}
+.my-pay{display:grid;gap:6px;padding:10px;border:1px solid var(--line);border-radius:10px}
+.my-pay p{margin:0}
+.my-pay button{min-height:44px}
+.pay-admin{display:grid;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.pay-admin form{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.pay-admin label{display:grid;gap:4px}

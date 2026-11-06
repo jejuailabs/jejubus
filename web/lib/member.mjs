@@ -1,10 +1,11 @@
 // 회원 기능: 후기, 찜, 문의, 마이페이지, 탈퇴.
 // 작성자와 소유자는 항상 서버가 세션으로 정한다. 화면이 보낸 이름이나 회원번호는 쓰지 않는다.
-import {createHash} from 'node:crypto';
+import {createHash,randomBytes} from 'node:crypto';
 import {ServiceError} from './catalog.mjs';
 import {adminOf,ownerOf} from './admin.mjs';
 
 export const WITHDRAWN_NAME='탈퇴한 회원';
+export const SAMPLE_PRODUCT='제주 여행 버스 코스 상담 (실습 샘플)';
 const CONTEXT=/^(route|stop):[\w:.-]{1,100}$/,REQUEST=/^[\w-]{8,80}$/;
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
 const digest=value=>createHash('sha256').update(value).digest('hex');
@@ -13,7 +14,8 @@ function text(value,min,max,key){if(typeof value!=='string')fail(key);const trim
 const label=value=>typeof value==='string'?value.trim().slice(0,80):'';
 const newest=(a,b)=>(b.created||0)-(a.created||0);
 
-export function createMemberService(config,store,{now=Date.now,notify=async()=>false}={}){
+export function createMemberService(config,store,{now=Date.now,notify=async()=>false,toss=null}={}){
+ const publicInquiry=({user_id,paymentKey,...q})=>q;
  const review=r=>({id:r.id,nickname:r.nickname,rating:r.rating,text:r.text,created:r.created,updated:r.updated||null,contextName:r.contextName||''});
  const rating=value=>Number.isInteger(value)&&value>=1&&value<=5?value:fail('reviewRating');
  const context=value=>typeof value==='string'&&CONTEXT.test(value)?value:fail('invalidRequest');
@@ -56,8 +58,30 @@ export function createMemberService(config,store,{now=Date.now,notify=async()=>f
    await store.recordPut('inquiries',id,{id,user_id:user.id,context:contextId,contextName:label(body.contextName),question,answer:'',status:'open',created:now(),answered:null});
    await notify(`💬 새 문의 · 접수 번호 ${id}`);return {id};
   },
-  async adminInquiries(actor){requireAdmin(actor);const rows=(await store.recordList('inquiries',{limit:300})).sort(newest);return {inquiries:rows.map(({user_id,...q})=>q),open:rows.filter(q=>q.status==='open').length};},
+  async adminInquiries(actor){requireAdmin(actor);const rows=(await store.recordList('inquiries',{limit:300})).sort(newest);return {inquiries:rows.map(publicInquiry),open:rows.filter(q=>q.status==='open').length};},
   async answerInquiry(actor,id,body){requireAdmin(actor);if(!/^Q[0-9A-F]{8}$/.test(id))fail('invalidRequest');const prior=await store.recordGet('inquiries',id);if(!prior)fail('notFound',404);await store.recordPut('inquiries',id,{...prior,answer:text(body?.answer,2,500,'inquiryAnswer'),status:'answered',answered:now()});return {ok:true};},
+
+  // 상태 흐름: 금액 입력 → pending(입금 대기) → paid(입금 확인) 또는 test_paid(카드 테스트). 취소는 cancelled.
+  async setPayment(actor,id,body){
+   requireAdmin(actor);if(!/^Q[0-9A-F]{8}$/.test(id))fail('invalidRequest');const prior=await store.recordGet('inquiries',id);if(!prior)fail('notFound',404);
+   const finished=['paid','test_paid'].includes(prior.payStatus);
+   if(body?.action==='request'){if(finished)fail('paymentDone',409);if(!Number.isInteger(body.amount)||body.amount<100||body.amount>1000000)fail('paymentAmount');await store.recordPut('inquiries',id,{...prior,amount:body.amount,payStatus:'pending',orderId:`jb-${id}-${randomBytes(6).toString('hex')}`,payUpdated:now()});return {ok:true};}
+   if(body?.action==='confirm'){if(prior.payStatus!=='pending')fail('paymentState',409);await store.recordPut('inquiries',id,{...prior,payStatus:'paid',paidMethod:'transfer',paidAt:now()});return {ok:true};}
+   if(body?.action==='cancel'){if(finished||!prior.payStatus)fail('paymentState',409);await store.recordPut('inquiries',id,{...prior,payStatus:'cancelled',orderId:null,payUpdated:now()});return {ok:true};}
+   fail('invalidRequest');
+  },
+  // 금액은 화면이 보낸 값을 믿지 않고 서버 기록과 비교한 뒤에만 승인한다.
+  async confirmCard(user,body){
+   const match=typeof body?.orderId==='string'&&body.orderId.match(/^jb-(Q[0-9A-F]{8})-[0-9a-f]{12}$/);if(!match||typeof body.paymentKey!=='string'||!body.paymentKey||body.paymentKey.length>200)fail('invalidRequest');
+   const prior=await store.recordGet('inquiries',match[1]);if(!prior||prior.user_id!==user.id)fail('notFound',404);
+   if(prior.payStatus==='test_paid'&&prior.paymentKey===body.paymentKey)return {ok:true};
+   if(prior.payStatus!=='pending'||prior.orderId!==body.orderId)fail('paymentState',409);
+   if(Number(body.amount)!==prior.amount)fail('paymentMismatch');
+   if(!toss?.enabled())fail('paymentFailed',503);
+   await toss.confirm({paymentKey:body.paymentKey,orderId:body.orderId,amount:prior.amount});
+   await store.recordPut('inquiries',match[1],{...prior,payStatus:'test_paid',paidMethod:'card_test',paymentKey:body.paymentKey,paidAt:now()});
+   await notify(`💳 테스트 결제 완료 · 접수 번호 ${match[1]}`);return {ok:true};
+  },
 
   // 회원번호(user_id)는 화면으로 보내지 않는다.
   async me(user){
@@ -65,7 +89,8 @@ export function createMemberService(config,store,{now=Date.now,notify=async()=>f
    return {profile:{name:user.name,provider:user.id.split(':')[0],created:account?.created||null,lastLogin:account?.lastLogin||null,visits:account?.visits||0,protected:ownerOf(config,user)},
     saved:saved.sort(newest).map(s=>s.item),
     reviews:reviews.filter(r=>r.status!=='deleted').sort(newest).map(r=>({...review(r),status:r.status})),
-    inquiries:inquiries.sort(newest).map(({user_id,...q})=>q)};
+    inquiries:inquiries.sort(newest).map(publicInquiry),
+    payment:{product:SAMPLE_PRODUCT,accountText:config.payAccountText||'',tossClientKey:toss?.enabled()?config.tossClientKey:'',customerKey:Buffer.from(digest(`pay|${user.id}`).slice(0,32)).toString('base64url')}};
   },
   async withdraw(user,body){
    if(body?.confirm!==true)fail('invalidRequest');if(ownerOf(config,user))fail('protectedAccount',403);

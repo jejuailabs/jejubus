@@ -147,6 +147,26 @@ test('블로그: 태그를 지우고 60자로 줄이며 위험한 링크를 버�
  assert.equal((await blog.search('201')).cached,true);assert.equal(calls,1);time=6*3600000+1;await blog.search('201');assert.equal(calls,2);
 });
 
+test('결제 샘플: 금액은 서버 기록으로 검증하고, 본인 것만, 한 번만 승인하며 live 키는 쓰지 않는다',async()=>{
+ const store=createStore(':memory:',{seed:false}),calls=[],toss={enabled:()=>true,confirm:async p=>{calls.push(p);return {status:'DONE'};}};
+ const m=createMemberService(config,store,{toss});await store.createSession(a.id,a.name);await store.createSession(b.id,b.name);
+ const {id}=await m.createInquiry(a,{requestId:'request-0009',question:'제주 일주 코스를 상담받고 싶어요'});
+ await assert.rejects(m.setPayment(a,id,{action:'request',amount:5000}),{key:'forbidden'});await assert.rejects(m.setPayment(owner,id,{action:'request',amount:99}),{key:'paymentAmount'});await assert.rejects(m.setPayment(owner,id,{action:'confirm'}),{key:'paymentState'});
+ await m.setPayment(owner,id,{action:'request',amount:5000});const q=(await m.me(a)).inquiries[0];assert.equal(q.payStatus,'pending');assert.match(q.orderId,/^jb-Q[0-9A-F]{8}-[0-9a-f]{12}$/);
+ const body={paymentKey:'pay_key',orderId:q.orderId,amount:'5000'};
+ await assert.rejects(m.confirmCard(a,{...body,amount:'100'}),{key:'paymentMismatch'});await assert.rejects(m.confirmCard(b,body),{key:'notFound'});await assert.rejects(m.confirmCard(a,{...body,orderId:'bad'}),{key:'invalidRequest'});assert.equal(calls.length,0);
+ await m.confirmCard(a,body);await m.confirmCard(a,body);assert.equal(calls.length,1);assert.equal(calls[0].amount,5000);
+ const done=(await m.me(a)).inquiries[0];assert.equal(done.payStatus,'test_paid');assert.ok(!('paymentKey'in done));assert.ok(!('paymentKey'in (await m.adminInquiries(owner)).inquiries[0]));
+ await assert.rejects(m.setPayment(owner,id,{action:'cancel'}),{key:'paymentState'});
+ const second=await m.createInquiry(a,{requestId:'request-0010',question:'계좌이체로 상담받고 싶어요'});await m.setPayment(owner,second.id,{action:'request',amount:3000});await m.setPayment(owner,second.id,{action:'confirm'});assert.equal((await store.recordGet('inquiries',second.id)).payStatus,'paid');
+ const live=configuration({TOSS_CLIENT_KEY:'live_ck_x',TOSS_SECRET_KEY:'live_sk_x'});assert.equal(live.tossClientKey,'');assert.equal(live.tossSecretKey,'');assert.equal(configuration({TOSS_CLIENT_KEY:'test_ck_x',TOSS_SECRET_KEY:'test_sk_x'}).tossSecretKey,'test_sk_x');
+ store.close();
+});
+
+test('마이페이지에서만 토스 스크립트를 허용한다',async()=>{
+ const s=await server();try{assert.ok((await s.call('/my')).headers.get('content-security-policy').includes('js.tosspayments.com'));assert.ok(!(await s.call('/')).headers.get('content-security-policy').includes('tosspayments'));assert.equal((await s.call('/api/me/payments/confirm',json({}))).status,401);assert.equal((await s.call('/api/admin/inquiries/Q12345678/payment',json({action:'cancel'}))).status,403);}finally{await s.close();}
+});
+
 test('환경변수 기본값은 모두 꺼짐이고 잘못된 채널 ID는 무시한다',()=>{
  const c=configuration({KAKAO_CHANNEL_ID:'javascript:alert(1)'});assert.equal(c.kakaoChannelId,'');assert.equal(c.kakaoLoginEnabled,false);assert.equal(c.blogEnabled,false);assert.equal(c.kakaoAlertEnabled,false);assert.equal(configuration({KAKAO_CHANNEL_ID:'_AbCdE'}).kakaoChannelId,'_AbCdE');
 });

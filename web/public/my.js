@@ -14,7 +14,12 @@ function reviewRow(r){
  if(editing===r.id)return `<form class="my-review" data-review-form="${e(r.id)}"><label>${t('ratingLabel')}<select name="rating">${[5,4,3,2,1].map(n=>`<option value="${n}" ${n===r.rating?'selected':''}>${stars(n)}</option>`).join('')}</select></label><label>${t('reviewBody')}<textarea name="text" rows="3" minlength="5" maxlength="200" required>${e(r.text)}</textarea></label><p class="form-error" role="alert"></p><div class="detail-tools"><button class="primary" type="submit">${t('edit')}</button><button type="button" data-cancel>${t('close')}</button></div></form>`;
  return `<article class="my-review"><strong>${e(r.contextName||t('route'))} · <span class="review-stars" aria-label="${r.rating}/5">${stars(r.rating)}</span></strong><p>${e(r.text)}</p><small>${date(r.created)}${r.status==='hidden'?` · ${t('statusHiddenReview')}`:''}</small>${r.status==='published'?`<div class="detail-tools"><button data-edit="${e(r.id)}">${t('edit')}</button><button data-delete="${e(r.id)}">${t('delete')}</button></div>`:''}</article>`;
 }
-const inquiryRow=q=>`<article class="my-review"><strong>${e(q.id)} · <span class="status-label ${q.status==='answered'?'on':'off'}">${t(q.status==='answered'?'statusAnswered':'statusOpen')}</span></strong>${q.contextName?`<small>${e(q.contextName)}</small>`:''}<p>${e(q.question)}</p>${q.answer?`<p class="my-answer"><b>${t('answerFromOperator')}</b> ${e(q.answer)}</p>`:''}<small>${date(q.created)}</small></article>`;
+function paymentRow(q){
+ if(!q.payStatus)return '';const p=data.payment,won=t('payWon',{n:Number(q.amount||0).toLocaleString(locale)});
+ if(q.payStatus==='pending')return `<div class="my-pay"><strong>${e(p.product)} · ${won} · ${t('payWaiting')}</strong><small>${t('paySample')}</small>${p.accountText?`<p><b>${t('payAccount')}</b> ${e(p.accountText)}<br><b>${t('payDepositor')}</b> ${e(q.id.slice(-4))}</p>`:''}${p.tossClientKey?`<button class="primary" data-pay="${e(q.id)}">${t('payCard')}</button>`:''}</div>`;
+ return `<div class="my-pay"><strong>${e(p.product)} · ${won} · ${t({paid:'payConfirmed',test_paid:'payTestDone',cancelled:'payCancelled'}[q.payStatus])}</strong></div>`;
+}
+const inquiryRow=q=>`<article class="my-review"><strong>${e(q.id)} · <span class="status-label ${q.status==='answered'?'on':'off'}">${t(q.status==='answered'?'statusAnswered':'statusOpen')}</span></strong>${q.contextName?`<small>${e(q.contextName)}</small>`:''}<p>${e(q.question)}</p>${q.answer?`<p class="my-answer"><b>${t('answerFromOperator')}</b> ${e(q.answer)}</p>`:''}${paymentRow(q)}<small>${date(q.created)}</small></article>`;
 function render(){
  document.documentElement.lang=locale==='zh'?'zh-CN':locale;document.title=`${t('myPage')} · ${t('brand')}`;
  if(failed){root.innerHTML=`${header()}<main class="admin-main">${section(t('myPage'),`<p role="alert">${t('connectionError')}</p>`)}</main>`;return;}
@@ -27,9 +32,22 @@ function render(){
  ${section(t('myReviews'),data.reviews.map(reviewRow).join('')||`<p class="muted">${t('noMyReviews')}</p>`)}</main>`;
  root.querySelectorAll('[data-review-form]').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;try{await api(`/api/reviews/${form.dataset.reviewForm}`,{method:'PATCH',body:JSON.stringify({rating:Number(form.elements.rating.value),text:form.elements.text.value})});editing=null;await load();toast(t('reviewSaved'));}catch(error){form.querySelector('.form-error').textContent=t(error.key||'connectionError');button.disabled=false;}}));
 }
+function tossSdk(){return window.TossPayments?Promise.resolve(window.TossPayments):new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://js.tosspayments.com/v2/standard';s.onload=()=>resolve(window.TossPayments);s.onerror=reject;document.head.append(s);});}
+async function payByCard(id){
+ const q=data.inquiries.find(x=>x.id===id),p=data.payment,Toss=await tossSdk(),back=`${location.origin}/my`;
+ await Toss(p.tossClientKey).payment({customerKey:p.customerKey}).requestPayment({method:'CARD',amount:{currency:'KRW',value:q.amount},orderId:q.orderId,orderName:p.product,successUrl:back,failUrl:back});
+}
+// 토스가 돌려보낸 주소의 값을 서버에서 다시 검증한 뒤 승인한다.
+async function finishPayment(){
+ const q=new URLSearchParams(location.search),paymentKey=q.get('paymentKey'),failed=q.get('code');if(!paymentKey&&!failed)return;
+ history.replaceState({},'',location.pathname);
+ if(failed){toast(t('payFailedToast'));return;}
+ try{await api('/api/me/payments/confirm',{method:'POST',body:JSON.stringify({paymentKey,orderId:q.get('orderId'),amount:q.get('amount')})});toast(t('payDoneToast'));}catch(error){toast(t(error.key||'paymentFailed'));}
+}
 async function load(){try{status={...await api('/api/status'),ready:true};if(status.user)data=await api('/api/me');else data=null;failed=false;}catch{failed=true;}render();}
 root.addEventListener('click',async event=>{
  const el=event.target.closest('button');if(!el||el.disabled)return;const d=el.dataset;
+ if(d.pay){el.disabled=true;try{await payByCard(d.pay);}catch(error){if(error?.code!=='USER_CANCEL')toast(t('payFailedToast'));}finally{if(el.isConnected)el.disabled=false;}return;}
  if(d.edit){editing=d.edit;render();return;}
  if('cancel' in d){editing=null;render();return;}
  el.disabled=true;
@@ -39,4 +57,4 @@ root.addEventListener('click',async event=>{
   else if('withdraw' in d){if(!confirm(t('withdrawConfirm')))return;await api('/api/me/withdraw',{method:'POST',body:JSON.stringify({confirm:true})});try{localStorage.removeItem('jejubus.savedRoutes');}catch{}location.href='/';}
  }catch(error){toast(t(error.key||'connectionError'));}finally{if(el.isConnected)el.disabled=false;}
 });
-render();await load();
+render();await finishPayment();await load();

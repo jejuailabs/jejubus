@@ -17,6 +17,7 @@ export function configuration(env){return {
   kakaoLoginKey:env.KAKAO_LOGIN_REST_KEY||'',kakaoClientSecret:env.KAKAO_CLIENT_SECRET||'',kakaoLoginEnabled:env.KAKAO_LOGIN_ENABLED==='true',kakaoAlertEnabled:env.KAKAO_ALERT_ENABLED==='true',kakaoChannelId:/^_[A-Za-z0-9]{2,30}$/.test(env.KAKAO_CHANNEL_ID||'')?env.KAKAO_CHANNEL_ID:'',
   naverLoginId:env.NAVER_LOGIN_CLIENT_ID||'',naverLoginSecret:env.NAVER_LOGIN_CLIENT_SECRET||'',naverLoginEnabled:env.NAVER_LOGIN_ENABLED==='true',
   naverSearchId:env.NAVER_CLIENT_ID||'',naverSearchSecret:env.NAVER_CLIENT_SECRET||'',blogEnabled:env.BLOG_ENABLED==='true',blogDailyLimit:Math.min(1000,Math.max(1,Number(env.BLOG_DAILY_LIMIT)||100)),
+  tossClientKey:/^test_ck_/.test(env.TOSS_CLIENT_KEY||'')?env.TOSS_CLIENT_KEY:'',tossSecretKey:/^test_sk_/.test(env.TOSS_SECRET_KEY||'')?env.TOSS_SECRET_KEY:'',payAccountText:(env.PAY_ACCOUNT_TEXT||'').slice(0,120),
   showSamples:env.SHOW_SAMPLE_POSTS==='true',adminSubjects:(env.ADMIN_GOOGLE_SUBS||'').split(',').map(v=>v.trim()).filter(Boolean),adminEmails:(env.ADMIN_GOOGLE_EMAILS||'').split(',').map(v=>v.trim().toLowerCase()).filter(Boolean),
   setupAllowed:env.NODE_ENV!=='production'&&(!env.HOST||['127.0.0.1','localhost','::1'].includes(env.HOST))&&/^http:\/\/localhost(?::\d+)?$/.test(env.APP_ORIGIN||`http://localhost:${Number(env.PORT)||3000}`)
 };}

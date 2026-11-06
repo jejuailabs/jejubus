@@ -13,6 +13,7 @@ import {createMemberService} from './lib/member.mjs';
 import {createSocialAuth} from './lib/social-auth.mjs';
 import {createKakaoAlert} from './lib/kakao-alert.mjs';
 import {createBlog} from './lib/blog.mjs';
+import {createToss} from './lib/toss.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
@@ -36,7 +37,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const administration=createAdminService(config,store);
   const social=createSocialAuth(config,authOptions);
   const kakaoAlert=createKakaoAlert(config,store,{fetchImpl});
-  const members=createMemberService(config,store,{notify:message=>kakaoAlert.send(message)});
+  const toss=createToss(config,{fetchImpl});
+  const members=createMemberService(config,store,{notify:message=>kakaoAlert.send(message),toss});
   const blog=createBlog(config,{fetchImpl,consume:administration.consume});
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
   let catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
@@ -59,7 +61,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   }
   const handler=async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
-    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+    // 토스 결제창은 마이페이지에서만 열린다. 다른 화면의 정책은 넓히지 않는다.
+    const payPage=(req.url||'').split('?')[0]==='/my';
+    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org${payPage?' https://*.tosspayments.com':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
     const redirect=url=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store'});res.end();};
     try{
@@ -153,10 +157,13 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/me/saved'&&method==='POST'){throttle(`write:${user.id}`,30);return send(200,await members.toggleSaved(user,await jsonBody(req)));}
         if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       }
+      if(path==='/api/me/payments/confirm'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`pay:${user.id}`,10);return send(200,await members.confirmCard(user,await jsonBody(req)));}
       if(path==='/api/admin/reviews'&&method==='GET')return send(200,await members.adminReviews(user));
       const adminReview=path.match(/^\/api\/admin\/reviews\/([a-f0-9]{32})$/);
       if(adminReview&&method==='POST')return send(200,await members.setReviewHidden(user,adminReview[1],(await jsonBody(req))?.hide));
       if(path==='/api/admin/inquiries'&&method==='GET')return send(200,{...await members.adminInquiries(user),alert:{ready:kakaoAlert.ready(),connected:await kakaoAlert.connected(),owner:owner(user)}});
+      const adminPayment=path.match(/^\/api\/admin\/inquiries\/(\w{1,20})\/payment$/);
+      if(adminPayment&&method==='POST')return send(200,await members.setPayment(user,adminPayment[1],await jsonBody(req)));
       const adminInquiry=path.match(/^\/api\/admin\/inquiries\/(\w{1,20})$/);
       if(adminInquiry&&method==='POST')return send(200,await members.answerInquiry(user,adminInquiry[1],await jsonBody(req)));
       const reply=path.match(/^\/api\/replies\/([\w-]+)$/);
