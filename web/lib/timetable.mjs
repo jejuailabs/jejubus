@@ -41,7 +41,7 @@ export function currentTabs(tabs,today){
  return [...best.values()].map(x=>x.tab);
 }
 export function headline(run,no){
- const part=String(run||'').split(/(?=\[[\d-]+번\])/).find(p=>p.startsWith(`[${no}번]`))||String(run||'');
+ const text=String(run||''),parts=text.split(/(?=\[[\d-]+번\])/).filter(p=>p.startsWith('[')),part=parts.length?parts.find(p=>p.startsWith(`[${no}번]`))||'':text;
  const first=/첫차(?:\(([^)]*)\))?\s*(\d{1,2}:\d{2})/.exec(part),last=/막차(?:\(([^)]*)\))?\s*(\d{1,2}:\d{2})/.exec(part),gap=/배차간격\s*([\d~\s-]+분)/.exec(part);
  return {first:first?.[2]||null,firstBase:first?.[1]||null,last:last?.[2]||null,lastBase:last?.[1]||null,interval:gap?.[1]?.replace(/\s/g,'')||null};
 }

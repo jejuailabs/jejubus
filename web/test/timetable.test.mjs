@@ -35,6 +35,7 @@ test('시행일이 미래인 탭은 쓰지 않고 같은 방향은 최신 탭만
 test('공식 문구에서 번호별 첫차·막차·배차를 뽑는다',()=>{
  const h=headline('[43-1번] 첫차(터미널 출발) 5:50, 막차 20:10, 배차간격 60~110분 [43-2번] 첫차(공항 출발) 5:57, 막차 20:50, 배차간격 60~100분','43-2');
  assert.deepEqual(h,{first:'5:57',firstBase:'공항 출발',last:'20:50',lastBase:null,interval:'60~100분'});
+ assert.deepEqual(headline('[43-1번] 첫차(터미널 출발) 5:50, 막차 20:10','43-3'),{first:null,firstBase:null,last:null,lastBase:null,interval:null},'다른 번호의 문구를 빌려 쓰지 않는다');
 });
 test('오늘 계획: 첫차 전, 운행, 끝, 주말 미운행을 표에서 정한다',async()=>{
  assert.equal((await table('10T04:30:00').plan('312')).today,'before');
