@@ -73,3 +73,15 @@ test('시간표 화면은 다음 차를 표시하고 값을 이스케이프한�
  assert.ok(html.includes('tt-time past'));assert.ok(html.includes('tt-time next'));assert.ok(html.includes('<s>13:00</s>'));assert.ok(html.includes('&lt;b>'));assert.ok(html.includes('&lt;i>막차'));
  assert.ok(timetableMarkup({no:'999',groups:[],sourceUrl:'https://x'},e,t).includes('ttNone'));
 });
+test('평일·휴일 표가 나뉜 번호는 오늘 요일 표만 쓴다',async()=>{
+ const tab=(day,first,extra={})=>({no:'365',path:`(${day})한라대-공항-제주대`,effective:'',run:`첫차 ${first}, 막차 21:00, 배차간격 10~20분`,columns:['','공항','제주대'],rows:[['',first,'08:00']],...extra});
+ const d={routes:{365:{tabs:[tab('평일','06:00'),tab('휴일','07:00')]},510:{tabs:[tab('평일','06:00',{no:'510'})]}}},make=time=>createTimetable(()=>d,{now:()=>at(time)});
+ assert.equal((await make('10T05:00:00').plan('365')).first,'06:00');assert.equal((await make('08T05:00:00').plan('365')).first,'07:00');assert.equal((await make('07T05:00:00').plan('365')).first,'07:00');
+ assert.equal((await make('08T10:00:00').plan('510')).today,'off');
+ const v=await make('10T05:00:00').view('365',{stopName:'공항'});assert.equal(v.day,'weekday');assert.deepEqual(v.groups.map(g=>g.day),['weekday','holiday']);assert.equal(v.groups[v.group].day,'weekday');
+});
+test('시간표 화면은 요일과 방향을 나눠 보여 주고 회차가 적은 정류장을 알려 준다',()=>{
+ const t=(k,o={})=>k+JSON.stringify(o),e=String,g=(day,end)=>({path:`(${day})x-${end}`,end,day,first:null,last:null,interval:null,effective:'',stop:1,stops:[{name:'많음',times:Array.from({length:9},(_,i)=>({time:`0${i}:00`,minutes:360+i,off:false,maybe:false,note:null}))},{name:'적음',times:[{time:'16:42',minutes:1000,off:false,maybe:false,note:null}]}]});
+ const html=timetableMarkup({no:'365',kind:'saturday',day:'holiday',current:600,sourceUrl:'https://x',group:2,groups:[g('weekday','제주대'),g('weekday','한라대'),g('holiday','제주대'),g('holiday','한라대')]},e,t);
+ assert.equal((html.match(/data-tt-day=/g)||[]).length,2);assert.equal((html.match(/data-tt-group=/g)||[]).length,2);assert.ok(html.includes('ttSaturdayGuess'));assert.ok(html.includes('ttFewTrips'));assert.ok(html.includes('ttTrips'));
+});

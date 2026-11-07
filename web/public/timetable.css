@@ -7,3 +7,5 @@
 .tt-done{margin:12px 0 0;font-weight:700}.tt-note{margin:10px 0 0;font-size:12px;color:var(--soft)}.tt-notes{margin-top:12px;font-size:13px}.tt-notes ol{margin:4px 0 0;padding-left:18px;color:var(--soft)}
 .tt-source{display:inline-block;margin-top:8px;font-size:12px;color:var(--soft);text-decoration:underline}
 @media(max-width:360px){.tt-times{grid-template-columns:repeat(3,1fr)}}
+.tt-days{display:flex;gap:3px;margin:14px 0 4px;padding:3px;border-radius:12px;background:var(--surface)}.tt-days button{flex:1;padding:8px 4px;border-radius:9px;font-weight:700;font-size:14px;color:var(--soft)}.tt-days .active{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}.tt-days small{margin-left:5px;padding:1px 6px;border-radius:7px;background:var(--blue);color:#fff;font-size:10px}
+.tt-groups{margin-top:8px}.tt-groups small{display:block;max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:10px;font-weight:500}
