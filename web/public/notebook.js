@@ -58,9 +58,9 @@ function mapPage({q,totals},e,t){
  const share=regionShare(q.stops,totals),stops=Object.keys(q.stops).length,lit=REGIONS.filter(r=>share[r].n>0),got=new Set(q.cards);
  const layers=REGIONS.map(r=>share[r].n?`<img class="nb-layer" src="/art/map/explore-${r}.webp?v=${ART_V}" alt="" style="opacity:${Math.min(1,.75+share[r].pct/20).toFixed(2)}">`:'').join('');
  const pins=CARDS.map(c=>{const p=PLACES[c.id];if(!p)return '';const on=got.has(c.id);return `<button class="nb-pin ${on?'on':''} r-${c.rarity}" style="left:${p[0]*100}%;top:${p[1]*100}%" data-q-place="${c.id}" aria-label="${e(p[2])}${on?'':` · ${t('nbLocked')}`}">${on?pic(`quest/place-${c.id}`,34):''}<span>${e(c.name)}</span></button>`;}).join('');
- return `<div class="nb-map" role="group" aria-label="${t('nbMap')}"><img class="nb-base" src="/art/map/explore-base.webp?v=${ART_V}" alt="" width="1600" height="1000">${layers}${pins}${stops?'':`<div class="nb-map-empty">${pic('quest/mascot-map',96)}<p>${t('nbMapEmpty')}</p></div>`}</div>
+ return `<div class="nb-map" role="group" aria-label="${t('nbMap')}"><img class="nb-base" src="/art/map/explore-base.webp?v=${ART_V}" alt="" width="1600" height="1000">${layers}${pins}</div>
  <p class="nb-cap">${t('nbMapCap',{stops,places:got.size,total:CARDS.length,regions:lit.length})}</p>
- <div class="nb-regions">${['north','east','south','west'].map(r=>`<span class="${share[r].n?'on':''} g-${r}">${t(`region_${r}`)} <b>${share[r].n}</b></span>`).join('')}</div>`;
+ ${stops?'':`<div class="nb-map-empty">${pic('quest/mascot-map',96)}<p>${t('nbMapEmpty')}</p></div>`}<div class="nb-regions">${['north','east','south','west'].map(r=>`<span class="${share[r].n?'on':''} g-${r}">${t(`region_${r}`)} <b>${share[r].n}</b></span>`).join('')}</div>`;
 }
 
 function bookPage({legs,now,rides,game,locale},e,t){
@@ -83,7 +83,7 @@ export function notebookMarkup({quest:q,legs,board,totals,now=Date.now(),guest=f
  const page=tab==='map'?mapPage({q,totals},e,t):tab==='book'?bookPage({legs,now,rides,game,locale},e,t):todayPage({q,legs,board,now},e,t);
  return `<section class="notebook">${certificate({q,lv,span,guest,open:cert},e,t)}
  <nav class="nb-tabs" role="tablist">${['today','map','book'].map(id=>`<button role="tab" data-q-tab="${id}" aria-selected="${tab===id}" class="${tab===id?'on':''}">${t(`nbTab_${id}`)}</button>`).join('')}</nav>
- <div class="nb-page nb-${tab}">${page}</div></section>`;
+ <div class="nb-page nb-p-${tab}">${page}</div></section>`;
 }
 
 // 장소 핀을 눌렀을 때의 카드

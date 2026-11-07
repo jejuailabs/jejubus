@@ -63,7 +63,7 @@
 .nb-pin.on:before{display:none}.nb-pin .art{width:30px;height:30px;border-radius:50%;box-shadow:0 2px 6px #0003;background:#fff}
 .nb-pin span{padding:0 4px;border-radius:6px;background:#fffc;font-size:9px;font-weight:800;color:#5b5449;white-space:nowrap}
 .nb-pin.on span{color:var(--nb-ink)}.nb-pin.on.r-rare span{color:var(--nb-orange)}.nb-pin.on.r-legend span{color:#a67c00}
-.nb-map-empty{position:absolute;inset:auto 8px 8px 8px;z-index:3;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#fffd;font-size:12px;font-weight:700}.nb-map-empty .art{width:56px;flex:none}.nb-map-empty p{margin:0}
+.nb-map-empty{display:flex;align-items:center;gap:10px;margin:4px 0 10px;padding:8px 12px;border-radius:12px;background:#fff8ec;border:1px dashed var(--nb-line);font-size:13px;font-weight:700}.nb-map-empty .art{width:56px;flex:none}.nb-map-empty p{margin:0}
 .nb-cap{margin:8px 0 6px;font-size:13px;font-weight:800;text-align:center}
 .nb-regions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}.nb-regions span{padding:4px 10px;border-radius:999px;background:#f4e8d2;font-size:12px;font-weight:700;color:#7b7466}
 .nb-regions .on.g-north{background:#f1c597;color:#7a3f06}.nb-regions .on.g-east{background:#a6cbc8;color:#1f5a63}.nb-regions .on.g-south{background:#e2b8ae;color:#7a2f25}.nb-regions .on.g-west{background:#b4c8a2;color:#34552b}
