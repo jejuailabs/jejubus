@@ -63,3 +63,16 @@ test('버스 기록: 탑승, 하차, 환승 묶기, 걷기 거리',()=>{
  const auto=startLeg(startLeg([],A),{...A,no:'2',at:t0+60000});assert.equal(auto[0].auto,true);
  const near=sortByDistance([{id:'1',name:'먼',lat:33.6,lng:126.5},{id:'2',name:'가까움',lat:33.5,lng:126.5}],{lat:33.5,lng:126.5});assert.equal(near[0].id,'2');assert.ok(offSheet({no:'1'},near,e,x).includes('data-log-stop="2"'));
 });
+test('기다리는 버스는 고르기 전엔 칩, 고른 뒤엔 대화 위 띠로 보인다',async()=>{
+ const {roomMarkup}=await import('../public/community.js'),e=String,t=k=>k,room={total:0,people:[],messages:[]};
+ const none=roomMarkup({room,me:'x',radius:0,located:false,wait:null},e,t,'ko');assert.ok(none.includes('wait-chip'));assert.ok(none.includes('wait-float'));
+ const set=roomMarkup({room,me:'x',radius:0,located:false,wait:{no:'201',stopName:'시청',minutes:4}},e,t,'ko');assert.ok(set.includes('has-wait'));assert.ok(!set.includes('wait-chip'));assert.ok(set.includes('201'));
+});
+test('글쓰기 검색은 정류장·노선·일반 순서로 묶고 노선 번호를 먼저 맞춘다',async()=>{
+ const {groupResults}=await import('../public/context-picker.js');
+ const rows=groupResults({routes:[{id:'R1',number:'201',start:'A',end:'B'}],stops:[{id:'S1',name:'시청',next:'광양'}]},k=>k);
+ assert.deepEqual(rows.filter(r=>r.id).map(r=>r.id),['stop:S1','route:R1','general']);
+ const {createNetwork}=await import('../lib/network.mjs'),{readFile}=await import('node:fs/promises');
+ const n=createNetwork(async()=>JSON.parse(await readFile(new URL('../public/data/network.json',import.meta.url))));
+ const r=await n.findRoutes('201',3);assert.ok(r.length&&r.every(x=>x.number.startsWith('201')));
+});

@@ -90,6 +90,12 @@ export function createNetwork(load){
   // 시간표와 맞춰 볼 이 번호의 변형들
   async variantStops(no){const n=await net();return (n.byNo.get(no)||[]).map(v=>({id:v.id,stops:v.stops.map(i=>n.stops[i])}));},
   // 이름이 같은 양쪽 정류장을 나눠 보여 준다. 다음 정류장으로 방향을 구분한다.
+  // 글쓰기에서 고를 노선: 번호가 맞거나 기점·종점 이름에 들어간 것
+  async findRoutes(query,limit=6){
+   const n=await net(),q=String(query||'').trim();if(!q)return [];const digits=/^\d/.test(q),seen=new Set(),out=[];
+   for(const v of n.byVariant.values()){const hit=digits?v.no===q||v.no.startsWith(q):(v.start||'').includes(q)||(v.end||'').includes(q);if(!hit)continue;const key=`${v.no}|${v.start}|${v.end}`;if(seen.has(key))continue;seen.add(key);out.push({id:v.id,number:v.no,start:v.start||v.firstName,end:v.end||v.lastName,exact:v.no===q});}
+   return out.sort((a,b)=>b.exact-a.exact||a.number.localeCompare(b.number,'ko',{numeric:true})).slice(0,limit).map(({exact,...r})=>r);
+  },
   async namedStops(query,limit=12){
    const n=await net(),q=baseName(query);if(q.length<2)return [];
    const names=[...n.byBase.keys()].filter(b=>b.includes(q)).sort((a,b)=>(b===q)-(a===q)||(b.startsWith(q))-(a.startsWith(q))||a.length-b.length);

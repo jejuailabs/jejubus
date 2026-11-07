@@ -1,5 +1,7 @@
 // 타도 돼 카드 문구. 순서: 한국어, 영어, 중국어(간체), 일본어.
 export const boardStrings={
+ roomOnlineShort:['{n}명','{n}','{n}人','{n}人'],
+ ctxWhich:['어느 버스·정류장 이야기인가요?','Which bus or stop is this about?','是关于哪路公交或车站？','どのバス・停留所の話ですか？'],ctxPlaceholder:['정류장 이름이나 버스 번호','Stop name or bus number','车站名或线路号','停留所名かバス番号'],ctxToward:['다음 {next}','next: {next}','下一站{next}','次: {next}'],ctxOther:['기타','Other','其他','その他'],ctxQuick:['자주 쓰는 곳','Quick picks','常用','よく使う'],ctxNone:['찾는 곳이 없어요','No matches','没有结果','見つかりません'],
  mapsTab:['지도','Maps','地图','地図'],ctab_notice:['공지','Notices','公告','お知らせ'],
  chatOnMap:['지도에서 보기 ({n}곳)','See on map ({n})','在地图上查看（{n}处）','地図で見る（{n}か所）'],
  chatMapTitle:['지도에서 확인 · {n}곳','On the map · {n}','地图确认 · {n}处','地図で確認 · {n}か所'],

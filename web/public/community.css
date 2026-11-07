@@ -66,3 +66,20 @@
 .ctabs .ctab-menu-list button.active{background:var(--surface-blue);color:var(--blue)}
 .ctab-gap{flex:1}
 .ctabs .ctab-icon{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink)}.ctab-icon .icon{width:19px;height:19px}
+
+/* 기다리는 버스: 점선 칩과 대화 위 반투명 띠 */
+.wait-chip{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 12px;border-radius:999px;border:1px dashed var(--line);background:none;color:var(--soft);font-size:13px;font-weight:700;white-space:nowrap}.wait-chip .icon{width:15px;height:15px}
+.room-feed-wrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+#wait-float:empty{display:none}
+#wait-float{position:absolute;z-index:3;left:0;right:0;top:2px;display:flex;justify-content:center;pointer-events:none}
+#wait-float .wait-pill{position:static;transform:none;pointer-events:auto;max-width:100%;min-height:32px;background:rgba(42,44,51,.74);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 10px #0003;font-size:13px}
+#wait-float .wait-main{padding:4px 6px 4px 6px}
+.room-feed-wrap.has-wait .room-feed{padding-top:40px}
+.view-community.ctab-live .room-feed-wrap{flex:1;min-height:80px}
+.view-community .ctabs{margin-top:0!important}
+
+/* 범위 · 접속 인원 · 버스봇을 한 줄에 */
+.room-bar .room-box{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.room-bar .room-box>strong{flex:none}
+.room-bar .room-people{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin:0}
+#wait-float .wait-chip{pointer-events:auto;background:color-mix(in srgb,var(--panel) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:color-mix(in srgb,var(--soft) 45%,transparent)}

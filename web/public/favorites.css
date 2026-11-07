@@ -128,3 +128,18 @@
  .view-map.mobile-map{position:relative}
  .view-map.mobile-map .map-controls{bottom:96px}
 }
+/* 글쓰기: 노선·정류장 검색 */
+.ctx-pick{position:relative;display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+.ctx-label{font-size:13px;font-weight:700;color:var(--soft)}
+.ctx-chip{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;max-width:100%;min-height:32px;padding:0 6px 0 12px;border-radius:999px;background:var(--surface-blue);color:var(--blue);font-size:13px;font-weight:800}
+.ctx-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctx-clear{width:26px;height:26px;padding:0;border-radius:50%;background:none;color:inherit;font-size:16px}
+.ctx-box{display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.ctx-box:focus-within{border-color:var(--blue)}.ctx-box .icon{width:16px;height:16px;color:var(--soft);flex:none}
+.ctx-box input{flex:1;min-width:0;min-height:44px;border:0!important;padding:0!important;background:none!important;outline:0}
+.ctx-list{position:absolute;z-index:30;left:0;right:0;top:100%;max-height:260px;overflow-y:auto;margin-top:-4px;padding:4px;border-radius:12px;border:1px solid var(--line);background:var(--panel);box-shadow:0 10px 26px #0003}
+.ctx-head{padding:6px 8px 2px;font-size:11px;font-weight:800;color:var(--soft)}
+.ctx-opt{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:9px;background:none;color:var(--ink);text-align:left}
+.ctx-opt:hover,.ctx-opt.focus{background:var(--surface)}.ctx-opt.on{background:var(--surface-blue)}
+.ctx-opt span{min-width:0}.ctx-opt strong{display:block;font-size:14px}.ctx-opt small{display:block;font-size:12px;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctx-ic{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--surface);color:var(--soft)}.ctx-ic .icon{width:15px;height:15px}.ctx-route{background:#2167ff;color:#fff}.ctx-stop{background:#2ea36a;color:#fff}
+.ctx-empty{margin:0;padding:10px;font-size:13px;color:var(--soft)}
