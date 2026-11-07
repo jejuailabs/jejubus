@@ -53,7 +53,7 @@ test('model request budget is reserved before network, forbids automatic retries
  await assert.rejects(unavailable.answer(input),{key:'aiProviderLimit'});assert.equal(requests,1);
  requests=0;const forged=createBusChat(config,{catalog:{},consume:async()=>{},fetchImpl:async()=>response(++requests===1?call('bus_guide',{}):answer('fake',['UNRETRIEVED']))});
  await assert.rejects(forged.answer(input),{key:'aiUnverified'});assert.equal(requests,2);
- assert.equal(CHAT_LIMITS.periodCalls,100);assert.equal(CHAT_LIMITS.inputBytes,26000);
+ assert.equal(CHAT_LIMITS.periodCalls,10000000);assert.equal(CHAT_LIMITS.inputBytes,26000);
 });
 
 test('chat rejects system messages and oversize inputs, limits history and cleans selected location context',()=>{

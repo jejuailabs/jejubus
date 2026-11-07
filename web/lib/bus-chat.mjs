@@ -1,7 +1,8 @@
 import {ServiceError,coordinate} from './catalog.mjs';
 
 export const CHAT_MODEL='gpt-5.4-mini';
-export const CHAT_LIMITS={inputBytes:26000,outputTokens:900,periodCalls:100,dailyCalls:20};
+// 호출 수 상한은 2026-11-07 운영자 요청으로 사실상 풀었다. 남용은 IP별 분당 제한으로 막는다.
+export const CHAT_LIMITS={inputBytes:26000,outputTokens:900,periodCalls:10000000,dailyCalls:1000000};
 const locales=['ko','en','zh','ja'];
 const validId=value=>typeof value==='string'&&/^[\w:.-]{1,100}$/.test(value);
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
@@ -53,8 +54,8 @@ export function createBusChat(config,{catalog,consume,observe=async()=>{},fetchI
     if(Buffer.byteLength(json)>CHAT_LIMITS.inputBytes)fail('chatTooLong');
     if(deadline-now()<1500)fail('chatTimeout',504);
     // Both counters persist across instances. Failed requests also keep their reservation.
-    await consume('ai',Math.min(config.aiDailyLimit||20,CHAT_LIMITS.dailyCalls));
-    await consume('ai_budget',Math.min(config.aiPeriodCalls||100,CHAT_LIMITS.periodCalls),`approval:${config.aiApprovalId}`);
+    await consume('ai',Math.min(config.aiDailyLimit||CHAT_LIMITS.dailyCalls,CHAT_LIMITS.dailyCalls));
+    await consume('ai_budget',Math.min(config.aiPeriodCalls||CHAT_LIMITS.periodCalls,CHAT_LIMITS.periodCalls),`approval:${config.aiApprovalId}`);
     if(!chatConfigured(config,now()))fail('aiNotEnabled',503);
     let response,result,ok=false;const started=now();
     try{

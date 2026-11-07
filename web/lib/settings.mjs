@@ -13,7 +13,7 @@ export function configuration(env){return {
   navigationFreeVerified:env.NAVIGATION_FREE_QUOTA_VERIFIED==='true',navigationApprovalId:env.NAVIGATION_APPROVAL_ID||'',navigationApprovalUntil:env.NAVIGATION_APPROVAL_UNTIL||'',navigationPeriodLimit:Math.min(100,Math.max(1,Number(env.NAVIGATION_PERIOD_LIMIT)||100)),
   odsayKey:env.ODSAY_API_KEY||'',odsayEnabled:env.ODSAY_ENABLED==='true',odsayDailyLimit:Math.min(25,Math.max(1,Number(env.ODSAY_DAILY_LIMIT)||25)),
   aiKey:env.OPENAI_API_KEY||'',aiModel:env.OPENAI_MODEL||'',aiEnabled:env.AI_ENABLED==='true'&&env.AI_BILLING_APPROVED==='true'&&env.OPENAI_MODEL==='gpt-5.4-mini'&&/^[\w-]{8,80}$/.test(env.AI_APPROVAL_ID||'')&&Date.parse(env.AI_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.AI_APPROVAL_UNTIL)<=Date.now()+31*86400000,
-  aiDailyLimit:Math.min(20,Math.max(1,Number(env.AI_DAILY_LIMIT)||20)),aiPeriodCalls:Math.min(100,Math.max(1,Number(env.AI_PERIOD_CALL_LIMIT)||100)),aiApprovalId:env.AI_APPROVAL_ID||'',aiApprovalUntil:env.AI_APPROVAL_UNTIL||'',
+  aiDailyLimit:1000000,aiPeriodCalls:10000000,aiApprovalId:env.AI_APPROVAL_ID||'',aiApprovalUntil:env.AI_APPROVAL_UNTIL||'',
   kakaoLoginKey:env.KAKAO_LOGIN_REST_KEY||'',kakaoClientSecret:env.KAKAO_CLIENT_SECRET||'',kakaoLoginEnabled:env.KAKAO_LOGIN_ENABLED==='true',kakaoAlertEnabled:env.KAKAO_ALERT_ENABLED==='true',kakaoChannelId:/^_[A-Za-z0-9]{2,30}$/.test(env.KAKAO_CHANNEL_ID||'')?env.KAKAO_CHANNEL_ID:'',
   naverLoginId:env.NAVER_LOGIN_CLIENT_ID||'',naverLoginSecret:env.NAVER_LOGIN_CLIENT_SECRET||'',naverLoginEnabled:env.NAVER_LOGIN_ENABLED==='true',
   naverSearchId:env.NAVER_CLIENT_ID||'',naverSearchSecret:env.NAVER_CLIENT_SECRET||'',blogEnabled:env.BLOG_ENABLED==='true',blogDailyLimit:Math.min(1000,Math.max(1,Number(env.BLOG_DAILY_LIMIT)||100)),

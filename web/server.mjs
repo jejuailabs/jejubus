@@ -20,6 +20,7 @@ import {createBoard} from './lib/board.mjs';
 import {fileTimetable} from './lib/timetable.mjs';
 import {createNoticeFeed} from './lib/notice-feed.mjs';
 import {bisFetch} from './lib/bis-fetch.mjs';
+import {createKudos,createLiveRoom} from './lib/live-room.mjs';
 import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
@@ -27,7 +28,7 @@ import {createNoticeWatch} from './lib/notice-watch.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.webmanifest':'application/manifest+json'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
-const categories=['question','update','concern','tip'];
+const categories=['question','update','concern','tip','suggest'];
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
 async function jsonBody(req){
   if(!req.headers['content-type']?.startsWith('application/json'))fail('invalidRequest',415);
@@ -66,6 +67,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
     Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   }});
+  const liveRoom=createLiveRoom(store,{consume:administration.consume,ask:async(text,locale)=>busChat.enabled()?(await busChat.answer({locale,messages:[{role:'user',content:text}]})).answer:null}),kudos=createKudos(store,{consume:administration.consume});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
   function throttle(key,max){const now=Date.now();for(const [k,l]of limits)if(l.until<now)limits.delete(k);const l=limits.get(key)||{count:0,until:now+60000};l.count++;limits.set(key,l);if(l.count>max)fail('rateLimited',429);}
@@ -129,6 +131,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/cron/notices'&&method==='GET'){if(!process.env.CRON_SECRET||req.headers.authorization!==`Bearer ${process.env.CRON_SECRET}`)fail('forbidden',403);return send(200,await noticeWatch.check());}
       if(path==='/api/field-reports'&&method==='POST'){throttle(`field:${req.socket.remoteAddress}`,6);return send(200,await fieldReports.submit(await jsonBody(req),user));}
+      if(path==='/api/room/ping'&&method==='POST'){throttle(`room-ping:${req.socket.remoteAddress}`,6);return send(200,await liveRoom.ping(await jsonBody(req)));}
+      if(path==='/api/room/say'&&method==='POST'){throttle(`room-say:${req.socket.remoteAddress}`,8);const b=await jsonBody(req);if(b?.bot)throttle(`room-bot:${req.socket.remoteAddress}`,2);return send(200,await liveRoom.say(b,{locale:typeof b?.locale==='string'&&['ko','en','zh','ja'].includes(b.locale)?b.locale:'ko'}));}
+      if(path==='/api/room/report'&&method==='POST'){throttle(`room-report:${req.socket.remoteAddress}`,5);return send(200,await liveRoom.report(await jsonBody(req)));}
+      if(path==='/api/kudos'&&method==='POST'){throttle(`kudos:${req.socket.remoteAddress}`,20);return send(200,await kudos.add(await jsonBody(req)));}
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       const query=()=>{const q=url.searchParams.get('q')?.trim();if(!q||q.length>100)fail('queryRequired');return q;};
       const page=()=>{const p=Number(url.searchParams.get('page')||1);if(!Number.isInteger(p)||p<1||p>45)fail('invalidRequest');return p;};
@@ -154,6 +160,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/board/nearby'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng'));if(!coordinate(lat,lng))fail('outsideJeju');const stops=await network.nearest({lat,lng});await remember(stops,'stop');return send(200,{stops});}
         if(path==='/api/notice-board')return shared(await noticeFeed.list(),300);
         if(path.startsWith('/api/notice-board/'))return shared(await noticeFeed.detail(path.slice(18)),3600);
+        if(path==='/api/room/top')return shared(await liveRoom.top(),15);
+        if(path==='/api/room'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),radius=Number(url.searchParams.get('r'));return shared(await liveRoom.view({lat,lng,radius}),4);}
+        if(path==='/api/kudos')return shared(await kudos.get(url.searchParams.get('no')),60);
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
