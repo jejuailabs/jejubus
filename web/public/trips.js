@@ -4,6 +4,8 @@ const LIMIT=300,TRANSFER_MS=3600000,KST=9*3600000;
 export const dayOf=at=>new Date(at+KST).toISOString().slice(0,10);
 const clock=(at,locale)=>new Date(at).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'});
 export const openLeg=legs=>legs.find(l=>!l.offAt)||null;
+// 타는 중에는 어느 화면에서나 내렸어요를 누를 수 있게 한다.
+export const rideBar=(leg,e,t,locale)=>leg?`<div class="ride-bar" role="status"><b>${e(leg.no)}</b><span>${t('rideNow',{no:e(leg.no)})}<small>${t('logOpen',{stop:e(leg.stopName),time:e(clock(leg.at,locale))})}</small></span><button data-log-off="1">${t('logOff')}</button></div>`:'';
 export function startLeg(legs,{no,stopId,stopName,lat,lng,at}){
  const closed=legs.map(l=>l.offAt?l:{...l,offAt:at,auto:true});
  return [...closed,{id:`${at}`,no,stopId,stopName,lat:lat??null,lng:lng??null,at,offAt:null}].slice(-LIMIT);

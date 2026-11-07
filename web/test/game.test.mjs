@@ -31,10 +31,11 @@ test('성격 칭호는 5번 타기 전에는 없다',()=>{
  const rides=['a','b','c','d'].map(s=>({no:'1',stopId:s,region:'east',at:at('07',10)}));assert.equal(titleOf(rides),null);
  assert.equal(titleOf([...rides,{no:'1',stopId:'e',region:'east',at:at('07',10)}]),'typeEast');
 });
-test('공지가 있는 줄에는 게임 버튼을 넣지 않는다',()=>{
+test('탔어요는 공지가 있거나 도착 정보가 없어도 누를 수 있다',()=>{
  const t=k=>k,e=String,row=notice=>({no:'201',routeId:'v',arrivals:[{minutes:3,remainingStops:1}],directions:[],direction:null,notice,scheduleUrl:'https://x',today:{state:'coming'}});
  assert.ok(boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:true,open:'201'}).includes('data-rode'));
- assert.ok(!boardMarkup({inNetwork:true,rows:[row({title:'우회'})]},e,t,{game:true,open:'201'}).includes('data-rode'));
+ assert.ok(boardMarkup({inNetwork:true,rows:[row({title:'우회'})]},e,t,{game:true,open:'201'}).includes('data-rode'));
+ assert.ok(boardMarkup({inNetwork:true,rows:[{...row(null),arrivals:[]}]},e,t,{game:true,open:'201'}).includes('data-rode-min="99"'));
  assert.ok(!boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:false,open:'201'}).includes('data-rode'));
 });
 test('내 제주 화면은 기록이 없어도 그려지고 삭제 버튼은 기록이 있을 때만 있다',()=>{

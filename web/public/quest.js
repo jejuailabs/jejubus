@@ -23,7 +23,7 @@ export const POOL=[
  ['late',20,legs=>legs.some(l=>hour(l.at)>=20)],
  ['twice',15,legs=>legs.length>=2],
  ['far',20,legs=>legs.some(l=>(l.painted||0)>=10)],
- ['lucky',15,(legs,a,day)=>legs.some(l=>String(l.no).replace(/\D/g,'').at(-1)===day.at(-1))],
+ ['lucky',15,(legs,a,day)=>legs.some(l=>String(l.no).replace(/\D/g,'').includes(day.at(-1)))],
  ['kudo',10,(legs,a)=>(a.kudo||0)>=1],
  ['chat',10,(legs,a)=>(a.chat||0)>=1],
 ];

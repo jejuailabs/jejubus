@@ -24,3 +24,7 @@ test('팀 점수는 기기당 하루 100점까지',async()=>{
  const m=new Map(),store={recordGet:async(k,id)=>m.get(`${k}/${id}`)??null,recordPut:async(k,id,d)=>m.set(`${k}/${id}`,d)},teams=createTeams(store,{now:()=>t0}),sid='11111111-1111-1111-1111-111111111111';
  await teams.add({sid,team:'sea',points:80});assert.equal((await teams.add({sid,team:'sea',points:80})).teams.sea,100);await assert.rejects(teams.add({sid,team:'x',points:1}),{key:'invalidRequest'});
 });
+test('행운 번호는 오늘 날짜 끝자리가 번호 어디에 있어도 된다',async()=>{
+ const {POOL}=await import('../public/quest.js'),lucky=POOL.find(m=>m[0]==='lucky')[2];
+ assert.ok(lucky([{no:'291'}],{},'2026-11-29'));assert.ok(lucky([{no:'960-1'}],{},'2026-11-09'));assert.ok(!lucky([{no:'201'}],{},'2026-11-29'));
+});
