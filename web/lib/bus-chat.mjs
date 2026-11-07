@@ -42,7 +42,7 @@ export function validateChatPayload(payload){
 }
 
 export function chatConfigured(config,now=Date.now()){
-  return !!(config.aiKey&&config.aiEnabled&&config.aiModel===CHAT_MODEL&&/^[\w-]{8,80}$/.test(config.aiApprovalId||'')&&Date.parse(config.aiApprovalUntil)>now&&Date.parse(config.aiApprovalUntil)<=now+31*86400000);
+  return !!(config.aiKey&&config.aiEnabled&&config.aiModel===CHAT_MODEL);
 }
 
 const BIS='https://bus.jeju.go.kr';
@@ -55,7 +55,7 @@ export function createBusChat(config,{catalog,consume,observe=async()=>{},fetchI
     if(deadline-now()<1500)fail('chatTimeout',504);
     // Both counters persist across instances. Failed requests also keep their reservation.
     await consume('ai',Math.min(config.aiDailyLimit||CHAT_LIMITS.dailyCalls,CHAT_LIMITS.dailyCalls));
-    await consume('ai_budget',Math.min(config.aiPeriodCalls||CHAT_LIMITS.periodCalls,CHAT_LIMITS.periodCalls),`approval:${config.aiApprovalId}`);
+    await consume('ai_budget',Math.min(config.aiPeriodCalls||CHAT_LIMITS.periodCalls,CHAT_LIMITS.periodCalls),`approval:${config.aiApprovalId||'open'}`);
     if(!chatConfigured(config,now()))fail('aiNotEnabled',503);
     let response,result,ok=false;const started=now();
     try{

@@ -18,6 +18,7 @@ export function todayState({notice=null,arrival=null,vehicleSeen=false,plan=null
 }
 
 // 부르는 이름과 정류장 이름이 다른 주요 지점
+const LONG_RIDE=100;
 const PLACE_ALIAS={제주공항:'제주국제공항',공항:'제주국제공항',중문:'중문환승정류장',성산:'성산일출봉입구',함덕:'함덕환승정류장',한림:'한림환승정류장',서귀포:'서귀포버스터미널'};
 export function createBoard({catalog,network,noticesFor=async()=>[],timetable=null,now=Date.now}){
  return {
@@ -41,7 +42,7 @@ export function createBoard({catalog,network,noticesFor=async()=>[],timetable=nu
    const alias=PLACE_ALIAS[name.trim()],[place]=[...(alias?await network.searchStops(alias):[]),...await network.searchStops(name)];if(!place)return null;
    const line=await this.homeLine(stopId,place.name);if(!line||!by||!timetable)return line;
    const at=await network.stopDirections(stopId),stopName=at?.stop?.name||null;
-   const options=await Promise.all(line.options.map(async o=>{const view=await timetable.view(o.no,{stopName,toName:place.name}).catch(()=>null),g=view?.groups[view.group];if(!g||!g.hasStop||g.to<=g.stop)return {...o,ticket:null,ticketReason:'ttNoTicket'};const today=!view.day||!g.day||g.day===view.day,ticket=planTrip(g,g.stop,g.to,by,today?view.current:null);return {...o,ticket,ticketReason:ticket?null:'ttNoTime'};}));
+   const options=await Promise.all(line.options.map(async o=>{const view=await timetable.view(o.no,{stopName,toName:place.name}).catch(()=>null),g=view?.groups[view.group];const last=o.last||g?.last||null;if(!g||!g.hasStop||g.to<=g.stop)return {...o,last,ticket:null,ticketReason:'ttNoTicket'};const today=!view.day||!g.day||g.day===view.day,found=planTrip(g,g.stop,g.to,by,today?view.current:null),detour=found&&found.ride>LONG_RIDE,ticket=detour?null:found;return {...o,last,ticket,ticketReason:ticket?null:detour?'ttDetour':'ttNoTime'};}));
    return {...line,options:options.sort((a,b)=>(b.ticket?.off||'').localeCompare(a.ticket?.off||''))};
   },
   // 귀가선: 이 정류장에서 돌아갈 정류장까지 바로 가는 번호의 오늘 마지막 출발. 시간표 값만 쓴다.

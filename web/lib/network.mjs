@@ -75,6 +75,12 @@ export function createNetwork(load){
    const reachable=AREAS.filter(([name])=>places.has(name)).map(([name])=>({name,routes:places.get(name).size}));
    return {...stopKind(stop.name,numbers),reachable};
   },
+  // 이 번호로 이 정류장 다음에 갈 수 있는 정류장. 내린 곳을 고를 때 쓴다.
+  async stopsAfter(stopId,no){
+   const n=await net(),stop=n.byId.get(stopId);if(!stop)return [];const seen=new Map();
+   for(const v of n.byStop.get(stop.i)||[]){if(v.no!==no)continue;for(const i of v.stops.slice(v.stops.indexOf(stop.i)+1)){const s=n.stops[i];if(!seen.has(s.id))seen.set(s.id,{id:s.id,name:s.name,lat:s.lat,lng:s.lng});}}
+   return [...seen.values()].slice(0,120);
+  },
   // 내 위치에서 가까운 정류장
   async nearest(point,limit=10){
    const n=await net();

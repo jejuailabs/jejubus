@@ -163,6 +163,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/room/top')return shared(await liveRoom.top(),15);
         if(path==='/api/room'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),radius=Number(url.searchParams.get('r'));return shared(await liveRoom.view({lat,lng,radius}),4);}
         if(path==='/api/kudos')return shared(await kudos.get(url.searchParams.get('no')),60);
+        if(path==='/api/board/next'){const no=url.searchParams.get('no')||'';if(!/^[\w-]{1,12}$/.test(no))fail('invalidRequest');return shared({stops:await network.stopsAfter(itemId(),no)},3600);}
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
@@ -216,6 +217,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/admin/notices'&&method==='POST')return send(200,await routeAdmin.saveNotice(user,await jsonBody(req)));
       const adminNotice=path.match(/^\/api\/admin\/notices\/([a-f0-9]{32})$/);
       if(adminNotice&&method==='POST')return send(200,await routeAdmin.setNotice(user,adminNotice[1],(await jsonBody(req))?.action));
+      if(path==='/api/admin/room'&&method==='GET'){if(!admin(user))fail('forbidden',403);return send(200,await liveRoom.adminList());}
+      if(path==='/api/admin/room'&&method==='POST'){if(!admin(user))fail('forbidden',403);const b=await jsonBody(req);return send(200,await liveRoom.adminHide(b?.id,b?.hide));}
       if(path==='/api/admin/reviews'&&method==='GET')return send(200,await members.adminReviews(user));
       const adminReview=path.match(/^\/api\/admin\/reviews\/([a-f0-9]{32})$/);
       if(adminReview&&method==='POST')return send(200,await members.setReviewHidden(user,adminReview[1],(await jsonBody(req))?.hide));

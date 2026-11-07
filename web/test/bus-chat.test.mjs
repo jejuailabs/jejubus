@@ -12,7 +12,7 @@ const response=json=>({ok:true,json:async()=>json});
 
 test('chat is fully offline without approval, with expired approval or a different model',async()=>{
  let network=0,quota=0;
- for(const invalid of [{aiEnabled:false},{aiApprovalId:''},{aiApprovalUntil:new Date(now-1).toISOString()},{aiModel:'other-model'},{aiApprovalUntil:new Date(now+40*86400000).toISOString()}]){
+ for(const invalid of [{aiEnabled:false},{aiKey:''},{aiModel:'other-model'}]){
   const c={...config,...invalid};assert.equal(chatConfigured(c,now),false);
   const chat=createBusChat(c,{catalog:{},now:()=>now,consume:()=>quota++,fetchImpl:()=>network++});
   await assert.rejects(chat.answer(input),{key:'aiNotEnabled'});

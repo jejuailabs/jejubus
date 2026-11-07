@@ -18,6 +18,7 @@ export function createNoticeFeed({fetchImpl=fetch,now=Date.now,knownNumber=async
     const today=new Date(now()+KST).toISOString().slice(0,10),rows=parseNoticeList(await page('/notice/list'));
     const notices=await Promise.all(rows.map(async n=>{const period=periodCandidate(n.title),candidates=routeCandidates(n.title),numbers=[];for(const no of candidates)if(await knownNumber(no))numbers.push(no);return {...n,...period,numbers,status:noticeStatus({...n,...period},today),url:`${BASE}/notice/detail?noticeId=${n.id}`};}));
     const order={active:0,upcoming:1,recent:2,past:3};notices.sort((a,b)=>order[a.status]-order[b.status]||b.postedOn.localeCompare(a.postedOn));
+    await Promise.all(notices.filter(n=>n.status!=='past').slice(0,6).map(async n=>{try{const parsed=parseNoticeDetail(await page(`/notice/detail?noticeId=${n.id}`)),found=routeCandidates(parsed?.body||'');for(const no of found)if(!n.numbers.includes(no)&&await knownNumber(no))n.numbers.push(no);}catch{}}));
     const value={notices,receivedAt:new Date(now()).toISOString(),available:true};cached={at:now(),value};return value;
    }catch(error){const reason=String(error?.cause?.code||error?.name||error?.key||'unknown').slice(0,40);console.warn(JSON.stringify({kind:'noticeFeedFailed',reason}));return cached?.value||{notices:[],receivedAt:null,available:false,reason};}
   },

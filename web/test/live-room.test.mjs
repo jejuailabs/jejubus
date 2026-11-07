@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {encodeValue} from '../lib/firestore.mjs';
+import {finishLeg,journeysOf,logMarkup,metersBetween,offSheet,openLeg,sortByDistance,startLeg,tripStats} from '../public/trips.js';
 import {aliasOf,bandOf,coarse,createKudos,createLiveRoom} from '../lib/live-room.mjs';
 import {kudosMarkup,nextFor,roomMarkup,soonest,topQuestion,waitPill} from '../public/community.js';
 
@@ -46,3 +47,19 @@ test('질문 한 줄은 10분 안의 가장 새로운 질문을 모두에게 보
  const e=String,t=k=>k,q={id:'1',alias:'나',text:'어디?'};assert.ok(topQuestion(q,'너',null,e,t).includes('어디?'));assert.equal(topQuestion(q,'나',null,e,t),'');assert.equal(topQuestion(q,'너','1',e,t),'');
 });
 test('Firestore에 소수 좌표를 소수로 저장한다',()=>{assert.deepEqual(encodeValue(33.512),{doubleValue:33.512});assert.deepEqual(encodeValue(3),{integerValue:'3'});});
+test('욕설은 막고 운영자는 숨길 수 있다',async()=>{
+ const room=createLiveRoom(memory(),{now:()=>1e12});await assert.rejects(room.say({sid:a,text:'시 발'}),{key:'roomBlocked'});
+ const {message}=await room.say({sid:a,text:'안녕'});assert.equal((await room.adminList()).messages.length,1);await room.adminHide(message.id,true);assert.equal((await room.view({radius:0})).messages.length,0);assert.equal((await room.adminList()).messages[0].hidden,true);
+});
+test('버스 기록: 탑승, 하차, 환승 묶기, 걷기 거리',()=>{
+ const t0=Date.parse('2026-11-07T01:00:00Z'),A={no:'201',stopId:'a',stopName:'시청',lat:33.5,lng:126.5,at:t0};
+ let legs=startLeg([],A);assert.equal(openLeg(legs).no,'201');legs=finishLeg(legs,{stopName:'터미널',lat:33.5,lng:126.51,at:t0+600000});assert.equal(openLeg(legs),null);
+ legs=startLeg(legs,{no:'325',stopId:'b',stopName:'터미널건너',lat:33.5,lng:126.512,at:t0+1200000});legs=finishLeg(legs,{stopName:'함덕',at:t0+2400000});
+ legs=startLeg(legs,{no:'9',stopId:'c',stopName:'먼곳',at:t0+9000000});
+ const js=journeysOf(legs);assert.equal(js.length,2);assert.equal(js[1].legs.length,2);assert.equal(tripStats(legs).rides,3);
+ assert.ok(Math.abs(metersBetween({lat:33.5,lng:126.51},{lat:33.5,lng:126.512})-186)<5);
+ const e=String,x=(k,o={})=>k+JSON.stringify(o),html=logMarkup(legs,e,x,'ko',t0+9000000);for(const key of ['logTransfer','logWalk','logOff','logPrivacy'])assert.ok(html.includes(key),key);
+ assert.ok(logMarkup([],e,x,'ko').includes('logEmpty'));
+ const auto=startLeg(startLeg([],A),{...A,no:'2',at:t0+60000});assert.equal(auto[0].auto,true);
+ const near=sortByDistance([{id:'1',name:'먼',lat:33.6,lng:126.5},{id:'2',name:'가까움',lat:33.5,lng:126.5}],{lat:33.5,lng:126.5});assert.equal(near[0].id,'2');assert.ok(offSheet({no:'1'},near,e,x).includes('data-log-stop="2"'));
+});

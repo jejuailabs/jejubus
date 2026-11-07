@@ -125,3 +125,9 @@ test('순환 노선은 타는 정류장 뒤에 나오는 같은 이름을 내릴
  const d={routes:{181:{tabs:[{no:'181',path:'공항-시청-서귀포-공항',effective:'',run:'',columns:['','공항','시청','서귀포','공항'],rows:[['','06:00','06:20','07:00','08:00']]}]}}};
  const v=await createTimetable(()=>d,{now:()=>at('10T05:00:00')}).view('181',{stopName:'제주시청',toName:'제주국제공항'}),g=v.groups[v.group];assert.equal(g.stop,1);assert.equal(g.to,3);
 });
+test('돌아가는 회차는 권하지 않고 막차는 표 값으로 채운다',async()=>{
+ const d={routes:{181:{tabs:[{no:'181',path:'시청-서귀포-공항',effective:'',run:'첫차 6:00, 막차 21:00',columns:['','시청','서귀포','공항'],rows:[['','10:00','11:00','12:30']]}]}}};
+ const net=createNetwork(()=>({builtAt:'x',stops:[['a','시청','',33.5,126.5],['b','제주국제공항3','',33.5,126.49]],variants:[{id:'v',no:'181',stops:[0,1]},{id:'w',no:'181',stops:[1,0]}]}));
+ const b=createBoard({catalog:{arrivals:async()=>({receivedAt:'t',arrivals:[]})},network:net,timetable:createTimetable(()=>d,{now:()=>at('10T05:00:00')})}),r=await b.trip('a','제주공항','13:00');
+ assert.equal(r.options[0].ticket,null);assert.equal(r.options[0].ticketReason,'ttDetour');assert.ok(r.options[0].last);
+});

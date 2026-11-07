@@ -13,7 +13,8 @@ export function aliasOf(sid,now){const h=createHash('sha256').update(`${sid}|${d
 export const coarse=point=>({lat:Math.round(point.lat*GRID)/GRID,lng:Math.round(point.lng*GRID)/GRID});
 export function bandOf(from,to){if(!from||!to)return null;const km=distanceMeters(from,to)/1000;return ROOM_RADII.find(r=>km<=r)??null;}
 // 전화번호와 링크는 올리지 못하게 막는다. 개인정보와 광고를 줄이려는 최소 장치다.
-const blocked=text=>/(?:\d[\s-]?){9,}|https?:\/\/|www\./i.test(text);
+const BANNED=/시발|씨발|ㅅㅂ|병신|ㅂㅅ|개새끼|좆|지랄|꺼져|닥쳐|fuck|shit/i;
+const blocked=text=>/(?:\d[\s-]?){9,}|https?:\/\/|www\./i.test(text)||BANNED.test(text.replace(/\s/g,''));
 const place=body=>coordinate(body?.lat,body?.lng);
 // 질문 한 줄: 최근 10분 안의 가장 새로운 질문을 모두에게 보여 준다.
 const TOP_MS=600000;
@@ -46,6 +47,8 @@ export function createLiveRoom(store,{consume=async()=>{},ask=null,now=Date.now}
    const bot=await post({id:`${now()}-bot`,alias:'버스봇',text:reply||'지금은 답하지 못해요. 잠시 뒤 다시 물어봐 주세요.',at:now(),bot:true,reports:0});
    return {message:mine,bot};
   },
+  async adminList(){return {messages:(await load('messages')).items.slice(-80).reverse().map(({id,alias,text,at,bot,hidden,reporters})=>({id,alias,text,at,bot:!!bot,hidden:!!hidden,reports:reporters?.length||0}))};},
+  async adminHide(id,hide){const doc=await load('messages'),item=doc.items.find(m=>m.id===id);if(!item)fail('notFound',404);item.hidden=!!hide;await store.recordPut('live_room','messages',doc);return {ok:true};},
   async report(body){
    check(body);const doc=await load('messages'),item=doc.items.find(m=>m.id===body.id);if(!item)fail('notFound',404);
    item.reporters=[...new Set([...(item.reporters||[]),body.sid.slice(0,8)])];if(item.reporters.length>=3)item.hidden=true;await store.recordPut('live_room','messages',doc);return {ok:true};

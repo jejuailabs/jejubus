@@ -16,7 +16,7 @@ export function mapMarkup({t,live=false,summary='',pick=''}) {
     <div class="map-controls"><button data-action="zoom-in" aria-label="${t('zoomIn')}">${icon('plus')}</button><button data-action="zoom-out" aria-label="${t('zoomOut')}">${icon('minus')}</button><span></span><button data-action="map-reset" aria-label="${t('resetMap')}">${icon('locate')}</button></div>`;
 }
 export function destroyMap(){
-  if(map){viewport={center:map.getCenter(),zoom:map.getZoom()};map.eachLayer(layer=>{if(!(layer instanceof L.Renderer))map.removeLayer(layer);});map.remove();}
+  if(map){viewport={center:map.getCenter(),zoom:map.getZoom()};map.eachLayer(layer=>{if(!(layer instanceof L.Renderer))map.removeLayer(layer);});map.eachLayer(layer=>{if(layer instanceof L.Renderer&&layer._redrawRequest){L.Util.cancelAnimFrame(layer._redrawRequest);layer._redrawRequest=null;}});map.remove();}
   clearTimeout(stopTimer);stopLayer=null;
   observer?.disconnect();map=null;locationMarker=null;locationCircle=null;
 }
