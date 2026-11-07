@@ -22,12 +22,19 @@
 .tt-line-list .tt-live-bus{display:flex;align-items:center;gap:8px;padding:3px 8px}.tt-line-list .tt-live-bus:before{display:none}.tt-live-bus .bus-face{width:38px;flex:none;margin-left:-26px}.tt-live-bus small{font-size:12px;font-weight:700;color:var(--blue)}
 /* 모바일 길찾기: 지도와 범례를 위에 늘 보여 준다 */
 @media(max-width:760px),(max-width:1020px) and (max-height:500px){
- .view-explore.mobile-search{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(170px,36%) minmax(0,1fr)}
- .view-explore.mobile-search>.map-panel{display:block;order:-1;height:100%;min-height:0;border-bottom:1px solid var(--line)}
- .view-explore.mobile-search>.search-panel{display:flex;min-height:0;overflow-y:auto;padding-top:10px}
+ .view-explore.mobile-search{display:block;position:relative;overflow:hidden}
+ .view-explore.mobile-search>.map-panel{display:block;position:absolute;inset:0;height:auto;min-height:0}
+ .view-explore.mobile-search>.search-panel{display:flex;position:absolute;top:auto;left:0;right:0;bottom:0;z-index:650;height:auto;max-height:74%;min-height:0;overflow-y:auto;padding:0 16px 12px;border:0;border-radius:20px 20px 0 0;box-shadow:0 -6px 22px #0003}
+ .view-explore.mobile-search:not(.sheet-open)>.search-panel{overflow:hidden;padding-bottom:4px}
+ .view-explore.mobile-search:not(.sheet-open)>.search-panel>:not(.sheet-handle):not(.search-types){display:none!important}
+ .view-explore.mobile-search .sheet-handle{display:flex;position:sticky;top:0;z-index:2;flex:none;justify-content:center;align-items:center;width:calc(100% + 32px);height:24px;min-height:0;margin:0 -16px;padding:0;border:0;background:var(--panel)}
+ .view-explore.mobile-search .sheet-handle i{width:42px;height:5px;border-radius:9px;background:var(--line);background:color-mix(in srgb,var(--soft) 45%,transparent)}
+ .view-explore.mobile-search:not(.sheet-open) .search-types{margin:0}
+ .view-explore.mobile-search .start-card{display:none}
+ .view-explore.mobile-search:not(.sheet-open) .map-controls{bottom:84px}
  .view-explore.mobile-search>.community-panel,.view-explore.mobile-search .search-intro,.view-explore.mobile-search .map-top,.view-explore.mobile-search .map-note{display:none}
  .view-explore.mobile-search .real-map{min-height:0}
- .view-explore.mobile-search .map-controls{bottom:26px;right:8px}
+ .view-explore.mobile-search .map-controls{bottom:26px;right:8px;transition:bottom .2s}
  .view-explore.mobile-search .map-controls button{width:34px;height:34px}
  .stop-legend{flex-wrap:wrap;overflow:visible;gap:4px}.view-explore.mobile-search .stop-legend{top:6px;left:6px;max-width:calc(100% - 12px)}
  .stop-legend button{padding:3px 8px 3px 4px;font-size:11px;background:color-mix(in srgb,var(--panel) 82%,transparent)}
@@ -70,3 +77,7 @@
 /* 타는 중 띠: 어느 화면에서나 내렸어요 */
 .ride-bar{position:fixed;z-index:780;left:12px;right:80px;bottom:calc(88px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:9px;padding:7px 7px 7px 9px;border-radius:16px;background:#2a2c33;color:#f6ecd8;box-shadow:0 4px 14px #0005}.ride-bar>b{flex:none;padding:3px 9px;border-radius:999px;background:#ff9a3c;color:#2a2c33;font-size:14px}.ride-bar>span{flex:1;min-width:0;font-size:13px;font-weight:800;line-height:1.3}.ride-bar small{display:block;font-size:11px;font-weight:600;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ride-bar button{flex:none;min-height:40px;padding:0 14px;border-radius:12px;background:#ff9a3c;color:#2a2c33;font-weight:800}
 @media(min-width:761px) and (min-height:501px){.ride-bar{left:auto;right:96px;bottom:24px;width:340px}}
+.sheet-handle{display:none}
+/* 채팅 입력: 안내 문구는 한 줄로 */
+.ai-chat-dialog .chat-composer{gap:2px}.ai-chat-dialog .chat-composer textarea{padding-inline:6px}
+.ai-chat-dialog .chat-composer textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

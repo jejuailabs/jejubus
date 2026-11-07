@@ -1,5 +1,7 @@
 // 타도 돼 카드 문구. 순서: 한국어, 영어, 중국어(간체), 일본어.
 export const boardStrings={
+ sheetOpen:['검색 메뉴 펼치기','Open search','展开搜索','検索を開く'],
+ sheetClose:['검색 메뉴 접고 지도 크게 보기','Close search and show map','收起搜索，放大地图','検索を閉じて地図を表示'],
  rideNow:['{no}번 타는 중','On bus {no}','正在乘坐{no}路','{no}番に乗車中'],
  chatAsk:['버스에 대해 물어보세요','Ask about buses','询问公交信息','バスについて質問'],
  chatExampleBoard:['제주공항 가려면 어디서 몇 번 타?','How do I get to Jeju Airport from here?','我要去济州机场，在哪坐几路？','済州空港へはどこで何番に乗る？'],
