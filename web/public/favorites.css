@@ -36,7 +36,10 @@
  .view-explore.mobile-search .real-map{min-height:0}
  .view-explore.mobile-search .map-controls{bottom:26px;right:8px;transition:bottom .2s}
  .view-explore.mobile-search .map-controls button{width:34px;height:34px}
- .stop-legend{flex-wrap:wrap;overflow:visible;gap:4px}.view-explore.mobile-search .stop-legend{top:6px;left:6px;max-width:calc(100% - 12px)}
+ .map-panel>.map-top{display:none}
+ .stop-legend,.view-explore.mobile-search .stop-legend{top:8px;left:8px;right:8px;max-width:none;flex-wrap:nowrap;overflow-x:auto;gap:4px;padding:0}
+ .stop-legend .legend-count{display:inline-flex;flex:none;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:#2a2c33;color:#f6ecd8;font-size:11px;font-weight:800;white-space:nowrap}.stop-legend .legend-count:before{content:'';width:7px;height:7px;border-radius:50%;background:#2ea36a}.stop-legend .legend-count:empty{display:none}
+ .map-panel>.map-note{display:flex;align-items:center;gap:6px;width:auto;max-width:none;padding:6px 12px;border-radius:999px;font-size:12px;line-height:1.3;white-space:nowrap;background:color-mix(in srgb,var(--panel) 90%,transparent)}.map-panel>.map-note span{overflow:hidden;text-overflow:ellipsis}.map-panel>.map-note .icon{flex:none;width:15px;height:15px}
  .stop-legend button{padding:3px 8px 3px 4px;font-size:11px;background:color-mix(in srgb,var(--panel) 82%,transparent)}
 }
 /* 정류장 모달 */
@@ -81,3 +84,4 @@
 /* 채팅 입력: 안내 문구는 한 줄로 */
 .ai-chat-dialog .chat-composer{gap:2px}.ai-chat-dialog .chat-composer textarea{padding-inline:6px}
 .ai-chat-dialog .chat-composer textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend-count{display:none}

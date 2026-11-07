@@ -9,7 +9,7 @@ let map=null,observer=null,selectedDestination=null,currentLocation=null,locatio
 export function mapMarkup({t,live=false,bar=''}) {
   return `<div id="real-map" class="real-map" role="region" aria-label="${t('realMap')}"></div>
     <div class="map-top"><div class="map-status"><span class="status-dot"></span><strong>${t('realMap')}</strong><small id="map-stop-count">OpenStreetMap</small></div></div>
-    ${live?bar:''}<div id="stop-legend" ${live?'hidden':''} class="stop-legend" role="group" aria-label="${t('stopLegend')}">${LEGEND.map(id=>`<button data-stop-filter="${id}" aria-pressed="${stopFilter===id}" class="${stopFilter===id?'on':''}"><span class="stop-pin ${id==='hub'?'kind-hub pin-trunk':id==='one'?'kind-one pin-branch':`kind-some pin-${id}`}">${id==='hub'?'<i aria-hidden="true">⇄</i>':''}</span>${t(`stopLegend_${id}`)}</button>`).join('')}</div>
+    ${live?bar:''}<div id="stop-legend" ${live?'hidden':''} class="stop-legend" role="group" aria-label="${t('stopLegend')}"><span class="legend-count" id="map-stop-short" aria-hidden="true"></span>${LEGEND.map(id=>`<button data-stop-filter="${id}" aria-pressed="${stopFilter===id}" class="${stopFilter===id?'on':''}"><span class="stop-pin ${id==='hub'?'kind-hub pin-trunk':id==='one'?'kind-one pin-branch':`kind-some pin-${id}`}">${id==='hub'?'<i aria-hidden="true">⇄</i>':''}</span>${t(`stopLegend_${id}`)}</button>`).join('')}</div>
     <div id="map-load-error" class="map-load-error" hidden role="alert">${icon('info')}<span>${t('mapLoadError')}</span><button data-action="map-retry">${t('retry')}</button></div>
     ${live?'':`<div class="map-note">${icon('info')}<span>${t('mapPickHelp')}</span></div>`}
     <div class="map-controls"><button data-action="zoom-in" aria-label="${t('zoomIn')}">${icon('plus')}</button><button data-action="zoom-out" aria-label="${t('zoomOut')}">${icon('minus')}</button><span></span><button data-action="map-reset" aria-label="${t('resetMap')}">${icon('locate')}</button></div>`;
@@ -79,9 +79,9 @@ async function loadStops(){
  try{
   if(!stopCache.has(cacheKey)){const response=await fetch(`/api/board/map?b=${key}&z=${zoom}`);if(!response.ok)throw new Error('stops');if(stopCache.size>40)stopCache.clear();stopCache.set(cacheKey,await response.json());}
   if(request===stopRequest&&map)drawStops(stopCache.get(cacheKey),zoom);
- }catch{if(request===stopRequest){stopLayer?.clearLayers();lastStops=null;const el=document.querySelector('#map-stop-count');if(el)el.textContent=stopContext.t?.('mapStopsError')||'';clearTimeout(stopTimer);stopTimer=setTimeout(loadStops,5000);}}
+ }catch{if(request===stopRequest){stopLayer?.clearLayers();lastStops=null;const el=document.querySelector('#map-stop-count');if(el)el.textContent=stopContext.t?.('mapStopsError')||'';const short=document.querySelector('#map-stop-short');if(short)short.textContent=stopContext.t?.('mapStopsError')||'';clearTimeout(stopTimer);stopTimer=setTimeout(loadStops,5000);}}
 }
-function stopCount(data){const el=document.querySelector('#map-stop-count'),t=stopContext.t;if(!el||!t)return;el.textContent=!data?'OpenStreetMap':t(data.thinned?'mapStopsThin':'mapStops',{n:data.stops.length});}
+function stopCount(data){const el=document.querySelector('#map-stop-count'),t=stopContext.t;const short=document.querySelector('#map-stop-short');if(short&&t)short.textContent=data?t('mapStops',{n:data.stops.length}):'';if(!el||!t)return;el.textContent=!data?'OpenStreetMap':t(data.thinned?'mapStopsThin':'mapStops',{n:data.stops.length});}
 function drawStops(data,zoom){lastStops=[data,zoom];
  const L=window.L,{onStop,mine=[]}=stopContext,view=map.getBounds().pad(.1),far=zoom<14;stopLayer.clearLayers();
  const match=s=>!stopFilter||(stopFilter==='hub'?s.kind==='hub':stopFilter==='one'?s.kind==='one':s.grade===stopFilter);
