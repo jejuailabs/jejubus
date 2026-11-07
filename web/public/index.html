@@ -3,21 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#2167ff">
+  <meta name="theme-color" content="#ff9a3c">
+  <meta property="og:title" content="제주버스">
+  <meta property="og:description" content="제주 버스, 타도 되는지 한눈에.">
+  <meta property="og:image" content="https://jejubus.vercel.app/art/brand/og-cover.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/art/brand/icon-180.png">
   <meta name="description" content="제주 버스 길찾기와 노선별 이야기를 한곳에서 만나세요.">
   <title>제주버스 · 길 위의 이야기를 잇다</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/art/brand/icon-192.png" type="image/png">
   <script src="/theme.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="/real-map.css">
   <link rel="stylesheet" href="/features.css">
+  <link rel="stylesheet" href="/art.css">
   <script src="/vendor/leaflet/leaflet.js"></script>
   <script type="module" src="/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 이동 / Skip to content</a>
-  <div id="app"></div>
+  <div id="app"><div class="boot"></div></div>
   <dialog id="dialog"></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>

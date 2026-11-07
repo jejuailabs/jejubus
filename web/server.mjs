@@ -22,7 +22,7 @@ import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
 import {createNoticeWatch} from './lib/notice-watch.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
-const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.webmanifest':'application/manifest+json'};
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
 const categories=['question','update','concern','tip'];
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
@@ -219,7 +219,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/privacy'?'/privacy.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       if(!mime[extname(file)])fail('notFound',404);
-      const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':'no-cache'});res.end(method==='HEAD'?undefined:data);
+      const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':path.startsWith('/art/')?'public, max-age=604800, s-maxage=31536000':'no-cache'});res.end(method==='HEAD'?undefined:data);
     }catch(error){if((error.status||500)>=500&&error.code!=='ENOENT')console.warn(JSON.stringify({kind:'serviceFailure',key:error.key||'serverError',providerCode:error.providerCode||null}));send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
   };
   const server=http.createServer(handler);

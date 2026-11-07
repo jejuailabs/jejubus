@@ -1,3 +1,4 @@
+import {gradeOf} from './board.js';
 import {icon} from './icons.js';
 
 // Neighbourhood view centres, never bus stops or boarding positions.
@@ -44,10 +45,10 @@ export function updateMapData(data={},t,onStop){
   for(const vehicle of data.vehicles||[]){
     if(!Number.isFinite(Number(vehicle.lat))||!Number.isFinite(Number(vehicle.lng)))continue;
     const ll=[Number(vehicle.lat),Number(vehicle.lng)];bounds.push(ll);
-    const node=document.createElement('span');node.className='live-bus-symbol';node.innerHTML=icon('bus');
+    const node=document.createElement('span');const grade=gradeOf(vehicle.number||data.routeNumber||'');node.className='live-bus-symbol art-bus';node.innerHTML=`<img src="/art/bus/bus-${grade==='other'?'trunk':grade}.webp" alt="">`;
     const number=document.createElement('strong');number.textContent=vehicle.number||data.routeNumber||'';node.append(number);
     const label=`${vehicle.number||data.routeNumber||''} · ${vehicle.id} · ${vehicle.stop||''}`;
-    const marker=L.marker(ll,{icon:L.divIcon({className:'live-bus-marker',html:node,iconSize:[44,42],iconAnchor:[22,21]}),title:label,alt:label,zIndexOffset:500}).addTo(overlay);
+    const marker=L.marker(ll,{icon:L.divIcon({className:'live-bus-marker',html:node,iconSize:[50,48],iconAnchor:[25,24]}),title:label,alt:label,zIndexOffset:500}).addTo(overlay);
     const element=marker.getElement();element.dataset.vehicleId=vehicle.id;element.dataset.lat=vehicle.lat;element.dataset.lng=vehicle.lng;
     const tooltip=document.createElement('span');tooltip.textContent=label;marker.bindTooltip(tooltip);marker.on('click',()=>marker.openTooltip());
   }
