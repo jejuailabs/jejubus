@@ -6,21 +6,33 @@ export const chip=(no,e,t)=>{const g=gradeOf(no);return `<span class="grade-chip
 // 번호판 버스. 번호는 그림이 아니라 글자로 얹어 4개 언어와 모든 번호에 같이 쓴다.
 export const busFace=(no,e,t,cls='')=>{const g=gradeOf(no),file=g==='other'?'trunk':g,n=String(no).length;return `<span class="bus-face ${cls} grade-${g} len-${Math.min(5,Math.max(3,n))}" title="${e(t(`grade_${g}`))}"><img src="/art/bus/bus-${file}.webp" width="46" alt="" loading="lazy" decoding="async"><b>${e(no)}</b></span>`;};
 const direction=(d,e,t)=>!d?'':d.terminus?`<small class="tado-dir">${t('boardTerminus')}</small>`:`<small class="tado-dir">${t('boardNext',{stop:e(d.next)})} · ${t('boardToward',{stop:e(d.end)})}${d.loop?` · ${t('boardLoop')}`:''}</small>`;
-function statusLine(r,e,t){const s=r.today;
- if(s.state==='coming'||r.arrivals.length)return '';
- if(s.state==='scheduled')return `<p>${s.time?t('boardScheduled',{time:e(s.time)}):t('boardRunningPlan')}</p>`;
- if(s.state==='beforeFirst')return `<p class="tado-state">${art('bus/face-before',44,'art-deco')}<span>${t('boardBeforeFirst',{time:e(s.time)})}</span></p>`;
- if(s.state==='ended')return `<p class="tado-state">${art('bus/face-done',44,'art-deco')}<span>${t('boardEnded')}</span></p>`;
- if(s.state==='notToday')return `<p class="tado-off tado-state">${art('bus/face-notoday',44,'art-deco')}<span><strong>${t('boardNotToday')}</strong>${s.effective?` <small>${e(s.effective)}</small>`:''}</span></p>`;
- if(s.state==='running')return `<p>${t('boardRunning')}</p>`;
- return `<p class="muted">${t('boardUnknown')}</p>`;}
-const planLine=(p,e,t)=>p&&(p.interval||p.last)?`<span class="tado-plan">${p.interval?`${t('planInterval',{v:e(p.interval)})}`:''}${p.interval&&p.last?' · ':''}${p.last?t('planLast',{v:e(p.last)}):''}${p.last&&p.lastBase?` (${e(p.lastBase)})`:''}</span>`:'';
-function row(r,e,t,reports,badge,game){const first=r.arrivals[0],second=r.arrivals[1],d=r.direction||(r.directions.length===1?r.directions[0]:null);
- const main=`<span class="tado-head">${busFace(r.no,e,t)}${first?`<strong class="tado-min">${t('arrive',{n:first.minutes})}</strong>${first.remainingStops===null?'':`<small>${t('boardStopsAway',{n:first.remainingStops})}</small>`}`:''}</span>${direction(d,e,t)}`;
- return `<article class="tado-row ${r.notice?'has-notice':''}">${r.notice?`<div class="tado-notice" role="status"><strong>${t('boardChanged')}</strong> ${e(r.notice.title)}${r.notice.sourceUrl?` <a href="${e(r.notice.sourceUrl)}" target="_blank" rel="noopener noreferrer">${t('noticeOpen')}</a>`:''}</div>`:''}${r.routeId?`<button class="tado-main" data-arrival-route="${e(r.routeId)}">${main}</button>`:`<div class="tado-main">${main}</div>`}${statusLine(r,e,t)}${reports.filter(x=>x.no===r.no).map(x=>badge(x,e,t)).join('')}<div class="tado-after">${second?`<span>${t('boardMissNext',{n:second.minutes})}</span>`:planLine(r.plan,e,t)}${game&&!r.notice&&first?`<button class="rode" data-rode="${e(r.no)}">${t('gameRode')}</button>`:''}<button class="tt-open" data-timetable="${e(r.no)}" data-towards="${e(d?.end||'')}">${t('boardSchedule')}</button><button data-report-no="${e(r.no)}">${t('reportOpen')}</button></div></article>`;}
-export function boardMarkup(board,e,t,{reports=[],badge=()=>'',game=false}={}){if(!board)return '';
- const on=board.rows.filter(r=>r.arrivals.length||r.notice),off=board.rows.filter(r=>!r.arrivals.length&&!r.notice);
- return `<div class="tado-card"><h3>${t('boardTitle')}</h3>${on.length?on.map(r=>row(r,e,t,reports,badge,game)).join(''):`<p class="muted">${t('boardNoArrivals')}</p>`}${off.length?`<details class="tado-more"><summary>${t('boardQuiet',{n:off.length})}</summary>${off.map(r=>row(r,e,t,reports,badge,game)).join('')}</details>`:''}${board.inNetwork?'':`<p class="muted">${t('boardNoTable')}</p>`}</div>`;}
+// 목록 한 줄의 짧은 상태. 도착이 있으면 도착, 없으면 시간표 기준 오늘 상태만 말한다.
+function shortStatus(r,e,t){const s=r.today,first=r.arrivals[0];
+ if(first)return `<strong class="tado-min">${t('arrive',{n:first.minutes})}</strong>${first.remainingStops===null?'':`<small>${t('boardStopsAway',{n:first.remainingStops})}</small>`}`;
+ if(s.state==='scheduled')return `<span class="row-state">${s.time?t('rowNext',{time:e(s.time)}):t('rowRunning')}</span>`;
+ if(s.state==='beforeFirst')return `<span class="row-state">${t('rowFirst',{time:e(s.time)})}</span>`;
+ if(s.state==='ended')return `<span class="row-state off">${t('rowEnded')}</span>`;
+ if(s.state==='notToday')return `<span class="row-state off">${t('rowOff')}</span>`;
+ if(s.state==='running')return `<span class="row-state">${t('boardRunning')}</span>`;
+ if(s.state==='changed')return `<span class="row-state warn">${t('rowChanged')}</span>`;
+ return `<span class="row-state muted">${t('boardUnknownShort')}</span>`;}
+// 오늘 운행 여부. 시간표를 해석한 값이고, 모르면 모른다고 말한다.
+function todayLine(r,e,t,locale){const day=new Intl.DateTimeFormat(locale,{month:'numeric',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date()),p=r.plan,kind=p?.today;
+ const word=kind==='off'?'detailOff':kind==='ended'?'detailEnded':kind==='running'||kind==='before'?'detailRuns':'detailUnknown';
+ return `<p class="row-today ${kind==='off'||kind==='ended'?'off':kind==='running'||kind==='before'?'on':''}"><b>${e(day)}</b> ${t(word)}</p>`;}
+function facts(r,e,t){const p=r.plan;if(!p)return '';const list=[p.next&&[t('factNext'),p.next],p.first&&[t('factFirst'),p.first],p.last&&[t('factLast'),p.lastBase?`${p.last} (${p.lastBase})`:p.last],p.interval&&[t('factGap'),p.interval]].filter(Boolean);
+ return list.length?`<dl class="row-facts">${list.map(([k,v])=>`<div><dt>${k}</dt><dd>${e(v)}</dd></div>`).join('')}</dl>`:'';}
+function detail(r,e,t,game,locale){const first=r.arrivals[0],second=r.arrivals[1],ways=r.direction?[r.direction]:r.directions;
+ return `<div class="row-detail">${todayLine(r,e,t,locale)}${first?`<p class="row-live">${t('arrive',{n:first.minutes})}${second?` · ${t('boardMissNext',{n:second.minutes})}`:''}</p>`:''}${facts(r,e,t)}${ways.slice(0,3).map(d=>direction(d,e,t)).join('')}<div class="row-actions"><button data-timetable="${e(r.no)}" data-towards="${e(ways.length===1?ways[0].end:'')}">${t('boardSchedule')}</button>${r.routeId?`<button data-arrival-route="${e(r.routeId)}">${t('rowRoute')}</button>`:''}${game&&!r.notice&&first?`<button class="rode" data-rode="${e(r.no)}">${t('gameRode')}</button>`:''}<button data-report-no="${e(r.no)}">${t('reportOpen')}</button></div></div>`;}
+function row(r,e,t,reports,badge,game,open,locale){const isOpen=open===r.no;
+ return `<article class="tado-row ${r.notice?'has-notice':''} ${isOpen?'open':''}">${r.notice?`<div class="tado-notice" role="status"><strong>${t('boardChanged')}</strong> ${e(r.notice.title)}${r.notice.sourceUrl?` <a href="${e(r.notice.sourceUrl)}" target="_blank" rel="noopener noreferrer">${t('noticeOpen')}</a>`:''}</div>`:''}<button class="tado-main" data-row-toggle="${e(r.no)}" aria-expanded="${isOpen}"><span class="tado-head">${busFace(r.no,e,t)}${shortStatus(r,e,t)}</span><i class="row-chevron" aria-hidden="true"></i></button>${reports.filter(x=>x.no===r.no).map(x=>badge(x,e,t)).join('')}${isOpen?detail(r,e,t,game,locale):''}</article>`;}
+// 정류장 표시: 색은 서는 버스 등급, 모양은 노선 수. 숫자는 번호 개수다.
+export const pinClass=({kind,grade})=>`stop-pin kind-${kind} pin-${grade}`;
+export const pinInner=({kind,routes})=>kind==='hub'?`<i aria-hidden="true">⇄</i>${routes}`:kind==='one'?'':String(routes);
+function profileMarkup(p,e,t){if(!p)return '';const parts=Object.entries(p.grades).map(([g,n])=>`${t(`grade_${g}`)} ${n}`).join(' · ');
+ return `<section class="stop-profile"><div class="stop-profile-head"><span class="${pinClass(p)}">${pinInner(p)}</span><div><strong>${t(`stopKind_${p.kind}`)}</strong><small>${t(`stopKindHelp_${p.kind}`,{n:p.routes})}${parts?` · ${parts}`:''}</small></div></div>${p.reachable.length?`<p class="stop-reach"><b>${t('stopReach')}</b> ${p.reachable.slice(0,6).map(r=>`<span>${e(r.name)}</span>`).join('')}</p>`:''}</section>`;}
+export function boardMarkup(board,e,t,{reports=[],badge=()=>'',game=false,open=null,locale='ko'}={}){if(!board)return '';
+ return `${profileMarkup(board.profile,e,t)}<div class="tado-card"><h3>${t('stopRoutes',{n:board.rows.length})}</h3>${board.rows.length?board.rows.map(r=>row(r,e,t,reports,badge,game,open,locale)).join(''):`<p class="muted">${t('boardNoArrivals')}</p>`}${board.inNetwork?'':`<p class="muted">${t('boardNoTable')}</p>`}</div>`;}
 export function routeBoardMarkup(stops,vehicles,no,age,mineId,e,t){const face=age===null?'ok':age<90?'ok':age<300?'stale':'lost',names=new Set(stops.map(s=>s.name)),away=vehicles.filter(v=>!names.has(v.stop)).length;
  return `<div class="route-board">${stops.map(s=>{const here=vehicles.filter(v=>v.stop===s.name);return `<button class="rb-stop ${s.id===mineId?'mine':''}" data-stop="${e(s.id)}"><span class="rb-dot"></span><span class="rb-name">${e(s.name)}</span>${here.map(()=>busFace(no,e,t,`bus-token state-${face}`)).join('')}</button>`;}).join('')}</div>${away?`<p class="rb-more">${t('rbOther',{n:away})}</p>`:''}`;}
 export const routeJumpMarkup=(t,hasBus,hasMine)=>hasBus||hasMine?`<div class="rb-jump">${hasMine?`<button data-action="rb-mine">${t('rbMine')}</button>`:''}${hasBus?`<button data-action="rb-bus">${t('rbBus')}</button>`:''}</div>`:'';

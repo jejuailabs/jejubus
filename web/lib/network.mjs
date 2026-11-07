@@ -2,12 +2,22 @@
 // 방향 값(updowncd)이 전부 0이라 쓰지 않는다. 방향은 기점·종점과 다음 정류장으로 만든다.
 import {readFile} from 'node:fs/promises';
 import {distanceMeters} from './catalog.mjs';
+import {gradeOf} from '../public/board.js';
 
-const PARTNER_METERS=300;
+const PARTNER_METERS=300,HUB_ROUTES=12,GRADE_ORDER=['express','trunk','branch','tour','other'];
+// 바로 갈 수 있는 곳으로 알려 줄 주요 지점
+const AREAS=[['제주공항',/^제주국제공항|^공항/],['제주버스터미널',/^제주버스터미널/],['제주시청',/^제주시청/],['제주대학교',/^제주대학교/],['서귀포버스터미널',/^서귀포버스터미널/],['중문',/^중문/],['성산',/^성산/],['함덕',/^함덕/],['한림',/^한림/],['표선',/^표선/],['대정·모슬포',/^(대정|모슬포|하모)/],['애월',/^애월/],['남원',/^남원/],['조천',/^조천/]];
+// 정류장 유형. 색은 서는 버스 중 가장 빠른 등급, 모양은 노선 수다. 공식 환승정류장은 노선 수와 상관없이 거점이다.
+export function stopKind(name,numbers){
+ const count=numbers.length,grades=numbers.map(gradeOf),grade=GRADE_ORDER.find(g=>grades.includes(g))||'other';
+ const kind=/환승정류장|환승센터|버스터미널|제주국제공항/.test(name)||count>=HUB_ROUTES?'hub':count>=6?'many':count>=2?'some':'one';
+ return {kind,grade,routes:count,grades:Object.fromEntries(GRADE_ORDER.map(g=>[g,grades.filter(x=>x===g).length]).filter(([,n])=>n))};
+}
 // 괄호의 방면, [동] 같은 방위, 공항 승차장 번호는 같은 장소의 표기 차이다.
 export const baseName=name=>String(name||'').replace(/\([^)]*\)|\[[^\]]*\]/g,'').replace(/\s+/g,'').replace(/^제주국제공항\d+$/,'제주국제공항').trim();
 export const scheduleUrl=no=>`https://bus.jeju.go.kr/schedule/viewNew/${encodeURIComponent(String(no).split('-')[0])}`;
 
+const rule_here=(stop,[,rule])=>rule.test(stop.base);
 export function indexNetwork(data){
  const stops=data.stops.map(([id,name,no,lat,lng],i)=>({i,id,name,no,lat,lng,base:baseName(name)}));
  const byId=new Map(stops.map(s=>[s.id,s])),byBase=new Map(),byNo=new Map(),byVariant=new Map(),byStop=new Map();
@@ -48,6 +58,27 @@ export function createNetwork(load){
    const exact=list.filter(s=>s.name===name),pool=exact.length?exact:list;
    const best=point?[...pool].sort((a,b)=>distanceMeters(point,a)-distanceMeters(point,b))[0]:pool[0];
    return {id:best.id,name:best.name,lat:best.lat,lng:best.lng,sure:pool.length===1||!!point};
+  },
+  // 지도 화면 안의 정류장. 호출 제한이 있는 TAGO를 쓰지 않고 번호표에서 고른다.
+  // 넓게 볼수록 칸을 키워 칸마다 노선이 가장 많은 정류장 하나만 남긴다.
+  async stopsIn({south,west,north,east},zoom){
+   const n=await net(),numbers=s=>[...new Set((n.byStop.get(s.i)||[]).map(v=>v.no))],routes=s=>numbers(s).length,inside=n.stops.filter(s=>s.lat>=south&&s.lat<=north&&s.lng>=west&&s.lng<=east),cell=zoom>=15?0:.0016*2**(15-zoom),seen=new Set();
+   const ranked=inside.map(s=>({s,count:routes(s)})).sort((a,b)=>b.count-a.count||a.s.i-b.s.i),kept=cell?ranked.filter(({s})=>{const key=`${Math.floor(s.lat/cell)}:${Math.floor(s.lng/cell)}`;if(seen.has(key))return false;seen.add(key);return true;}):ranked;
+   const stops=kept.slice(0,350).map(({s})=>{const {kind,grade,routes:count}=stopKind(s.name,numbers(s));return {id:s.id,name:s.name,number:s.no,lat:s.lat,lng:s.lng,kind,grade,routes:count};});
+   return {stops,total:inside.length,thinned:stops.length<inside.length};
+  },
+  // 정류장 소개: 유형과 갈아타지 않고 갈 수 있는 주요 지점
+  async stopProfile(stopId){
+   const n=await net(),stop=n.byId.get(stopId);if(!stop)return null;
+   const variants=n.byStop.get(stop.i)||[],numbers=[...new Set(variants.map(v=>v.no))],places=new Map();
+   for(const v of variants){const at=v.stops.indexOf(stop.i);for(const i of v.stops.slice(at+1)){const base=n.stops[i].base,hit=AREAS.find(([,rule])=>rule.test(base));if(hit&&!rule_here(stop,hit)){if(!places.has(hit[0]))places.set(hit[0],new Set());places.get(hit[0]).add(v.no);}}}
+   const reachable=AREAS.filter(([name])=>places.has(name)).map(([name])=>({name,routes:places.get(name).size}));
+   return {...stopKind(stop.name,numbers),reachable};
+  },
+  // 내 위치에서 가까운 정류장
+  async nearest(point,limit=10){
+   const n=await net();
+   return n.stops.map(s=>({s,distance:distanceMeters(point,s)})).sort((a,b)=>a.distance-b.distance).slice(0,limit).map(({s,distance})=>{const {kind,grade,routes}=stopKind(s.name,[...new Set((n.byStop.get(s.i)||[]).map(v=>v.no))]);return {id:s.id,name:s.name,number:s.no,lat:s.lat,lng:s.lng,distanceMeters:Math.round(distance),kind,grade,routes};});
   },
   async hasNumber(no){return (await net()).byNo.has(no);},
   async variantsOf(variantId){const n=await net(),v=n.byVariant.get(variantId);return v?n.byNo.get(v.no).map(o=>o.id):[];},

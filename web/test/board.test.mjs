@@ -80,3 +80,10 @@ test('화면은 값을 이스케이프하고 없는 값을 지어내지 않는�
  assert.ok(sideResultMarkup({verdict:'across',to:'x',here:[],across:['201'],unsure:[],acrossStop:{id:'b',name:'나'}},e,t).includes('side-across'));
  assert.ok(sideResultMarkup({error:true},e,t).includes('sideNoPlace'));
 });
+test('정류장 노선 목록: 모든 번호를 한 줄씩 보여 주고 누르면 오늘 운행과 시간, 이동 버튼이 나온다',()=>{
+ const t=(k,o={})=>k+JSON.stringify(o),e=x=>String(x),base={routeId:'v',directions:[{next:'나',end:'끝',terminus:false,loop:false}],direction:null,notice:null,scheduleUrl:'https://x'};
+ const rows=[{...base,no:'201',arrivals:[{minutes:3,remainingStops:1}],plan:{today:'running',first:'06:00',last:'21:00',lastBase:null,interval:'20분',next:null},today:{state:'coming'}},{...base,no:'310',arrivals:[],plan:{today:'off',first:null,last:null,lastBase:null,interval:null,next:null},today:{state:'notToday'}}];
+ const closed=boardMarkup({inNetwork:true,rows},e,t);assert.equal((closed.match(/data-row-toggle/g)||[]).length,2);assert.ok(!closed.includes('row-detail'));assert.ok(closed.includes('rowOff'));
+ const open=boardMarkup({inNetwork:true,rows},e,t,{open:'201'});assert.equal((open.match(/row-detail/g)||[]).length,1);for(const x of ['detailRuns','factLast','data-timetable="201"','data-arrival-route','data-report-no'])assert.ok(open.includes(x),x);
+ assert.ok(boardMarkup({inNetwork:true,rows},e,t,{open:'310'}).includes('detailOff'));
+});

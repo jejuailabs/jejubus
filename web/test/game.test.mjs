@@ -33,9 +33,9 @@ test('성격 칭호는 5번 타기 전에는 없다',()=>{
 });
 test('공지가 있는 줄에는 게임 버튼을 넣지 않는다',()=>{
  const t=k=>k,e=String,row=notice=>({no:'201',routeId:'v',arrivals:[{minutes:3,remainingStops:1}],directions:[],direction:null,notice,scheduleUrl:'https://x',today:{state:'coming'}});
- assert.ok(boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:true}).includes('data-rode'));
- assert.ok(!boardMarkup({inNetwork:true,rows:[row({title:'우회'})]},e,t,{game:true}).includes('data-rode'));
- assert.ok(!boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:false}).includes('data-rode'));
+ assert.ok(boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:true,open:'201'}).includes('data-rode'));
+ assert.ok(!boardMarkup({inNetwork:true,rows:[row({title:'우회'})]},e,t,{game:true,open:'201'}).includes('data-rode'));
+ assert.ok(!boardMarkup({inNetwork:true,rows:[row(null)]},e,t,{game:false,open:'201'}).includes('data-rode'));
 });
 test('내 제주 화면은 기록이 없어도 그려지고 삭제 버튼은 기록이 있을 때만 있다',()=>{
  const t=k=>k,e=String;assert.ok(!gameMarkup([],e,t).includes('game-clear'));assert.ok(gameMarkup([{no:'1',stopId:'a',region:'east',at:at('07',10)}],e,t).includes('game-clear'));
