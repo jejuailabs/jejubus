@@ -1,5 +1,6 @@
 // 타도 돼 카드 문구. 순서: 한국어, 영어, 중국어(간체), 일본어.
 export const boardStrings={
+ chatAsk:['버스에 대해 물어보세요','Ask about buses','询问公交信息','バスについて質問'],
  chatExampleBoard:['제주공항 가려면 어디서 몇 번 타?','How do I get to Jeju Airport from here?','我要去济州机场，在哪坐几路？','済州空港へはどこで何番に乗る？'],
  chatExampleOff:['동문시장 가는데 어디서 내려?','Where do I get off for Dongmun Market?','去东门市场在哪下车？','東門市場はどこで降りる？'],
  chatExampleWhen:['201번 얼마나 있다 와?','How long until bus 201?','201路还要多久？','201番はあと何分？'],
