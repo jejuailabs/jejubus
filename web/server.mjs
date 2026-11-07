@@ -20,7 +20,7 @@ import {createBoard} from './lib/board.mjs';
 import {fileTimetable} from './lib/timetable.mjs';
 import {createNoticeFeed} from './lib/notice-feed.mjs';
 import {bisFetch} from './lib/bis-fetch.mjs';
-import {createKudos,createLiveRoom} from './lib/live-room.mjs';
+import {createKudos,createLiveRoom,createTeams} from './lib/live-room.mjs';
 import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
@@ -30,9 +30,9 @@ const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8',
 const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').filter(Boolean).map(v=>{const i=v.indexOf('=');return [v.slice(0,i).trim(),v.slice(i+1).trim()];}));
 const categories=['question','update','concern','tip','suggest'];
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
-async function jsonBody(req){
+async function jsonBody(req,limit=16000){
   if(!req.headers['content-type']?.startsWith('application/json'))fail('invalidRequest',415);
-  let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>16000)fail('invalidRequest',413);}
+  let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>limit)fail('invalidRequest',413);}
   try{return JSON.parse(body);}catch{fail('invalidRequest');}
 }
 export async function createApp({env=process.env,store,fetchImpl=fetch,settingsFile=env===process.env?join(root,'.env.local'):null}={}){
@@ -67,7 +67,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
     Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   }});
-  const liveRoom=createLiveRoom(store,{consume:administration.consume,ask:async(text,locale)=>busChat.enabled()?(await busChat.answer({locale,messages:[{role:'user',content:text}]})).answer:null}),kudos=createKudos(store,{consume:administration.consume});
+  const liveRoom=createLiveRoom(store,{consume:administration.consume,ask:async(text,locale)=>busChat.enabled()?(await busChat.answer({locale,messages:[{role:'user',content:text}]})).answer:null}),kudos=createKudos(store,{consume:administration.consume}),teams=createTeams(store,{consume:administration.consume});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
   function throttle(key,max){const now=Date.now();for(const [k,l]of limits)if(l.until<now)limits.delete(k);const l=limits.get(key)||{count:0,until:now+60000};l.count++;limits.set(key,l);if(l.count>max)fail('rateLimited',429);}
@@ -134,6 +134,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/room/ping'&&method==='POST'){throttle(`room-ping:${req.socket.remoteAddress}`,6);return send(200,await liveRoom.ping(await jsonBody(req)));}
       if(path==='/api/room/say'&&method==='POST'){throttle(`room-say:${req.socket.remoteAddress}`,8);const b=await jsonBody(req);if(b?.bot)throttle(`room-bot:${req.socket.remoteAddress}`,2);return send(200,await liveRoom.say(b,{locale:typeof b?.locale==='string'&&['ko','en','zh','ja'].includes(b.locale)?b.locale:'ko'}));}
       if(path==='/api/room/report'&&method==='POST'){throttle(`room-report:${req.socket.remoteAddress}`,5);return send(200,await liveRoom.report(await jsonBody(req)));}
+      if(path==='/api/quest/points'&&method==='POST'){throttle(`quest:${req.socket.remoteAddress}`,10);return send(200,await teams.add(await jsonBody(req)));}
       if(path==='/api/kudos'&&method==='POST'){throttle(`kudos:${req.socket.remoteAddress}`,20);return send(200,await kudos.add(await jsonBody(req)));}
       if(path==='/api/logout'&&method==='POST'){await store.destroySession(token);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       const query=()=>{const q=url.searchParams.get('q')?.trim();if(!q||q.length>100)fail('queryRequired');return q;};
@@ -162,6 +163,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path.startsWith('/api/notice-board/'))return shared(await noticeFeed.detail(path.slice(18)),3600);
         if(path==='/api/room/top')return shared(await liveRoom.top(),15);
         if(path==='/api/room'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),radius=Number(url.searchParams.get('r'));return shared(await liveRoom.view({lat,lng,radius}),4);}
+        if(path==='/api/quest')return shared({...await teams.board(),totals:await network.regionTotals()},60);
         if(path==='/api/kudos')return shared(await kudos.get(url.searchParams.get('no')),60);
         if(path==='/api/board/next'){const no=url.searchParams.get('no')||'';if(!/^[\w-]{1,12}$/.test(no))fail('invalidRequest');return shared({stops:await network.stopsAfter(itemId(),no)},3600);}
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
@@ -201,9 +203,11 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/me'||path.startsWith('/api/me/')){
         if(!user)fail('loginRequired',401);
         if(path==='/api/me'&&method==='GET')return send(200,await members.me(user));
+        if(path==='/api/me/progress'&&method==='GET')return send(200,{data:(await store.recordGet('progress',user.id))?.data||{}});
+        if(path==='/api/me/progress'&&method==='POST'){throttle(`progress:${user.id}`,30);const data=(await jsonBody(req,450000))?.data;if(!data||typeof data!=='object'||Array.isArray(data)||Buffer.byteLength(JSON.stringify(data))>400000)fail('invalidRequest');const keys=['quest','trips','rides','myStops','homeStop','ttRecent'],clean=Object.fromEntries(keys.filter(k=>data[k]!==undefined).map(k=>[k,data[k]]));await store.recordPut('progress',user.id,{id:user.id,user_id:user.id,data:clean,updated:Date.now()});return send(200,{ok:true});}
         if(path==='/api/me/saved'&&method==='GET')return send(200,await members.saved(user));
         if(path==='/api/me/saved'&&method==='POST'){throttle(`write:${user.id}`,30);return send(200,await members.toggleSaved(user,await jsonBody(req)));}
-        if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
+        if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));await store.recordDelete('progress',user.id);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
       }
       if(path==='/api/me/payments/confirm'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`pay:${user.id}`,10);return send(200,await members.confirmCard(user,await jsonBody(req)));}
       if(path==='/api/notices'&&method==='GET')return send(200,await routeAdmin.notices(url.searchParams.get('context')));

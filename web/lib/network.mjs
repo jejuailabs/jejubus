@@ -76,6 +76,7 @@ export function createNetwork(load){
    return {...stopKind(stop.name,numbers),reachable};
   },
   // 이 번호로 이 정류장 다음에 갈 수 있는 정류장. 내린 곳을 고를 때 쓴다.
+  async regionTotals(){const n=await net(),t={east:0,west:0,south:0,north:0};for(const s of n.stops){const r=s.lng>=126.72?'east':s.lng<=126.38?'west':s.lat>=33.38?'north':'south';t[r]++;}return t;},
   async stopsAfter(stopId,no){
    const n=await net(),stop=n.byId.get(stopId);if(!stop)return [];const seen=new Map();
    for(const v of n.byStop.get(stop.i)||[]){if(v.no!==no)continue;for(const i of v.stops.slice(v.stops.indexOf(stop.i)+1)){const s=n.stops[i];if(!seen.has(s.id))seen.set(s.id,{id:s.id,name:s.name,lat:s.lat,lng:s.lng});}}

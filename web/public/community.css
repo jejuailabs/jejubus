@@ -25,3 +25,5 @@
 /* 작은 폰: 입력칸을 늘 보이게 */
 .room-form{position:sticky;bottom:0;z-index:2;padding:6px 0;background:var(--panel)}
 @media(max-width:350px){.view-community .community-heading h2,.room-box strong{display:none}.view-community .community-heading{padding-bottom:6px}.view-community #community-query{padding-block:8px}.room-feed{height:clamp(150px,calc(100dvh - 420px),300px)}}
+@media(max-width:760px){.mobile-nav [data-view=favorites]{display:flex!important}}
+.save-login{display:block;width:100%;margin:8px 0 10px;padding:11px 12px;border-radius:12px;background:var(--surface-blue);color:var(--blue);font-size:13px;font-weight:800;text-align:left}

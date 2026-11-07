@@ -55,6 +55,18 @@ export function createLiveRoom(store,{consume=async()=>{},ask=null,now=Date.now}
   }
  };
 }
+// 팀 대항전: 주간 합계만 둔다. 사람별 순위와 위치는 없다. 하루 기여는 기기당 100점까지.
+export function createTeams(store,{consume=async()=>{},now=Date.now}={}){
+ const TEAMS=['tangerine','sea','oreum'],weekId=()=>{const d=new Date(now()+KST),b=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));b.setUTCDate(b.getUTCDate()-((b.getUTCDay()+6)%7));return b.toISOString().slice(0,10);};
+ return {
+  async board(){return {week:weekId(),teams:(await store.recordGet('quest_week',weekId()))?.teams||{}};},
+  async add(body){
+   if(typeof body?.sid!=='string'||!SID.test(body.sid)||!TEAMS.includes(body.team)||!Number.isInteger(body.points)||body.points<1||body.points>100)fail('invalidRequest');
+   await consume('quest',3000);const id=weekId(),doc=(await store.recordGet('quest_week',id))||{id,teams:{},gave:{}},key=`${body.sid.slice(0,13)}|${day(now())}`,used=doc.gave[key]||0,points=Math.min(body.points,100-used);if(points<=0)return {teams:doc.teams};
+   doc.gave[key]=used+points;doc.teams[body.team]=(doc.teams[body.team]||0)+points;await store.recordPut('quest_week',id,doc);return {teams:doc.teams};
+  }
+ };
+}
 // 원탭 평가. 칭찬과 노선 평가의 개수만 남기고 사람을 특정할 값은 받지 않는다.
 export const KUDOS={ontime:'route',clean:'route',comfy:'route',crowded:'route',kind:'driver',safe:'driver',waited:'driver'};
 export function createKudos(store,{consume=async()=>{}}={}){

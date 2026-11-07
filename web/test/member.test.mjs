@@ -194,3 +194,16 @@ test('마이페이지에서만 토스 스크립트를 허용한다',async()=>{
 test('환경변수 기본값은 모두 꺼짐이고 잘못된 채널 ID는 무시한다',()=>{
  const c=configuration({KAKAO_CHANNEL_ID:'javascript:alert(1)'});assert.equal(c.kakaoChannelId,'');assert.equal(c.kakaoLoginEnabled,false);assert.equal(c.blogEnabled,false);assert.equal(c.kakaoAlertEnabled,false);assert.equal(configuration({KAKAO_CHANNEL_ID:'_AbCdE'}).kakaoChannelId,'_AbCdE');
 });
+test('API: 기록은 로그인 계정에 저장되고 탈퇴하면 지워진다',async()=>{
+ const s=await server();try{
+  assert.equal((await s.call('/api/me/progress')).status,401);
+  const token=s.store.createSession(a.id,a.name),data={quest:{coins:30,cards:['airport'],done:{'2026-11-10:ride':true},stops:{'x':'north'}},trips:[{id:'1',no:'201',at:1,offAt:2}],secret:'버림'};
+  assert.equal((await s.call('/api/me/progress',{token,...json({data})})).status,200);
+  const got=await (await s.call('/api/me/progress',{token})).json();assert.equal(got.data.quest.coins,30);assert.equal(got.data.trips[0].no,'201');assert.equal('secret' in got.data,false);
+  assert.equal((await s.call('/api/me/progress',{token,...json({data:{trips:'x'.repeat(420000)}})})).status,400);
+  assert.equal((await s.call('/api/me/progress',{token,...json({data:{quest:{stops:Object.fromEntries(Array.from({length:4340},(_,i)=>[`JEB40500${i}`,'north']))}}})})).status,200);
+  assert.equal((await s.call('/api/me/progress',{token,...json({data})})).status,200);
+  const other=s.store.createSession('other','다른');assert.deepEqual((await (await s.call('/api/me/progress',{token:other})).json()).data,{});
+  assert.equal((await s.call('/api/me/withdraw',{token,...json({confirm:true})})).status,200);assert.equal(await s.store.recordGet('progress',a.id),null);
+ }finally{await s.close();}
+});
