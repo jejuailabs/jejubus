@@ -19,6 +19,7 @@ import {fileNetwork} from './lib/network.mjs';
 import {createBoard} from './lib/board.mjs';
 import {fileTimetable} from './lib/timetable.mjs';
 import {createNoticeFeed} from './lib/notice-feed.mjs';
+import {bisFetch} from './lib/bis-fetch.mjs';
 import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
@@ -56,10 +57,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const liveRoute=createLiveRoute({positions:id=>catalog.positions(id),groupOf:network.groupOf});
   const fieldReports=createFieldReports(config,store);
   let todayCache={until:0,value:null};
-  const noticeWatch=createNoticeWatch(config,store,{fetchImpl,knownNumber:no=>network.hasNumber(no)});
+  const noticeWatch=createNoticeWatch(config,store,{fetchImpl:fetchImpl===fetch?bisFetch:fetchImpl,knownNumber:no=>network.hasNumber(no)});
   const timetable=fileTimetable(join(root,'public/data/timetable.json'));
   const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,timetable,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
-  const noticeFeed=createNoticeFeed({fetchImpl,knownNumber:no=>network.hasNumber(no)}),chatData={timetable,network,board,noticeFeed,fieldReports};
+  const bisRequest=fetchImpl===fetch?bisFetch:fetchImpl,noticeFeed=createNoticeFeed({fetchImpl:bisRequest,knownNumber:no=>network.hasNumber(no)}),chatData={timetable,network,board,noticeFeed,fieldReports};
   let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
