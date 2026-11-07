@@ -87,6 +87,14 @@ export function createNetwork(load){
    const n=await net();
    return n.stops.map(s=>({s,distance:distanceMeters(point,s)})).sort((a,b)=>a.distance-b.distance).slice(0,limit).map(({s,distance})=>{const {kind,grade,routes}=stopKind(s.name,[...new Set((n.byStop.get(s.i)||[]).map(v=>v.no))]);return {id:s.id,name:s.name,number:s.no,lat:s.lat,lng:s.lng,distanceMeters:Math.round(distance),kind,grade,routes};});
   },
+  // 시간표와 맞춰 볼 이 번호의 변형들
+  async variantStops(no){const n=await net();return (n.byNo.get(no)||[]).map(v=>({id:v.id,stops:v.stops.map(i=>n.stops[i])}));},
+  // 이름이 같은 양쪽 정류장을 나눠 보여 준다. 다음 정류장으로 방향을 구분한다.
+  async namedStops(query,limit=12){
+   const n=await net(),q=baseName(query);if(q.length<2)return [];
+   const names=[...n.byBase.keys()].filter(b=>b.includes(q)).sort((a,b)=>(b===q)-(a===q)||(b.startsWith(q))-(a.startsWith(q))||a.length-b.length);
+   return names.flatMap(name=>n.byBase.get(name)).slice(0,limit).map(s=>({id:s.id,name:s.name,lat:s.lat,lng:s.lng,next:directionsAt(n,s).find(d=>d.next)?.next||null}));
+  },
   async numbers(){const n=await net();return [...n.byNo.keys()].sort((a,b)=>a.localeCompare(b,'ko',{numeric:true}));},
   async hasNumber(no){return (await net()).byNo.has(no);},
   async variantsOf(variantId){const n=await net(),v=n.byVariant.get(variantId);return v?n.byNo.get(v.no).map(o=>o.id):[];},

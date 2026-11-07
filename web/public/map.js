@@ -6,13 +6,12 @@ const views={airport:[33.507,126.493],cityhall:[33.500,126.531],market:[33.512,1
 const LEGEND=['hub','express','trunk','branch','tour','one'];let stopFilter=null,lastStops=null;
 let stopLayer=null,stopTimer=null,stopRequest=0,stopsOn=true,stopContext={};const stopCache=new Map();
 let map=null,observer=null,selectedDestination=null,currentLocation=null,locationMarker=null,locationCircle=null,viewport=null,overlay=null,focusKey=null;
-export function mapMarkup({t,live=false,summary='',pick=''}) {
+export function mapMarkup({t,live=false,bar=''}) {
   return `<div id="real-map" class="real-map" role="region" aria-label="${t('realMap')}"></div>
     <div class="map-top"><div class="map-status"><span class="status-dot"></span><strong>${t('realMap')}</strong><small id="map-stop-count">OpenStreetMap</small></div></div>
-    ${live?`<div class="live-map-card"><div id="map-live-summary" role="status">${summary}</div><button data-action="choose-live-route">${icon('search')}${t('chooseLiveRoute')}</button><p>${icon('bus')}${t('busLegend')} · ${t('stopLegend')}</p><small>${t('liveRefreshHelp')}</small></div>`:''}
-    ${live?pick:''}<div id="stop-legend" ${live?'hidden':''} class="stop-legend" role="group" aria-label="${t('stopLegend')}">${LEGEND.map(id=>`<button data-stop-filter="${id}" aria-pressed="${stopFilter===id}" class="${stopFilter===id?'on':''}"><span class="stop-pin ${id==='hub'?'kind-hub pin-trunk':id==='one'?'kind-one pin-branch':`kind-some pin-${id}`}">${id==='hub'?'<i aria-hidden="true">⇄</i>':''}</span>${t(`stopLegend_${id}`)}</button>`).join('')}</div>
+    ${live?bar:''}<div id="stop-legend" ${live?'hidden':''} class="stop-legend" role="group" aria-label="${t('stopLegend')}">${LEGEND.map(id=>`<button data-stop-filter="${id}" aria-pressed="${stopFilter===id}" class="${stopFilter===id?'on':''}"><span class="stop-pin ${id==='hub'?'kind-hub pin-trunk':id==='one'?'kind-one pin-branch':`kind-some pin-${id}`}">${id==='hub'?'<i aria-hidden="true">⇄</i>':''}</span>${t(`stopLegend_${id}`)}</button>`).join('')}</div>
     <div id="map-load-error" class="map-load-error" hidden role="alert">${icon('info')}<span>${t('mapLoadError')}</span><button data-action="map-retry">${t('retry')}</button></div>
-    <div class="map-note">${icon('info')}<span>${t(live?'liveMapHelp':'mapPickHelp')}</span></div>
+    ${live?'':`<div class="map-note">${icon('info')}<span>${t('mapPickHelp')}</span></div>`}
     <div class="map-controls"><button data-action="zoom-in" aria-label="${t('zoomIn')}">${icon('plus')}</button><button data-action="zoom-out" aria-label="${t('zoomOut')}">${icon('minus')}</button><span></span><button data-action="map-reset" aria-label="${t('resetMap')}">${icon('locate')}</button></div>`;
 }
 export function destroyMap(){
@@ -65,7 +64,7 @@ export function updateMapData(data={},t,onStop){
   // bounds change synchronously so its saved viewport includes the whole route.
   if(bounds.length&&data.focusKey&&focusKey!==data.focusKey){
     focusKey=data.focusKey;
-    const card=document.querySelector('.live-map-card'),size=map.getSize();
+    const card=document.querySelector('.live-bar'),size=map.getSize();
     const cardHeight=card?.getBoundingClientRect().height||0;
     const top=Math.min(cardHeight?cardHeight+24:32,Math.max(24,size.y*.4));
     const side=Math.min(35,size.x*.08),bottom=Math.min(55,size.y*.15);

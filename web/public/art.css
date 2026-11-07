@@ -13,7 +13,6 @@
 .art-note{display:flex;gap:10px;align-items:center}.art-note .art{width:64px;flex:none}
 .empty-art{margin:0 auto 10px;width:150px}.start-card .art{width:120px;margin:0 0 8px}
 .home-board .home-empty .art,.favorites-board .empty-state .art{width:170px;margin:0 auto 8px}.home-hint{display:flex;align-items:center;gap:8px}.home-hint .art{width:44px;flex:none}.home-stop-name{display:flex;align-items:center;gap:7px}.home-stop-name .art{width:22px}
-.guide article{display:flex;gap:12px;align-items:center}.guide article .art{width:64px;flex:none}
 .home-line{position:relative;overflow:hidden}.home-line>.art{float:right;width:96px;margin:0 0 4px 8px}
 .side-art{float:right;width:66px;margin-left:8px}
 .report-head{display:flex;align-items:center;gap:12px}.report-head .art{width:72px;flex:none}.report-choices button{display:flex;align-items:center;gap:10px}.report-choices .art{width:26px}

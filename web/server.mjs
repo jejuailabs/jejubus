@@ -24,6 +24,7 @@ import {createKudos,createLiveRoom,createTeams} from './lib/live-room.mjs';
 import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
+import {matchVariants,placeVehicles} from './lib/table-live.mjs';
 import {createNoticeWatch} from './lib/notice-watch.mjs';
 const root=dirname(fileURLToPath(import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.webmanifest':'application/manifest+json'};
@@ -157,6 +158,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/board/find'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),point=Number.isFinite(lat)&&Number.isFinite(lng)&&url.searchParams.has('lat')?{lat,lng}:null,stop=await network.stopByName(query(),point);if(!stop)fail('notFound',404);return send(200,stop);}
         if(path==='/api/board/home'){const result=await board.homeLine(itemId(),query());if(!result)fail('notFound',404);return shared(result,300);}
         if(path==='/api/timetable'){const no=url.searchParams.get('no')||'',stop=url.searchParams.get('stop')||null,towards=url.searchParams.get('towards')||null,toName=url.searchParams.get('to')||null;if(!/^[\w-]{1,12}$/.test(no)||(stop&&stop.length>100)||(towards&&towards.length>100)||(toName&&toName.length>100))fail('invalidRequest');return shared(await timetable.view(no,{stopName:stop,towards,toName})||{no,groups:[],sourceUrl:scheduleUrl(no)},60);}
+        // 정류장 노트의 실시간 위치. 방향이 같은 변형의 차량만 표 구간에 얹는다.
+        if(path==='/api/timetable/live'){const no=url.searchParams.get('no')||'',group=Number(url.searchParams.get('group'));if(!/^[\w-]{1,12}$/.test(no)||!Number.isInteger(group)||group<0)fail('invalidRequest');const table=(await timetable.view(no))?.groups?.[group];if(!table)fail('notFound',404);const names=table.stops.map(s=>s.name),variants=matchVariants(names,await network.variantStops(no));if(!variants.length)return shared({matched:false,vehicles:[]},300);const seen=new Set(),picks=[];for(const v of variants){const key=(await network.groupOf(v.id))?.key||v.id;if(!seen.has(key)&&picks.length<3){seen.add(key);picks.push(v.id);}}const results=await Promise.allSettled(picks.map(id=>liveRoute.route(id))),ok=results.filter(r=>r.status==='fulfilled').map(r=>r.value);if(!ok.length)throw results[0].reason;const vehicles=[...new Map(ok.flatMap(r=>r.vehicles).map(v=>[v.id,v])).values()];return shared({matched:true,vehicles:placeVehicles(vehicles,variants),receivedAt:ok[0].receivedAt},25);}
         if(path==='/api/board/map'){const [south,west,north,east]=(url.searchParams.get('b')||'').split(',').map(Number),zoom=Number(url.searchParams.get('z'));if(![south,west,north,east].every(Number.isFinite)||!Number.isInteger(zoom)||zoom<7||zoom>19||north<=south||east<=west)fail('invalidRequest');return shared(await network.stopsIn({south,west,north,east},zoom),3600);}
         if(path==='/api/board/nearby'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng'));if(!coordinate(lat,lng))fail('outsideJeju');const stops=await network.nearest({lat,lng});await remember(stops,'stop');return send(200,{stops});}
         if(path==='/api/notice-board')return shared(await noticeFeed.list(),300);
@@ -168,6 +171,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/board/next'){const no=url.searchParams.get('no')||'';if(!/^[\w-]{1,12}$/.test(no))fail('invalidRequest');return shared({stops:await network.stopsAfter(itemId(),no)},3600);}
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
+        if(path==='/api/board/named')return shared({stops:await network.namedStops(query())},3600);
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
         if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return shared(result,3600);}
         if(path==='/api/geometry')return send(200,await catalog.geometry(url.searchParams.get('mapObject')));
@@ -204,7 +208,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(!user)fail('loginRequired',401);
         if(path==='/api/me'&&method==='GET')return send(200,await members.me(user));
         if(path==='/api/me/progress'&&method==='GET')return send(200,{data:(await store.recordGet('progress',user.id))?.data||{}});
-        if(path==='/api/me/progress'&&method==='POST'){throttle(`progress:${user.id}`,30);const data=(await jsonBody(req,450000))?.data;if(!data||typeof data!=='object'||Array.isArray(data)||Buffer.byteLength(JSON.stringify(data))>400000)fail('invalidRequest');const keys=['quest','trips','rides','myStops','homeStop','ttRecent'],clean=Object.fromEntries(keys.filter(k=>data[k]!==undefined).map(k=>[k,data[k]]));await store.recordPut('progress',user.id,{id:user.id,user_id:user.id,data:clean,updated:Date.now()});return send(200,{ok:true});}
+        if(path==='/api/me/progress'&&method==='POST'){throttle(`progress:${user.id}`,30);const data=(await jsonBody(req,450000))?.data;if(!data||typeof data!=='object'||Array.isArray(data)||Buffer.byteLength(JSON.stringify(data))>400000)fail('invalidRequest');const keys=['quest','trips','rides','myStops','homeStop','ttRecent','places','favGone'],clean=Object.fromEntries(keys.filter(k=>data[k]!==undefined).map(k=>[k,data[k]]));await store.recordPut('progress',user.id,{id:user.id,user_id:user.id,data:clean,updated:Date.now()});return send(200,{ok:true});}
         if(path==='/api/me/saved'&&method==='GET')return send(200,await members.saved(user));
         if(path==='/api/me/saved'&&method==='POST'){throttle(`write:${user.id}`,30);return send(200,await members.toggleSaved(user,await jsonBody(req)));}
         if(path==='/api/me/withdraw'&&method==='POST'){await members.withdraw(user,await jsonBody(req));await store.recordDelete('progress',user.id);res.setHeader('Set-Cookie',cookie('jeju_session','',0));return send(200,{ok:true});}
