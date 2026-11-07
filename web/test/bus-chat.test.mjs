@@ -82,3 +82,14 @@ test('enabled chat rejects anonymous users before any model or provider request'
  try{const r=await fetch(base+'/api/chat',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify(input)});assert.equal(r.status,401);assert.equal((await r.json()).error,'loginRequired');assert.equal(requests,0);}
  finally{await new Promise(resolve=>app.server.close(resolve));store.close();}
 });
+test('챗봇은 질문이 올 때만 시간표와 공지, 정류장 정보를 읽는다',async()=>{
+ const feed={list:async()=>({available:true,receivedAt:'t',notices:[{id:'1',title:'마라톤 임시변경',postedOn:'2026-11-01',startsOn:'2026-11-07',endsOn:'2026-11-08',status:'active',numbers:['201'],url:'u'}]}),detail:async()=>({body:'본문'})};
+ const timetable={plan:async()=>({today:'running',first:'06:00',last:'21:00',interval:'20분',notes:[],sourceUrl:'https://x'}),view:async()=>({kind:'saturday',day:'holiday',current:600,group:0,groups:[{path:'(휴일)a',day:'holiday',first:'06:00',last:'21:00',interval:'20분',effective:'',hasStop:true,stop:0,stops:[{name:'시청',times:[{time:'12:00',minutes:720,off:false}]}]}]})};
+ const run=async(name,args,check)=>{let n=0;const chat=createBusChat(config,{catalog:{},consume:async()=>{},data:{timetable,noticeFeed:feed},fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);if(++n===1)return response(call(name,args));check(JSON.parse(body.input.at(-1).output));return response(answer('확인'));}});assert.equal((await chat.answer(input)).answer,'확인');assert.equal(n,2);};
+ await run('timetable_lookup',{number:'201',stop:'시청',destination:null},e=>{const d=e.sources[0].data;assert.equal(d.saturdayUsesHolidayTable,true);assert.deepEqual(d.nextAtStop,['12:00']);assert.equal(d.last,'21:00');});
+ await run('service_notices',{query:'201'},e=>{const d=e.sources[0].data;assert.equal(d.notices[0].title,'마라톤 임시변경');assert.equal(d.firstBody,'본문');});
+});
+test('챗봇은 쓰기나 관리 도구를 갖지 않는다',async()=>{
+ let names=[];const chat=createBusChat(config,{catalog:{},consume:async()=>{},fetchImpl:async(url,options)=>{names=JSON.parse(options.body).tools.map(t=>t.name);throw Error('stop');}});
+ await chat.answer(input).catch(()=>{});assert.ok(names.includes('timetable_lookup'));assert.ok(!names.some(n=>/admin|publish|delete|save|write|update/.test(n)));
+});

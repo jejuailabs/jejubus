@@ -1,3 +1,4 @@
+import {createNoticeFeed,noticeStatus} from '../lib/notice-feed.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createStore} from '../lib/store.mjs';
@@ -39,4 +40,12 @@ test('게시는 관리자만, 번호가 있어야 하고, 게시하면 번호 �
 test('목록을 못 읽으면 실패로 알린다',async()=>{
  const store=createStore(':memory:',{seed:false}),watch=createNoticeWatch({},store,{fetchImpl:async()=>({ok:true,text:async()=>'<html></html>'})});
  await assert.rejects(watch.check(),{key:'providerUnavailable'});
+});
+test('공지 게시판: 기간으로 진행 중과 지난 공지를 나누고 실패해도 멈추지 않는다',async()=>{
+ const html=`<tr><td onclick="goDetail('10')"><span>행사 임시변경 알림('26.11.7.~11.8.)</span></td><td>2026-11-05</td></tr><tr><td onclick="goDetail('9')"><span>202-2번 임시변경 알림('26. 9. 28.)</span></td><td>2026-09-20</td></tr><tr><td onclick="goDetail('8')"><span>앱 안내</span></td><td>2026-11-01</td></tr>`;
+ let down=false;const feed=createNoticeFeed({now:()=>Date.parse('2026-11-07T03:00:00Z'),knownNumber:async no=>no==='202-2',fetchImpl:async()=>{if(down)throw Error('x');return {ok:true,text:async()=>html};}});
+ const {notices}=await feed.list();assert.deepEqual(notices.map(n=>[n.id,n.status]),[['10','active'],['8','recent'],['9','past']]);assert.deepEqual(notices[2].numbers,['202-2']);
+ assert.equal(noticeStatus({startsOn:'2026-12-01',endsOn:'2026-12-02',postedOn:'2026-11-01'},'2026-11-07'),'upcoming');
+ down=true;const fresh=createNoticeFeed({fetchImpl:async()=>{throw Error('x');}});assert.equal((await fresh.list()).available,false);
+ await assert.rejects(feed.detail('../x'),{key:'invalidRequest'});
 });

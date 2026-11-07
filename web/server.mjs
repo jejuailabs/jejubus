@@ -18,6 +18,7 @@ import {createRouteAdmin} from './lib/route-admin.mjs';
 import {fileNetwork} from './lib/network.mjs';
 import {createBoard} from './lib/board.mjs';
 import {fileTimetable} from './lib/timetable.mjs';
+import {createNoticeFeed} from './lib/notice-feed.mjs';
 import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
@@ -58,10 +59,11 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const noticeWatch=createNoticeWatch(config,store,{fetchImpl,knownNumber:no=>network.hasNumber(no)});
   const timetable=fileTimetable(join(root,'public/data/timetable.json'));
   const board=createBoard({catalog:{arrivals:id=>catalog.arrivals(id)},network,timetable,noticesFor:(numbers,stopId)=>routeAdmin.noticesByNumber(numbers,stopId,network.numberOf)});
-  let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
+  const noticeFeed=createNoticeFeed({fetchImpl,knownNumber:no=>network.hasNumber(no)}),chatData={timetable,network,board,noticeFeed,fieldReports};
+  let busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   const settings=createSettings(settingsFile,env,{onChange:async next=>{
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
-    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl});
+    Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   }});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
@@ -149,6 +151,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/timetable'){const no=url.searchParams.get('no')||'',stop=url.searchParams.get('stop')||null,towards=url.searchParams.get('towards')||null,toName=url.searchParams.get('to')||null;if(!/^[\w-]{1,12}$/.test(no)||(stop&&stop.length>100)||(towards&&towards.length>100)||(toName&&toName.length>100))fail('invalidRequest');return shared(await timetable.view(no,{stopName:stop,towards,toName})||{no,groups:[],sourceUrl:scheduleUrl(no)},60);}
         if(path==='/api/board/map'){const [south,west,north,east]=(url.searchParams.get('b')||'').split(',').map(Number),zoom=Number(url.searchParams.get('z'));if(![south,west,north,east].every(Number.isFinite)||!Number.isInteger(zoom)||zoom<7||zoom>19||north<=south||east<=west)fail('invalidRequest');return shared(await network.stopsIn({south,west,north,east},zoom),3600);}
         if(path==='/api/board/nearby'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng'));if(!coordinate(lat,lng))fail('outsideJeju');const stops=await network.nearest({lat,lng});await remember(stops,'stop');return send(200,{stops});}
+        if(path==='/api/notice-board')return shared(await noticeFeed.list(),300);
+        if(path.startsWith('/api/notice-board/'))return shared(await noticeFeed.detail(path.slice(18)),3600);
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
