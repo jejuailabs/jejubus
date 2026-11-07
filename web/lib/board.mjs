@@ -19,7 +19,7 @@ export function todayState({notice=null,arrival=null,vehicleSeen=false,plan=null
 
 // 부르는 이름과 정류장 이름이 다른 주요 지점
 const LONG_RIDE=100;
-const PLACE_ALIAS={제주공항:'제주국제공항',공항:'제주국제공항',중문:'중문환승정류장',성산:'성산일출봉입구',함덕:'함덕환승정류장',한림:'한림환승정류장',서귀포:'서귀포버스터미널'};
+export const PLACE_ALIAS={제주공항:'제주국제공항',공항:'제주국제공항',중문:'중문환승정류장',성산:'성산일출봉입구',함덕:'함덕환승정류장',한림:'한림환승정류장',서귀포:'서귀포버스터미널'};
 export function createBoard({catalog,network,noticesFor=async()=>[],timetable=null,now=Date.now}){
  return {
   async stop(stopId){

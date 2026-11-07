@@ -95,6 +95,27 @@ export function createNetwork(load){
    const names=[...n.byBase.keys()].filter(b=>b.includes(q)).sort((a,b)=>(b===q)-(a===q)||(b.startsWith(q))-(a.startsWith(q))||a.length-b.length);
    return names.flatMap(name=>n.byBase.get(name)).slice(0,limit).map(s=>({id:s.id,name:s.name,lat:s.lat,lng:s.lng,next:directionsAt(n,s).find(d=>d.next)?.next||null}));
   },
+  // 출발·도착 근처 정류장을 잇는 직행 번호. 방향이 맞는 변형만 쓰고 번호마다 가장 편한 조합을 남긴다.
+  async directTrips(from,to,{walk=800,limit=3}={}){
+   const n=await net(),within=(p,m)=>n.stops.map(s=>({s,d:distanceMeters(p,s)})).filter(x=>x.d<=m),ends=new Map(within(to,walk).map(x=>[x.s.i,x.d])),best=new Map();
+   const brief=(s,w)=>({id:s.id,name:s.name,lat:s.lat,lng:s.lng,walk:w});
+   for(const {s,d} of within(from,walk))for(const v of n.byStop.get(s.i)||[]){
+    const at=v.stops.indexOf(s.i);
+    for(let k=at+1;k<v.stops.length;k++){const i=v.stops[k];if(!ends.has(i))continue;const off=ends.get(i),score=d+off+(k-at)*75,prior=best.get(v.no);if(!prior||score<prior.score)best.set(v.no,{no:v.no,variantId:v.id,score,stops:k-at,board:brief(s,d),off:brief(n.stops[i],off)});}
+   }
+   return [...best.values()].sort((a,b)=>a.score-b.score).slice(0,limit);
+  },
+  // 타고 있는 번호에서 목적지에 가장 가까운 정류장. 위치를 알면 지금 위치 뒤쪽 정류장만 본다.
+  async alightOn(no,to,me=null){
+   const n=await net();let best=null;
+   for(const v of n.byNo.get(no)||[]){
+    const stops=v.stops.map(i=>n.stops[i]);let start=-1;
+    if(me){let near=Infinity;stops.forEach((s,i)=>{const d=distanceMeters(me,s);if(d<near){near=d;start=i;}});if(near>2000)continue;}
+    for(let k=start+1;k<stops.length;k++){const d=distanceMeters(to,stops[k]);if(!best||d<best.walk)best={no,variantId:v.id,id:stops[k].id,name:stops[k].name,lat:stops[k].lat,lng:stops[k].lng,walk:d,stopsLeft:me?k-start:null,now:me?stops[start].name:null,before:k>0?stops[k-1].name:null,end:v.lastName};}
+   }
+   return best;
+  },
+  async stopByCode(code){const n=await net(),digits=String(code).replace(/\D/g,'');if(digits.length<5)return null;const s=n.stops.find(x=>x.id.endsWith(digits));return s?{id:s.id,name:s.name,lat:s.lat,lng:s.lng}:null;},
   async numbers(){const n=await net();return [...n.byNo.keys()].sort((a,b)=>a.localeCompare(b,'ko',{numeric:true}));},
   async hasNumber(no){return (await net()).byNo.has(no);},
   async variantsOf(variantId){const n=await net(),v=n.byVariant.get(variantId);return v?n.byNo.get(v.no).map(o=>o.id):[];},

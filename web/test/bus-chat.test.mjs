@@ -27,7 +27,7 @@ test('chat requires fresh provider data, preserves direction choices and cites o
   assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(options.body);calls.push(body);return response(calls.length===1?call('route_status',{query:'201번 버스',routeId:null}):answer('운행 방향을 선택해주세요.'));
  }});
  const result=await chat.answer(input);assert.equal(lookups,1);assert.equal(result.choices.length,2);assert.equal(result.sources[0].provider,'TAGO');assert.equal(result.sources[0].receivedAt,'2026-10-24T02:00:00Z');
- assert.match(calls[1].input.at(-1).output,/R-DOWN/);assert.equal(calls[0].store,false);assert.equal(calls[0].max_output_tokens,900);assert.equal(calls[0].parallel_tool_calls,false);assert.equal(calls[0].reasoning.effort,'none');assert.equal(calls[0].tool_choice,'required');
+ assert.match(calls[1].input.at(-1).output,/R-DOWN/);assert.equal(calls[0].store,false);assert.equal(calls[0].max_output_tokens,900);assert.equal(calls[0].parallel_tool_calls,true);assert.equal(calls[0].reasoning.effort,'none');assert.equal(calls[0].tool_choice,'required');
  assert.deepEqual(consumed.map(c=>c[0]),['ai','ai_budget','ai','ai_budget']);assert.equal(consumed[1][2],'approval:test-approval-001');
 });
 

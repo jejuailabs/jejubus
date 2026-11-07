@@ -178,7 +178,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
       if(path==='/api/intent'&&method==='POST'){const p=await jsonBody(req);if(typeof p?.input!=='string'||!p.input.trim()||p.input.length>500)fail('queryRequired');return send(200,await catalog.intent(p.input));}
-      if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,4);return send(200,await busChat.answer(await jsonBody(req)));}
+      if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,8);return send(200,await busChat.answer(await jsonBody(req)));}
       if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,routeNo:String(p.route).startsWith('route:')?await network.numberOf(p.route.slice(6)).catch(()=>null):null,contextName:(await store.context(p.route))?.name||null})))});
       if(path==='/api/posts'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);const p=await validatePost(await jsonBody(req));return send(201,{id:await store.createPost(user.id,p)});}
       const post=path.match(/^\/api\/posts\/([\w-]+)(?:\/(replies|like|report|block))?$/);

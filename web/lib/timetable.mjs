@@ -71,7 +71,7 @@ export function createTimetable(load,{now=Date.now}={}){
     const stops=cols.map(col=>({name:nameOf(col),times:trips.flatMap((trip,index)=>{const hit=trip.times.find(x=>x.col===col);return hit?[{trip:index,time:clock(hit.minutes),minutes:hit.minutes,off:excluded(trip,tabKind),maybe:maybe(trip),note:[hit.label,trip.note].filter(Boolean).join(' · ')||null}]:[];}).sort((a,b)=>a.minutes-b.minutes)}));
     const hub=/공항|터미널/.exec(key||'')?.[0],hit=(name,hubName)=>{const k=baseName(name);return s=>baseName(s.name)===k||s.name.includes(k)||k.includes(baseName(s.name))||(hubName&&s.name.includes(hubName));},stop=key?stops.findIndex(hit(stopName,hub)):-1,toHit=toName?hit(toName,/공항|터미널/.exec(toName)?.[0]):null,after=toHit?stops.findIndex((s,i)=>i>stop&&toHit(s)):-1,to=toHit?(after>=0?after:stops.findIndex(toHit)):-1,end=tab.path.split('-').at(-1).replace(/[()]/g,'');
     const busiest=stops.reduce((a,s,i)=>s.times.length>stops[a].times.length?i:a,0);
-    return [{path:tab.path,end,day:tabDay(tab),effective:tab.effective,...headline(tab.run,no),stops,stop:stop>=0?stop:busiest,hasStop:stop>=0,to,score:[...pairs(baseName(end))].filter(p=>wanted.has(p)).length}];
+    return [{path:tab.path,end,day:tabDay(tab),effective:tab.effective,operator:/([가-힣]{2,}[^(),]*)\((0\d{1,3}-\d{3,4}-\d{4})\)/.exec(tab.run||'')?.slice(1,3).join(' ')||null,...headline(tab.run,no),stops,stop:stop>=0?stop:busiest,hasStop:stop>=0,to,score:[...pairs(baseName(end))].filter(p=>wanted.has(p)).length}];
    });
    if(!groups.length)return null;
    const rank=g=>(!day||!g.day||g.day===day?100:0)+(g.hasStop&&g.to>g.stop?50:0)+g.score*2+(g.hasStop?1:0),best=groups.reduce((a,b,i)=>rank(b)>rank(groups[a])?i:a,0);
