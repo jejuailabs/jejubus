@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createTimetable,currentTabs,headline,parseTime,tripFlags,tripsOf} from '../lib/timetable.mjs';
 import {createNetwork} from '../lib/network.mjs';
 import {createBoard} from '../lib/board.mjs';
+import {timetableMarkup} from '../public/timetable-view.js';
 
 const at=text=>Date.parse(`2026-11-${text}+09:00`);
 const tab=(extra={})=>({id:'1',no:'312',path:'터미널-시청-함덕',effective:'(시행일 : 2024.8.1.)',run:'첫차(터미널 출발) 6:00, 막차 21:00, 배차간격 15~22분, 회사',columns:['터미널','시청','함덕','비 고'],rows:[['06:00','06:20','07:00',''],['X','12:00','12:40','토.공휴일 방학기간 운행 안함'],['21:00<br>(막차)','21:20','22:00','막차 3회 승객없으면 함덕 5구까지 운행']],...extra});
@@ -58,4 +59,17 @@ test('시간표가 카드와 귀가선으로 이어진다',async()=>{
  const {rows}=await board.stop('a');assert.equal(rows[0].today.state,'ended');assert.equal(rows[0].plan.last,'21:00');
  const line=await board.homeLine('a','함덕');assert.equal(line.options[0].no,'312');assert.equal(line.options[0].last,'21:20');assert.equal(line.options[0].lastHere,true);assert.equal(line.options[0].today,'ended');
  assert.equal((await board.homeLine('a','시청')).verdict,'same');assert.equal(await board.homeLine('a','없는곳'),null);
+});
+test('앱 안 시간표: 방향별 정류장 시각과 오늘 미운행을 표에서 그대로 낸다',async()=>{
+ const d={routes:{111:{tabs:[{no:'111',path:'공항-성산',effective:'',run:'첫차 6:00, 막차 20:00',columns:['','공항','시청','비고'],rows:[['','06:00','06:20',''],['','X','12:00','토요일 운행 안함']]},{no:'111',path:'성산-공항',effective:'',run:'',columns:['','시청','공항'],rows:[['','07:00','07:30']]}]}}};
+ const v=await createTimetable(()=>d,{now:()=>at('07T10:00:00')}).view('111',{stopName:'제주시청',towards:'제주국제공항'});
+ assert.equal(v.group,1);assert.equal(v.groups[1].stops[v.groups[1].stop].name,'시청');
+ const a=await createTimetable(()=>d,{now:()=>at('07T10:00:00')}).view('111',{stopName:'제주시청',towards:'성산항'}),times=a.groups[a.group].stops[a.groups[a.group].stop].times;
+ assert.equal(a.group,0);assert.deepEqual(times.map(x=>[x.time,x.off]),[['06:20',false],['12:00',true]]);assert.equal(await createTimetable(()=>d).view('999'),null);
+});
+test('시간표 화면은 다음 차를 표시하고 값을 이스케이프한다',()=>{
+ const t=(k,o={})=>k+JSON.stringify(o),e=x=>String(x).replace(/</g,'&lt;');
+ const html=timetableMarkup({no:'312',kind:'weekday',current:600,sourceUrl:'https://x',group:0,groups:[{path:'a',end:'함덕',first:'6:00',last:null,interval:null,effective:'',stop:0,stops:[{name:'<b>',times:[{time:'06:00',minutes:360,off:false,maybe:false,note:null},{time:'12:00',minutes:720,off:false,maybe:false,note:'<i>막차'},{time:'13:00',minutes:780,off:true,maybe:false,note:null}]}]}]},e,t);
+ assert.ok(html.includes('tt-time past'));assert.ok(html.includes('tt-time next'));assert.ok(html.includes('<s>13:00</s>'));assert.ok(html.includes('&lt;b>'));assert.ok(html.includes('&lt;i>막차'));
+ assert.ok(timetableMarkup({no:'999',groups:[],sourceUrl:'https://x'},e,t).includes('ttNone'));
 });

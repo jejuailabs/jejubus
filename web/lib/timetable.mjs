@@ -23,7 +23,7 @@ export function tripsOf(tab){
  const noteCol=tab.columns.findIndex(c=>/비\s*고/.test(c)),noCol=tab.columns.findIndex(c=>/노선\s*번호/.test(c));
  const trips=tab.rows.map(cells=>{
   const times=[];let extra='';
-  cells.forEach((cell,col)=>{if(col===noteCol||col===noCol||!cell)return;const t=parseTime(cell);if(t!==null)times.push({col,minutes:t});else if(!/^[X○x\-]$/.test(cell))extra+=` ${cell}`;});
+  cells.forEach((cell,col)=>{if(col===noteCol||col===noCol||!cell)return;const t=parseTime(cell);if(t!==null)times.push({col,minutes:t,label:String(cell).replace(/^[^\d]*\d{1,2}:\d{2}/,'').replace(/<[^>]*>/g,' ').replace(/[()]/g,'').trim()||null});else if(!/^[X○x\-]$/.test(cell))extra+=` ${cell}`;});
   const cell=noCol>=0?cells[noCol]||'':'',note=`${noteCol>=0?cells[noteCol]||'':''}${extra}`.trim(),flags=tripFlags(note);
   if(/\(평일\)/.test(cell))flags.weekdayOnly=true;
   return {no:rowNumber(cell,rowNumber(tab.no,tab.no)),times,note,flags};
@@ -52,6 +52,24 @@ export function createTimetable(load,{now=Date.now}={}){
  const data=()=>ready??=Promise.resolve().then(load).catch(error=>{ready=null;throw error;});
  const tabsFor=async no=>{const d=await data(),route=d.routes[String(no).split('-')[0]];if(!route)return [];const today=koreaDay(now());return currentTabs(route.tabs,today);};
  return {
+  // 앱 안 시간표 화면용. 방향별로 정류장마다 표의 시각을 그대로 내준다.
+  async view(no,{stopName=null,towards=null}={}){
+   const tabs=await tabsFor(no);if(!tabs.length)return null;
+   const own=tabs.filter(tab=>tab.no===no),use=own.length?own:tabs,kind=dayKind(now()),raw=new Date(now()+KST),at=raw.getUTCHours()*60+raw.getUTCMinutes(),current=at<CUT?at+DAY:at,key=stopName?baseName(stopName):null,seen=new Set();
+   const pairs=x=>new Set(Array.from({length:Math.max(0,x.length-1)},(_,i)=>x.slice(i,i+2))),wanted=towards?pairs(baseName(towards)):new Set();
+   const groups=use.flatMap(tab=>{
+    const trips=tripsOf(tab).filter(t=>t.no===no);if(!trips.length)return [];
+    const sign=JSON.stringify(trips.map(t=>t.times));if(seen.has(sign))return [];seen.add(sign);
+    const cols=[...new Set(trips.flatMap(t=>t.times.map(x=>x.col)))].sort((a,b)=>a-b);
+    const nameOf=col=>{const clean=x=>String(x||'').replace(/\s+/g,' ').trim(),own=clean(tab.columns[col]);if(own)return own;const prior=clean(tab.columns[col-1]);return prior?`${prior} (출발)`:'';};
+    const stops=cols.map(col=>({name:nameOf(col),times:trips.flatMap(trip=>{const hit=trip.times.find(x=>x.col===col);return hit?[{time:clock(hit.minutes),minutes:hit.minutes,off:excluded(trip,kind),maybe:maybe(trip),note:[hit.label,trip.note].filter(Boolean).join(' · ')||null}]:[];}).sort((a,b)=>a.minutes-b.minutes)}));
+    const hub=/공항|터미널/.exec(key||'')?.[0],stop=key?stops.findIndex(s=>baseName(s.name)===key||s.name.includes(key)||key.includes(baseName(s.name))||(hub&&s.name.includes(hub))):-1,end=tab.path.split('-').at(-1).replace(/[()]/g,'');
+    return [{path:tab.path,end,effective:tab.effective,...headline(tab.run,no),stops,stop:Math.max(0,stop),hasStop:stop>=0,score:[...pairs(baseName(end))].filter(p=>wanted.has(p)).length}];
+   });
+   if(!groups.length)return null;
+   const rank=g=>g.score*2+(g.hasStop?1:0),best=groups.reduce((a,b,i)=>rank(b)>rank(groups[a])?i:a,0);
+   return {no,kind,current,sourceUrl:scheduleUrl(no),group:best,groups:groups.map(({score,hasStop,...g})=>g)};
+  },
   // 번호 하나의 오늘 계획. 알 수 없으면 null을 돌려준다. 방학 기간은 공식 달력이 없어 방학 제외 회차만 남으면 단정하지 않는다.
   async plan(no,{stopName=null,towards=null}={}){
    const tabs=await tabsFor(no);if(!tabs.length)return null;

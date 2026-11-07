@@ -18,6 +18,7 @@ import {createRouteAdmin} from './lib/route-admin.mjs';
 import {fileNetwork} from './lib/network.mjs';
 import {createBoard} from './lib/board.mjs';
 import {fileTimetable} from './lib/timetable.mjs';
+import {scheduleUrl} from './lib/network.mjs';
 import {createFieldReports} from './lib/field-reports.mjs';
 import {createLiveRoute} from './lib/live-route.mjs';
 import {createNoticeWatch} from './lib/notice-watch.mjs';
@@ -145,6 +146,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/board/side'){const q=query(),[place]=await network.searchStops(q),result=place&&await network.sideCheck(itemId(),place.name);if(!result)fail('notFound',404);return shared(result,3600);}
         if(path==='/api/board/find'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),point=Number.isFinite(lat)&&Number.isFinite(lng)&&url.searchParams.has('lat')?{lat,lng}:null,stop=await network.stopByName(query(),point);if(!stop)fail('notFound',404);return send(200,stop);}
         if(path==='/api/board/home'){const result=await board.homeLine(itemId(),query());if(!result)fail('notFound',404);return shared(result,300);}
+        if(path==='/api/timetable'){const no=url.searchParams.get('no')||'',stop=url.searchParams.get('stop')||null,towards=url.searchParams.get('towards')||null;if(!/^[\w-]{1,12}$/.test(no)||(stop&&stop.length>100)||(towards&&towards.length>100))fail('invalidRequest');return shared(await timetable.view(no,{stopName:stop,towards})||{no,groups:[],sourceUrl:scheduleUrl(no)},60);}
         if(path==='/api/board/places')return shared({stops:await network.searchStops(query())},3600);
         if(path==='/api/route-groups'){const result=await network.groups(query());if(!result)fail('notFound',404);return shared(result,3600);}
         if(path==='/api/geometry')return send(200,await catalog.geometry(url.searchParams.get('mapObject')));
