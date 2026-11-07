@@ -1,5 +1,9 @@
 // 타도 돼 카드 문구. 순서: 한국어, 영어, 중국어(간체), 일본어.
 export const boardStrings={
+ chatOnMap:['지도에서 보기 ({n}곳)','See on map ({n})','在地图上查看（{n}处）','地図で見る（{n}か所）'],
+ chatMapTitle:['지도에서 확인 · {n}곳','On the map · {n}','地图确认 · {n}处','地図で確認 · {n}か所'],
+ chatPinChoice:['후보','Option','候选','候補'],chatPinBoard:['{no}번 타는 곳','Board {no} here','在此乘坐{no}路','{no}番の乗り場'],chatPinOff:['{no}번 내리는 곳','Get off {no} here','在此下{no}路','{no}番を降りる所'],chatPinStop:['정류장','Stop','车站','停留所'],chatPinMe:['내 위치','You','我的位置','現在地'],
+ chatPick:['이곳으로','Choose','选这里','ここにする'],chatSeeStop:['정류장 보기','Open stop','查看车站','停留所を見る'],
  sheetOpen:['검색 메뉴 펼치기','Open search','展开搜索','検索を開く'],
  sheetClose:['검색 메뉴 접고 지도 크게 보기','Close search and show map','收起搜索，放大地图','検索を閉じて地図を表示'],
  rideNow:['{no}번 타는 중','On bus {no}','正在乘坐{no}路','{no}番に乗車中'],

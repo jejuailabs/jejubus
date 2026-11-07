@@ -93,3 +93,14 @@ test('챗봇은 쓰기나 관리 도구를 갖지 않는다',async()=>{
  let names=[];const chat=createBusChat(config,{catalog:{},consume:async()=>{},fetchImpl:async(url,options)=>{names=JSON.parse(options.body).tools.map(t=>t.name);throw Error('stop');}});
  await chat.answer(input).catch(()=>{});assert.ok(names.includes('timetable_lookup'));assert.ok(!names.some(n=>/admin|publish|delete|save|write|update/.test(n)));
 });
+test('선택지를 버튼으로 보여 줄 때 본문의 번호 목록은 지운다',async()=>{
+ const {tidyChoices}=await import('../lib/bus-chat.mjs');
+ const c=[{name:'제주동문시장'},{name:'다이소 제주동문시장점'}];
+ assert.equal(tidyChoices('하나 골라 주세요.\n\n1) 제주동문시장\n2) 다이소 제주동문시장점',c),'하나 골라 주세요.');
+ assert.equal(tidyChoices('1) 버스를 타요',c),'1) 버스를 타요');assert.equal(tidyChoices('그대로',[]),'그대로');
+});
+test('지도 모달은 선택지에 번호를 달고 같은 자리는 한 번만 찍는다',async()=>{
+ const {placesList}=await import('../public/chat-map.js');
+ const list=placesList({choices:[{name:'A',lat:33.5,lng:126.5},{name:'좌표없음'}],points:[{name:'A',lat:33.5,lng:126.5,role:'stop'},{name:'B',lat:33.4,lng:126.4,role:'board',label:'201'}],me:{lat:33.45,lng:126.45}});
+ assert.deepEqual(list.map(p=>[p.role,p.mark]),[['choice','1'],['board','201'],['me','']]);
+});
