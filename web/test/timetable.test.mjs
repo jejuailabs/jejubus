@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {createTimetable,currentTabs,headline,parseTime,tripFlags,tripsOf} from '../lib/timetable.mjs';
 import {createNetwork} from '../lib/network.mjs';
 import {createBoard} from '../lib/board.mjs';
-import {timetableMarkup} from '../public/timetable-view.js';
+import {planTrip,timetableMarkup} from '../public/timetable-view.js';
+import {filterNumbers,timetableBoardMarkup,upcomingMarkup} from '../public/timetable-board.js';
 
 const at=text=>Date.parse(`2026-11-${text}+09:00`);
 const tab=(extra={})=>({id:'1',no:'312',path:'터미널-시청-함덕',effective:'(시행일 : 2024.8.1.)',run:'첫차(터미널 출발) 6:00, 막차 21:00, 배차간격 15~22분, 회사',columns:['터미널','시청','함덕','비 고'],rows:[['06:00','06:20','07:00',''],['X','12:00','12:40','토.공휴일 방학기간 운행 안함'],['21:00<br>(막차)','21:20','22:00','막차 3회 승객없으면 함덕 5구까지 운행']],...extra});
@@ -84,4 +85,43 @@ test('시간표 화면은 요일과 방향을 나눠 보여 주고 회차가 적
  const t=(k,o={})=>k+JSON.stringify(o),e=String,g=(day,end)=>({path:`(${day})x-${end}`,end,day,first:null,last:null,interval:null,effective:'',stop:1,stops:[{name:'많음',times:Array.from({length:9},(_,i)=>({time:`0${i}:00`,minutes:360+i,off:false,maybe:false,note:null}))},{name:'적음',times:[{time:'16:42',minutes:1000,off:false,maybe:false,note:null}]}]});
  const html=timetableMarkup({no:'365',kind:'saturday',day:'holiday',current:600,sourceUrl:'https://x',group:2,groups:[g('weekday','제주대'),g('weekday','한라대'),g('holiday','제주대'),g('holiday','한라대')]},e,t);
  assert.equal((html.match(/data-tt-day=/g)||[]).length,2);assert.equal((html.match(/data-tt-group=/g)||[]).length,2);assert.ok(html.includes('ttSaturdayGuess'));assert.ok(html.includes('ttFewTrips'));assert.ok(html.includes('ttTrips'));
+});
+test('여정 승차권은 원하는 시각까지 닿는 가장 늦은 회차를 표에서 찾는다',()=>{
+ const item=(trip,minutes,off=false)=>({trip,minutes,time:`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`,off,maybe:false,note:null});
+ const g={stops:[{name:'가',times:[item(0,480),item(1,540),item(2,600,true)]},{name:'나',times:[item(0,510),item(1,570),item(2,630,true)]}]};
+ const r=planTrip(g,0,1,'09:40');assert.deepEqual([r.board,r.off,r.ride,r.early],['09:00','09:30',30,10]);
+ assert.equal(planTrip(g,0,1,'11:00').board,'09:00');assert.equal(planTrip(g,0,1,'08:00'),null);assert.equal(planTrip(g,1,0,'11:00'),null);assert.equal(planTrip(g,0,1,'09:40',550),null);assert.equal(planTrip(g,0,0,'09:40'),null);
+});
+test('정류장 노트는 표에 있는 정류장만 잇고 승차권은 시간표 기준임을 밝힌다',()=>{
+ const t=(k,o={})=>k+JSON.stringify(o),e=String,item=(trip,time,minutes)=>({trip,time,minutes,off:false,maybe:false,note:null});
+ const g={path:'a',end:'다',day:null,first:null,last:null,interval:null,effective:'',stop:0,stops:[{name:'가',times:[item(0,'08:00',480),item(1,'09:00',540)]},{name:'나',times:[item(1,'09:20',560)]},{name:'다',times:[item(0,'08:40',520),item(1,'09:40',580)]}]},view=extra=>({no:'1',kind:'weekday',day:null,current:500,sourceUrl:'https://x',group:0,groups:[g],...extra});
+ const note=timetableMarkup(view({mode:'note'}),e,t);assert.ok(note.includes('09:20'));assert.ok(note.includes('ttNoteHelp'));assert.ok(!note.includes('08:40')||note.includes('09:40'));
+ const pass=timetableMarkup(view({mode:'trip',trip:{to:2,target:'10:00'}}),e,t);assert.ok(pass.includes('ttTicketBasis'));assert.ok(pass.includes('09:40'));
+ assert.ok(timetableMarkup(view({mode:'trip',trip:{to:2,target:'08:30'}}),e,t).includes('ttNoTrip'));
+});
+test('시간표 메뉴: 번호 찾기와 세 기준 화면',()=>{
+ assert.deepEqual(filterNumbers(['101','201','1201','202'],'20'),['201','202','1201']);assert.deepEqual(filterNumbers(['101'],''),[]);
+ const t=(k,o={})=>k+JSON.stringify(o),e=x=>String(x).replace(/</g,'&lt;'),base={query:'',numbers:['201'],recent:['201'],favorites:[],stop:null,board:null,mine:[],nearby:[],picking:false,stopQuery:'',to:'',by:'',trip:null,inline:null,live:''};
+ assert.ok(timetableBoardMarkup({...base,mode:'route'},e,t).includes('data-tt-no="201"'));
+ assert.ok(timetableBoardMarkup({...base,mode:'stop'},e,t).includes('ttStopHelp'));
+ const place=timetableBoardMarkup({...base,mode:'place',stop:{id:'a',name:'가'},to:'함덕',trip:{verdict:'here',to:'함덕',options:[{no:'201',sure:true,today:'running',last:'21:00',ticket:{board:'09:00',off:'09:40'}}],across:[],acrossStop:null},by:'10:00'},e,t);
+ for(const x of ['ttDirect','ttTicketLine','data-tt-plan="201"','ttJourney'])assert.ok(place.includes(x),x);
+ assert.ok(timetableBoardMarkup({...base,mode:'place',stop:{id:'a',name:'가'},trip:{verdict:'none',to:'x',options:[],across:[],acrossStop:null}},e,t).includes('ttNoDirect'));
+ const board={rows:[{no:'201',arrivals:[{minutes:4},{minutes:20}]},{no:'310',arrivals:[{minutes:9}]}]},flap=upcomingMarkup(board,e,t);assert.ok(flap.indexOf('201')<flap.indexOf('310'));assert.equal(upcomingMarkup({rows:[]},e,t),'');
+});
+test('시간표 메뉴 목적지 기준은 시간표에 두 정류장이 다 있을 때만 회차를 말한다',async()=>{
+ const net=createNetwork(()=>({builtAt:'x',stops:[['a','시청','',33.5,126.5],['b','함덕','',33.5,126.7],['c','김녕','',33.5,126.75]],variants:[{id:'v',no:'312',stops:[0,1,2]}]}));
+ const b=createBoard({catalog:{arrivals:async()=>({receivedAt:'t',arrivals:[]})},network:net,timetable:table('10T05:00:00')});
+ const r=await b.trip('a','함덕','22:30');assert.equal(r.options[0].ticket.board,'21:20');assert.equal(r.options[0].ticket.off,'22:00');
+ const none=await b.trip('a','김녕','22:30');assert.equal(none.options[0].ticket,null);assert.equal(none.options[0].ticketReason,'ttNoTicket');
+ assert.equal(await b.trip('a','없는곳'),null);
+});
+test('목적지 칩의 이름은 실제 정류장으로 이어진다',async()=>{
+ const net=createNetwork(()=>({builtAt:'x',stops:[['a','시청','',33.5,126.5],['b','제주국제공항3','',33.5,126.49]],variants:[{id:'v',no:'312',stops:[0,1]}]}));
+ const b=createBoard({catalog:{arrivals:async()=>({receivedAt:'t',arrivals:[]})},network:net,timetable:table('10T05:00:00')});
+ assert.equal((await b.trip('a','제주공항')).to,'제주국제공항');
+});
+test('순환 노선은 타는 정류장 뒤에 나오는 같은 이름을 내릴 곳으로 본다',async()=>{
+ const d={routes:{181:{tabs:[{no:'181',path:'공항-시청-서귀포-공항',effective:'',run:'',columns:['','공항','시청','서귀포','공항'],rows:[['','06:00','06:20','07:00','08:00']]}]}}};
+ const v=await createTimetable(()=>d,{now:()=>at('10T05:00:00')}).view('181',{stopName:'제주시청',toName:'제주국제공항'}),g=v.groups[v.group];assert.equal(g.stop,1);assert.equal(g.to,3);
 });

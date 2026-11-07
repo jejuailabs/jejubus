@@ -59,7 +59,7 @@ export function createTimetable(load,{now=Date.now}={}){
  const tabsFor=async no=>{const d=await data(),route=d.routes[String(no).split('-')[0]];if(!route)return [];const today=koreaDay(now());return currentTabs(route.tabs,today);};
  return {
   // 앱 안 시간표 화면용. 방향별로 정류장마다 표의 시각을 그대로 내준다.
-  async view(no,{stopName=null,towards=null}={}){
+  async view(no,{stopName=null,towards=null,toName=null}={}){
    const tabs=await tabsFor(no);if(!tabs.length)return null;
    const own=tabs.filter(tab=>tab.no===no),use=own.length?own:tabs,kind=dayKind(now()),day=tabs.some(tabDay)?wantedDay(tabs,kind):null,raw=new Date(now()+KST),at=raw.getUTCHours()*60+raw.getUTCMinutes(),current=at<CUT?at+DAY:at,key=stopName?baseName(stopName):null,seen=new Set();
    const pairs=x=>new Set(Array.from({length:Math.max(0,x.length-1)},(_,i)=>x.slice(i,i+2))),wanted=towards?pairs(baseName(towards)):new Set();
@@ -68,14 +68,14 @@ export function createTimetable(load,{now=Date.now}={}){
     const sign=JSON.stringify([tabDay(tab),trips.map(t=>t.times)]);if(seen.has(sign))return [];seen.add(sign);
     const cols=[...new Set(trips.flatMap(t=>t.times.map(x=>x.col)))].sort((a,b)=>a-b);
     const nameOf=col=>{const clean=x=>String(x||'').replace(/\s+/g,' ').trim(),own=clean(tab.columns[col]);if(own)return own;const prior=clean(tab.columns[col-1]);return prior?`${prior} (출발)`:'';};
-    const stops=cols.map(col=>({name:nameOf(col),times:trips.flatMap(trip=>{const hit=trip.times.find(x=>x.col===col);return hit?[{time:clock(hit.minutes),minutes:hit.minutes,off:excluded(trip,tabKind),maybe:maybe(trip),note:[hit.label,trip.note].filter(Boolean).join(' · ')||null}]:[];}).sort((a,b)=>a.minutes-b.minutes)}));
-    const hub=/공항|터미널/.exec(key||'')?.[0],stop=key?stops.findIndex(s=>baseName(s.name)===key||s.name.includes(key)||key.includes(baseName(s.name))||(hub&&s.name.includes(hub))):-1,end=tab.path.split('-').at(-1).replace(/[()]/g,'');
+    const stops=cols.map(col=>({name:nameOf(col),times:trips.flatMap((trip,index)=>{const hit=trip.times.find(x=>x.col===col);return hit?[{trip:index,time:clock(hit.minutes),minutes:hit.minutes,off:excluded(trip,tabKind),maybe:maybe(trip),note:[hit.label,trip.note].filter(Boolean).join(' · ')||null}]:[];}).sort((a,b)=>a.minutes-b.minutes)}));
+    const hub=/공항|터미널/.exec(key||'')?.[0],hit=(name,hubName)=>{const k=baseName(name);return s=>baseName(s.name)===k||s.name.includes(k)||k.includes(baseName(s.name))||(hubName&&s.name.includes(hubName));},stop=key?stops.findIndex(hit(stopName,hub)):-1,toHit=toName?hit(toName,/공항|터미널/.exec(toName)?.[0]):null,after=toHit?stops.findIndex((s,i)=>i>stop&&toHit(s)):-1,to=toHit?(after>=0?after:stops.findIndex(toHit)):-1,end=tab.path.split('-').at(-1).replace(/[()]/g,'');
     const busiest=stops.reduce((a,s,i)=>s.times.length>stops[a].times.length?i:a,0);
-    return [{path:tab.path,end,day:tabDay(tab),effective:tab.effective,...headline(tab.run,no),stops,stop:stop>=0?stop:busiest,hasStop:stop>=0,score:[...pairs(baseName(end))].filter(p=>wanted.has(p)).length}];
+    return [{path:tab.path,end,day:tabDay(tab),effective:tab.effective,...headline(tab.run,no),stops,stop:stop>=0?stop:busiest,hasStop:stop>=0,to,score:[...pairs(baseName(end))].filter(p=>wanted.has(p)).length}];
    });
    if(!groups.length)return null;
-   const rank=g=>(!day||!g.day||g.day===day?100:0)+g.score*2+(g.hasStop?1:0),best=groups.reduce((a,b,i)=>rank(b)>rank(groups[a])?i:a,0);
-   return {no,kind,day,current,sourceUrl:scheduleUrl(no),group:best,groups:groups.map(({score,hasStop,...g})=>g)};
+   const rank=g=>(!day||!g.day||g.day===day?100:0)+(g.hasStop&&g.to>g.stop?50:0)+g.score*2+(g.hasStop?1:0),best=groups.reduce((a,b,i)=>rank(b)>rank(groups[a])?i:a,0);
+   return {no,kind,day,current,sourceUrl:scheduleUrl(no),group:best,groups:groups.map(({score,...g})=>g)};
   },
   // 번호 하나의 오늘 계획. 알 수 없으면 null을 돌려준다. 방학 기간은 공식 달력이 없어 방학 제외 회차만 남으면 단정하지 않는다.
   async plan(no,{stopName=null,towards=null}={}){

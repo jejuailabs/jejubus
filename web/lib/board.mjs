@@ -2,6 +2,7 @@
 // 판단 순서는 공지 → 실시간 도착 → 시간표다. 근거가 없으면 단정하지 않는다.
 import {ServiceError} from './catalog.mjs';
 import {scheduleUrl} from './network.mjs';
+import {planTrip} from '../public/timetable-view.js';
 
 // 상태값 7종. plan은 공개 시간표를 해석한 결과이고, 없거나 불확실하면 단정하지 않는다.
 export function todayState({notice=null,arrival=null,vehicleSeen=false,plan=null}={}){
@@ -16,6 +17,8 @@ export function todayState({notice=null,arrival=null,vehicleSeen=false,plan=null
  return {state:'scheduled',time:plan.next,interval:plan.interval,last:plan.last,lastBase:plan.lastBase,...source};
 }
 
+// 부르는 이름과 정류장 이름이 다른 주요 지점
+const PLACE_ALIAS={제주공항:'제주국제공항',공항:'제주국제공항',중문:'중문환승정류장',성산:'성산일출봉입구',함덕:'함덕환승정류장',한림:'한림환승정류장',서귀포:'서귀포버스터미널'};
 export function createBoard({catalog,network,noticesFor=async()=>[],timetable=null,now=Date.now}){
  return {
   async stop(stopId){
@@ -32,6 +35,14 @@ export function createBoard({catalog,network,noticesFor=async()=>[],timetable=nu
     return {no:r.no,routeId:first?.routeId||r.directions[0]?.variantIds[0]||null,direction,directions:r.directions.map(({variantIds,...d})=>d),arrivals:r.arrivals.map(a=>({minutes:Math.max(1,Math.ceil(a.seconds/60)),remainingStops:a.remainingStops??null})),notice,scheduleUrl:r.scheduleUrl,plan:plan?{today:plan.today,first:plan.first||plan.firstTime||null,interval:plan.interval,last:plan.last,lastBase:plan.lastBase,next:plan.next||null}:null,today:todayState({notice,arrival:first,plan})};
    })).then(list=>list.sort((a,b)=>(a.arrivals[0]?.minutes??1e9)-(b.arrivals[0]?.minutes??1e9)||a.no.localeCompare(b.no,'ko',{numeric:true})));
    return {stop:map?.stop||{id:stopId,name:live.arrivals[0]?.stop||''},receivedAt:live.receivedAt,builtAt:await network.builtAt().catch(()=>null),inNetwork:!!map,profile,partners:map?.partners||[],arrivals:live.arrivals,rows};
+  },
+  // 목적지 기준: 바로 가는 번호와 도착 희망 시각에 맞는 회차. 시간표에 두 정류장이 다 있을 때만 회차를 말한다.
+  async trip(stopId,name,by=null){
+   const alias=PLACE_ALIAS[name.trim()],[place]=[...(alias?await network.searchStops(alias):[]),...await network.searchStops(name)];if(!place)return null;
+   const line=await this.homeLine(stopId,place.name);if(!line||!by||!timetable)return line;
+   const at=await network.stopDirections(stopId),stopName=at?.stop?.name||null;
+   const options=await Promise.all(line.options.map(async o=>{const view=await timetable.view(o.no,{stopName,toName:place.name}).catch(()=>null),g=view?.groups[view.group];if(!g||!g.hasStop||g.to<=g.stop)return {...o,ticket:null,ticketReason:'ttNoTicket'};const today=!view.day||!g.day||g.day===view.day,ticket=planTrip(g,g.stop,g.to,by,today?view.current:null);return {...o,ticket,ticketReason:ticket?null:'ttNoTime'};}));
+   return {...line,options:options.sort((a,b)=>(b.ticket?.off||'').localeCompare(a.ticket?.off||''))};
   },
   // 귀가선: 이 정류장에서 돌아갈 정류장까지 바로 가는 번호의 오늘 마지막 출발. 시간표 값만 쓴다.
   async homeLine(stopId,homeName){

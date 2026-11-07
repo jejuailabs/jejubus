@@ -80,6 +80,7 @@ export function createNetwork(load){
    const n=await net();
    return n.stops.map(s=>({s,distance:distanceMeters(point,s)})).sort((a,b)=>a.distance-b.distance).slice(0,limit).map(({s,distance})=>{const {kind,grade,routes}=stopKind(s.name,[...new Set((n.byStop.get(s.i)||[]).map(v=>v.no))]);return {id:s.id,name:s.name,number:s.no,lat:s.lat,lng:s.lng,distanceMeters:Math.round(distance),kind,grade,routes};});
   },
+  async numbers(){const n=await net();return [...n.byNo.keys()].sort((a,b)=>a.localeCompare(b,'ko',{numeric:true}));},
   async hasNumber(no){return (await net()).byNo.has(no);},
   async variantsOf(variantId){const n=await net(),v=n.byVariant.get(variantId);return v?n.byNo.get(v.no).map(o=>o.id):[];},
   async stats(){const n=await net();return {builtAt:n.builtAt,variants:n.byVariant.size,numbers:n.byNo.size,stops:n.stops.length};},
