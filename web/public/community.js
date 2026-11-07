@@ -1,7 +1,9 @@
+import {icon} from './icons.js';
 // 커뮤니티 화면 조각: 탭, 지금 대화, 기다리는 버스, 원탭 평가.
-export const CTABS=['live','same','ask','suggest'];
+export const CTABS=['live','same','ask','suggest','notice'];
 export const topQuestion=(q,me,hidden,e,t)=>!q||q.alias===me||hidden===q.id?'':`<div class="top-q"><button class="top-q-main" data-top-q="1"><b>${t('topAsk')}</b><span>${e(q.text)}</span></button><button class="top-q-x" data-top-q-hide="${e(q.id)}" aria-label="${t('close')}">×</button></div>`;
-export const ctabsMarkup=(tab,t)=>`<div class="ctabs" role="tablist">${CTABS.map(id=>`<button role="tab" aria-selected="${tab===id}" class="${tab===id?'active':''}" data-ctab="${id}">${t(`ctab_${id}`)}</button>`).join('')}</div>`;
+// 실시간 채팅만 늘 보이고, 나머지 탭은 햄버거 메뉴에 담는다. 새로고침·글쓰기도 같은 줄에.
+export const ctabsMarkup=(tab,t)=>`<div class="ctabs" role="tablist"><button role="tab" aria-selected="${tab==='live'}" class="ctab-live ${tab==='live'?'active':''}" data-ctab="live"><i class="live-dot" aria-hidden="true"></i>${t('ctab_live')}</button><details class="ctab-menu ${tab!=='live'?'active':''}"><summary aria-label="${t('ctabMenu')}">${icon('menu')}${tab!=='live'?`<span>${t(`ctab_${tab}`)}</span>`:''}</summary><div class="ctab-menu-list">${CTABS.filter(id=>id!=='live').map(id=>`<button role="tab" aria-selected="${tab===id}" class="${tab===id?'active':''}" data-ctab="${id}">${t(`ctab_${id}`)}</button>`).join('')}</div></details><span class="ctab-gap"></span><button class="ctab-icon" data-action="community-refresh" aria-label="${t('refresh')}">${icon('refresh')}</button><button class="ctab-icon" data-action="compose" aria-label="${t('write')}">${icon('pencil')}</button></div>`;
 const bandLabel=(band,t)=>band?t('roomBand',{n:band}):'';
 const when=(at,locale)=>new Date(at).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'});
 export const roomPeople=(room,e,t)=>`<strong>${t('roomOnline',{n:room?.total??0})}</strong><div class="room-people">${room?.botReady?`<span class="room-person bot">${t('roomBot')}</span>`:''}${(room?.people||[]).map(p=>`<span class="room-person">${e(p.alias)}${p.band?` <small>${bandLabel(p.band,t)}</small>`:''}</span>`).join('')}</div>`;

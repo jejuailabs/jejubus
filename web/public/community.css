@@ -52,3 +52,17 @@
  body.room-typing .view-community.ctab-live{height:var(--vvh,100dvh)}
 }
 .room-feed>:first-child{margin-top:auto}
+
+/* 커뮤니티 탭 줄: 실시간 채팅 · 햄버거 · 새로고침 · 글쓰기 */
+.ctabs{align-items:center;overflow:visible;position:relative;z-index:5}
+.ctabs .ctab-live{flex:none;display:inline-flex;align-items:center;gap:7px}
+.ctabs .ctab-live:not(.active){background:var(--surface);color:var(--ink)}
+.ctab-menu{position:relative;flex:none}
+.ctab-menu summary{display:inline-flex;align-items:center;gap:6px;min-height:40px;min-width:40px;padding:0 10px;border-radius:11px;background:var(--surface);font-size:14px;font-weight:700;color:var(--soft);cursor:pointer;list-style:none}
+.ctab-menu summary::-webkit-details-marker{display:none}.ctab-menu summary .icon{width:20px;height:20px}
+.ctab-menu.active summary{background:var(--blue);color:#fff}
+.ctab-menu-list{position:absolute;left:0;top:calc(100% + 6px);z-index:20;display:flex;flex-direction:column;min-width:170px;padding:6px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 10px 28px #0003}
+.ctabs .ctab-menu-list button{flex:none;text-align:left;padding:11px 12px;border-radius:10px;background:none;color:var(--ink);font-size:15px}
+.ctabs .ctab-menu-list button.active{background:var(--surface-blue);color:var(--blue)}
+.ctab-gap{flex:1}
+.ctabs .ctab-icon{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink)}.ctab-icon .icon{width:19px;height:19px}
