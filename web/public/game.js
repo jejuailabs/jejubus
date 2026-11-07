@@ -1,4 +1,4 @@
-import {art,TYPE_ART,CARD_ART} from './art.js';
+import {art,TYPE_ART,CARD_ART,ART_V} from './art.js';
 // 내 제주: 탑승 기록과 도장. 기록은 이 기기에만 저장하고 서버로 보내지 않는다.
 // 도장은 "탔어요"를 누른 사용자의 자기 기록이다. 현금 보상, 순위, 위치 추적은 없다.
 export const REGIONS=['east','west','south','north'];
@@ -30,7 +30,7 @@ export function titleOf(rides){
 export function shareStats(rides){const count=regionCounts(rides);return {rides:rides.length,routes:new Set(rides.map(r=>r.no)).size,stamps:stampsOf(rides).filter(s=>s.earned).length,regions:REGIONS.filter(id=>count[id]>0)};}
 const load=src=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=src;});
 // 공유 카드 그림을 미리 불러온다. 못 불러오면 그림 없이 만든다.
-export async function shareImages(rides){const title=titleOf(rides),count=regionCounts(rides),[bg,type,base,...lit]=await Promise.all([load(`/art/share/card-${CARD_ART[title]||'oreum'}.webp`),title?load(`/art/share/type-${TYPE_ART[title]}.webp`):load('/art/bus/face-happy.webp'),load('/art/map/jeju-base-gray.webp'),...REGIONS.filter(id=>count[id]).map(id=>load(`/art/map/jeju-${id}.webp`))]);return {bg,type,base,lit:lit.filter(Boolean)};}
+export async function shareImages(rides){const title=titleOf(rides),count=regionCounts(rides),[bg,type,base,...lit]=await Promise.all([load(`/art/share/card-${CARD_ART[title]||'oreum'}.webp?v=${ART_V}`),title?load(`/art/share/type-${TYPE_ART[title]}.webp?v=${ART_V}`):load(`/art/bus/face-happy.webp?v=${ART_V}`),load(`/art/map/jeju-base-gray.webp?v=${ART_V}`),...REGIONS.filter(id=>count[id]).map(id=>load(`/art/map/jeju-${id}.webp?v=${ART_V}`))]);return {bg,type,base,lit:lit.filter(Boolean)};}
 export function drawShareCard(canvas,rides,t,images={}){
  const s=shareStats(rides),g=canvas.getContext('2d'),title=titleOf(rides),night=title==='typeNight',ink=night?'#fff':'#2a2c33';canvas.width=720;canvas.height=1080;
  g.fillStyle='#f6ecd8';g.fillRect(0,0,720,1080);if(images.bg)g.drawImage(images.bg,0,0,720,1080);

@@ -1,0 +1,95 @@
+/* 미션 「제주 버스 탐험 수첩」: 종이 수첩 한 권 */
+.notebook{--nb-paper:#fdf8ee;--nb-ink:#2a2c33;--nb-orange:#c2540a;--nb-tangerine:#ff9a3c;--nb-teal:#3a9fb5;--nb-green:#5f9e5a;--nb-line:#ecdcc0;margin:0 auto 18px;max-width:560px;border-radius:20px;background:var(--nb-paper);border:1px solid var(--nb-line);box-shadow:0 1px 0 #fff inset,0 6px 18px #6b4a1a14;overflow:hidden;color:var(--nb-ink)}
+.notebook .art{display:block;height:auto}
+.nb-bar{display:block;height:7px;border-radius:9px;background:#f0e2c8;overflow:hidden}.nb-bar i{display:block;height:100%;border-radius:9px;background:var(--nb-tangerine)}
+.nb-bar.u-tangerine i{background:var(--nb-tangerine)}.nb-bar.u-sea i{background:var(--nb-teal)}.nb-bar.u-oreum i{background:var(--nb-green)}
+
+/* 탐험가 증명서 */
+.nb-cert{padding:12px 14px 10px;background:#fff7e8;border-bottom:1px dashed var(--nb-line)}
+.nb-cert-row{display:flex;align-items:center;gap:10px}
+.nb-cert-main{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:0;background:none;color:inherit;text-align:left}
+.nb-face{width:52px;height:52px;flex:none;border-radius:50%;background:#ffe9cc;object-fit:contain}
+.nb-id{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.nb-id small{font-size:11px;font-weight:700;color:var(--nb-orange)}.nb-id strong{font-size:18px;line-height:1.15}
+.nb-purse{flex:none;padding:5px 10px;border-radius:999px;background:#fff;border:1px solid var(--nb-line);font-size:13px}
+.nb-bonus{position:relative;flex:none;width:52px;padding:0;background:none}.nb-bonus .art{width:52px}.nb-bonus b{position:absolute;right:-4px;top:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--nb-orange);color:#fff;font-size:12px;line-height:20px}.nb-bonus:disabled{opacity:.45}.nb-bonus:disabled b{background:#9a9388}
+.nb-keep{margin-top:8px;width:100%;min-height:36px;border-radius:10px;background:#fff;border:1px dashed var(--nb-orange);color:var(--nb-orange);font-size:13px;font-weight:800}
+.nb-cert-more{margin-top:12px}.nb-cert-more h4{display:flex;justify-content:space-between;margin:12px 0 6px;font-size:13px}.nb-cert-more h4 small{color:#7b7466;font-weight:600}
+.nb-ranks{display:flex;gap:6px;overflow-x:auto;margin:0;padding:2px 0 6px;list-style:none;scrollbar-width:none}
+.nb-ranks li{flex:none;width:58px;text-align:center;font-size:10px;font-weight:700;color:#9a9388}.nb-ranks .art{width:48px;margin:0 auto 2px;filter:grayscale(1) opacity(.4)}.nb-ranks li.on .art{filter:none}.nb-ranks li.on{color:var(--nb-ink)}.nb-ranks li.now span{color:var(--nb-orange)}
+.nb-covers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.nb-covers button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;background:#fff;border:1px solid var(--nb-line);font-size:11px;font-weight:700}.nb-covers .art{width:44px;border-radius:5px;box-shadow:2px 2px 0 #0001}.nb-covers small{font-size:10px;color:#7b7466}.nb-covers .on{outline:2px solid var(--nb-orange)}.nb-covers button:disabled{opacity:.5}
+.nb-rules{margin-top:10px;padding:0;background:none;color:#7b7466;font-size:12px;text-decoration:underline}
+
+/* 탭 */
+.nb-tabs{display:flex;gap:4px;padding:8px 10px 0;background:var(--nb-paper)}
+.nb-tabs button{flex:1;min-height:40px;border-radius:12px 12px 0 0;background:#f4e8d2;color:#7b7466;font-weight:800;font-size:14px}
+.nb-tabs button.on{background:#fff;color:var(--nb-orange);box-shadow:0 -2px 0 var(--nb-orange) inset}
+.nb-page{padding:4px 14px 16px;background:#fff;background-image:repeating-linear-gradient(transparent 0 31px,#f5ead6 31px 32px)}
+.nb-head{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 8px;font-size:16px}.nb-head small{font-size:12px;color:#7b7466;font-weight:600}
+.nb-muted{margin:6px 0;font-size:12px;color:#7b7466}
+
+/* 오늘: 승차권 카드 */
+.nb-trips{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.nb-trip{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:#fff8ec;border:1px solid var(--nb-line)}
+.nb-trip:before,.nb-trip:after{content:'';position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;border:1px solid var(--nb-line)}.nb-trip:before{left:-8px}.nb-trip:after{right:62px;background:none;border:0;width:0;height:60%;top:20%;margin:0;border-radius:0;border-left:2px dashed var(--nb-line)}
+.nb-trip-art{width:56px;flex:none}
+.nb-trip>div{flex:1;min-width:0}.nb-trip strong{display:block;font-size:15px;line-height:1.3}.nb-trip small{font-size:12px;font-weight:700;color:var(--nb-orange)}
+.nb-punch{flex:none;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px dashed #e3cfa9}
+.nb-trip.done{transform:rotate(-1deg)}.nb-trip.done .nb-punch{border-color:transparent}.nb-trip.done .nb-punch .art{width:46px;animation:nb-stamp .35s ease-out}
+.nb-trip.done strong{text-decoration:line-through;text-decoration-color:#c2540a80}
+@keyframes nb-stamp{0%{transform:scale(1.8);opacity:0}70%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.nb-trip.done .nb-punch .art{animation:none}}
+.nb-bonus-row{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:8px 12px;border-radius:14px;background:var(--nb-ink);color:#ffd9b0;font-weight:800;text-align:left}.nb-bonus-row .art{width:52px}
+
+/* 오늘: 이번 주 노선도 */
+.nb-route{padding:10px 4px 0}
+.nb-line{position:relative;height:40px;margin:0}
+.nb-line:before{content:'';position:absolute;left:0;right:0;top:34px;height:6px;border-radius:6px;background:#f0e2c8}
+.nb-line>i{position:absolute;left:0;top:34px;height:6px;border-radius:6px;background:var(--nb-tangerine)}
+.nb-bus{position:absolute;top:2px;width:52px;transform:translateX(-50%);transition:left .4s}
+.nb-bus-at{display:none}
+.nb-goal{position:absolute;right:-2px;top:-2px;width:32px}
+.nb-route ol{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:-8px 0 0;padding:0;list-style:none}
+.nb-route li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}.nb-route li .art{width:28px;position:relative;z-index:1}.nb-route li:not(.on) .art{opacity:.8}.nb-route li strong{font-size:12px;line-height:1.25}.nb-route li small{font-size:11px;color:#7b7466}.nb-route li.on strong{color:var(--nb-orange)}
+
+/* 오늘: 조합 */
+.nb-unions{display:grid;gap:7px}.nb-unions>div{display:grid;grid-template-columns:30px 76px 1fr 40px;align-items:center;gap:7px;font-size:13px;font-weight:700}.nb-unions .art{width:30px}.nb-unions .mine span{color:var(--nb-orange)}.nb-unions small{text-align:right;color:#7b7466}
+.nb-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nb-pick button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:14px;background:#fff8ec;border:1px solid var(--nb-line);font-size:13px;font-weight:800}.nb-pick .art{width:52px}
+
+/* 지도 */
+.nb-map{position:relative;margin:10px -6px 0;border-radius:14px;overflow:hidden;background:#fbf4e6;aspect-ratio:1600/1000}
+.nb-map .nb-base,.nb-map .nb-layer{position:absolute;inset:0;width:100%;height:100%}
+.nb-pin{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:0;background:none;transform:translate(-50%,-50%)}
+.nb-pin:before{content:'';width:12px;height:12px;border-radius:50%;border:2px dashed #b9a582;background:#fff9}
+.nb-pin.on:before{display:none}.nb-pin .art{width:30px;height:30px;border-radius:50%;box-shadow:0 2px 6px #0003;background:#fff}
+.nb-pin span{padding:0 4px;border-radius:6px;background:#fffc;font-size:9px;font-weight:800;color:#5b5449;white-space:nowrap}
+.nb-pin.on span{color:var(--nb-ink)}.nb-pin.on.r-rare span{color:var(--nb-orange)}.nb-pin.on.r-legend span{color:#a67c00}
+.nb-map-empty{position:absolute;inset:auto 8px 8px 8px;z-index:3;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#fffd;font-size:12px;font-weight:700}.nb-map-empty .art{width:56px;flex:none}.nb-map-empty p{margin:0}
+.nb-cap{margin:8px 0 6px;font-size:13px;font-weight:800;text-align:center}
+.nb-regions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}.nb-regions span{padding:4px 10px;border-radius:999px;background:#f4e8d2;font-size:12px;font-weight:700;color:#7b7466}
+.nb-regions .on.g-north{background:#f1c597;color:#7a3f06}.nb-regions .on.g-east{background:#a6cbc8;color:#1f5a63}.nb-regions .on.g-south{background:#e2b8ae;color:#7a2f25}.nb-regions .on.g-west{background:#b4c8a2;color:#34552b}
+
+/* 수첩 */
+.nb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.nb-stats div{padding:10px 4px;border-radius:12px;background:#fff8ec;border:1px solid var(--nb-line);text-align:center}.nb-stats b{display:block;font-size:22px;color:var(--nb-orange)}.nb-stats small{font-size:12px;color:#7b7466;font-weight:700}
+.nb-stamps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 4px}.nb-stamps figure{margin:0;text-align:center;font-size:11px;font-weight:700;color:#9a9388}.nb-stamps .art{width:64px;margin:0 auto 2px;filter:grayscale(1) opacity(.28)}.nb-stamps .on .art{filter:none;transform:rotate(-6deg)}.nb-stamps .on{color:var(--nb-ink)}
+.nb-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.nb-actions button{min-height:34px;padding:0 12px;border-radius:999px;background:#fff8ec;border:1px solid var(--nb-line);font-size:12px;font-weight:700}.nb-actions button:disabled{opacity:.5}
+.nb-off{padding:12px;border-radius:14px;background:#fff8ec;border:1px dashed var(--nb-line);text-align:center}.nb-off p{margin:0 0 8px;font-size:13px}.nb-off button{min-height:38px;padding:0 16px;border-radius:999px;background:var(--nb-orange);color:#fff;font-weight:800}
+.nb-log{margin:0;padding:0;list-style:none}
+.nb-day{margin:10px 0 4px;font-size:12px;font-weight:800;color:#7b7466}
+.nb-stub{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding:8px 10px;border-radius:10px;background:#fff8ec;border:1px solid var(--nb-line);border-left:4px dotted var(--nb-tangerine)}
+.nb-stub b{flex:none;min-width:40px;padding:2px 6px;border-radius:8px;background:var(--nb-orange);color:#fff;font-size:12px;text-align:center}.nb-stub span{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nb-stub small{flex:none;font-size:12px;color:#7b7466}
+.nb-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;text-align:center}.nb-empty .art{width:110px}.nb-empty p{margin:0;font-size:13px;color:#7b7466}
+
+/* 장소 카드·규칙 모달 */
+.nb-place{text-align:center}.nb-place-art{width:180px;margin:0 auto 6px;filter:grayscale(1) opacity(.35)}.nb-place.on .nb-place-art{filter:none}
+.nb-rarity{display:inline-block;padding:2px 10px;border-radius:999px;background:#d8ecef;color:#1f5a63;font-size:12px;font-weight:800}.nb-place.r-rare .nb-rarity{background:#ffe1c4;color:#8a3d04}.nb-place.r-legend .nb-rarity{background:#f6e3a6;color:#6e5200}
+.nb-rules-sheet{text-align:center}.nb-rules-sheet .art{width:120px;margin:0 auto}.nb-rules-sheet p{text-align:left;line-height:1.7}
+.q-result{background-size:cover;background-position:center}
+
+/* 큰 글자 모드 버튼은 내 보드 아래로 */
+.home-simple{display:block;margin:6px auto 14px}
+
+:root[data-theme=dark] .notebook{--nb-paper:#2a2721;--nb-ink:#f4ead8;--nb-line:#4a4235;background:#2a2721}
+:root[data-theme=dark] .nb-cert{background:#332e26}:root[data-theme=dark] .nb-page{background:#25221d;background-image:none}
+:root[data-theme=dark] .nb-trip,:root[data-theme=dark] .nb-stats div,:root[data-theme=dark] .nb-stub,:root[data-theme=dark] .nb-off,:root[data-theme=dark] .nb-pick button,:root[data-theme=dark] .nb-covers button,:root[data-theme=dark] .nb-actions button,:root[data-theme=dark] .nb-purse{background:#332e26}
+:root[data-theme=dark] .nb-tabs button{background:#3a342a;color:#c9bfae}:root[data-theme=dark] .nb-tabs button.on{background:#25221d}
+.nb-pin:not(.on) span{display:none}

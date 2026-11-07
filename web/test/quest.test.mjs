@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {CARDS,applyRide,blankQuest,cardsFor,evaluate,levelOf,questMarkup,rollTicket,todayMissions,weekOf} from '../public/quest.js';
+import {notebookMarkup,PLACES} from '../public/notebook.js';
+import {CARDS,applyRide,blankQuest,cardsFor,evaluate,levelOf,rollTicket,todayMissions,weekOf} from '../public/quest.js';
 import {createTeams} from '../lib/live-room.mjs';
 import {existsSync} from 'node:fs';
 
@@ -14,10 +15,11 @@ test('정류장을 칠하고 카드와 뽑기권을 준다. 뽑기권은 곧 오
  let q=blankQuest();for(let i=0;i<4;i++)q=applyRide(q,leg({verified:true}),[],t0+600000).quest;assert.equal(q.tickets,3);
 });
 test('뽑기 확률 구간과 레벨',()=>{assert.equal(rollTicket(()=>.01).rarity,'legend');assert.equal(rollTicket(()=>.2).rarity,'rare');assert.equal(rollTicket(()=>.9).rarity,'common');assert.equal(levelOf(0).level,1);assert.equal(levelOf(160).level,3);assert.equal(levelOf(99999).to,null);});
-test('임시 그림 파일이 모두 있고 화면이 그려진다',()=>{
- for(const c of CARDS)assert.ok(existsSync(new URL(`../public/art/quest/card-${c.id}.svg`,import.meta.url)),c.id);
- const html=questMarkup({quest:{...blankQuest(),tickets:1},legs:[leg()],board:{teams:{}},totals:{east:1,west:1,south:1,north:1},now:t0},String,k=>k);for(const k of ['qToday','qConquest','qCards','qShop','data-q-spin','data-q-team'])assert.ok(html.includes(k),k);
- for(const [,src] of html.matchAll(/src="([^"]+)"/g))assert.ok(existsSync(new URL(`../public${src}`,import.meta.url)),src);
+test('탐험 수첩 세 탭이 그려지고 부르는 그림 파일이 모두 있다',()=>{
+ const base={quest:{...blankQuest(),tickets:1,cards:['airport'],stops:{s1:'east'}},legs:[leg()],board:{teams:{}},totals:{east:1,west:1,south:1,north:1},now:t0,rides:[{no:'201',stopId:'s',region:'east',at:t0}],game:true};
+ const pages={today:['nbTrips','nbRoute','data-q-spin','data-q-team'],map:['nbMapCap','data-q-place="airport"','explore-east'],book:['nbStamps','nbLog','game-share']};
+ for(const [tab,keys] of Object.entries(pages)){const html=notebookMarkup({...base,tab,cert:true},String,k=>k);for(const k of keys)assert.ok(html.includes(k),tab+':'+k);for(const [,src] of html.matchAll(/src="([^"]+)"/g))assert.ok(existsSync(new URL('../public'+src,import.meta.url)),src);}
+ for(const c of CARDS){assert.ok(PLACES[c.id],c.id);assert.ok(existsSync(new URL('../public/art/quest/place-'+c.id+'.webp',import.meta.url)),c.id);}
  assert.deepEqual(cardsFor(['제주국제공항3']),['airport']);assert.equal(weekOf(Date.parse('2026-11-08T03:00:00Z')),'2026-11-02');
 });
 test('팀 점수는 기기당 하루 100점까지',async()=>{
