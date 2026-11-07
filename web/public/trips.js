@@ -22,7 +22,7 @@ export function journeysOf(legs){
 export const tripStats=legs=>({rides:legs.length,routes:new Set(legs.map(l=>l.no)).size,minutes:legs.reduce((n,l)=>n+(l.offAt&&!l.auto?Math.max(0,Math.round((l.offAt-l.at)/60000)):0),0)});
 function journeyMarkup(j,e,t,locale){
  return `<ol class="log-line">${j.legs.map((l,i)=>{const prior=j.legs[i-1],walk=prior?metersBetween({lat:prior.offLat,lng:prior.offLng},l):null,wait=prior?Math.max(0,Math.round((l.at-prior.offAt)/60000)):null;
-  return `${prior?`<li class="log-gap">${t('logTransfer',{n:wait})}${walk!==null?` · ${t('logWalk',{m:walk})}`:''}</li>`:''}<li class="log-leg"><b>${e(l.no)}</b><div><strong>${e(l.stopName)} → ${e(l.offName||(l.offAt?t('logUnknownOff'):t('logRiding')))}</strong><small>${e(clock(l.at,locale))}${l.offAt&&!l.auto?` ~ ${e(clock(l.offAt,locale))} · ${t('logMinutes',{n:Math.max(0,Math.round((l.offAt-l.at)/60000))})}`:''}</small></div></li>`;}).join('')}</ol>`;
+  return `${prior?`<li class="log-gap">${t('logTransfer',{n:wait})}${walk!==null?` · ${t('logWalk',{m:walk})}`:''}</li>`:''}<li class="log-leg"><b>${e(l.no)}</b><div><strong>${e(l.stopName)} → ${e(l.offName||(l.offAt?t('logUnknownOff'):t('logRiding')))}</strong><small>${e(clock(l.at,locale))}${l.offAt&&!l.auto?` ~ ${e(clock(l.offAt,locale))} · ${t('logMinutes',{n:Math.max(0,Math.round((l.offAt-l.at)/60000))})}`:''}${l.ride?.points?` · ${t('qPoints',{n:l.ride.points})}`:''}${l.ride?.kind==='bus'?` · ${t('rideOk')}`:''}</small></div></li>`;}).join('')}</ol>`;
 }
 export function logMarkup(legs,e,t,locale,now=Date.now()){
  const open=openLeg(legs),journeys=journeysOf(legs),today=journeys.filter(j=>j.day===dayOf(now)),past=journeys.filter(j=>j.day!==dayOf(now)),s=tripStats(legs);

@@ -5,7 +5,7 @@ function mergeQuest(a,b){
  if(!a||!b)return a||b||null;
  const max=k=>Math.max(a[k]||0,b[k]||0),set=k=>[...new Set([...(a[k]||[]),...(b[k]||[])])];
  const days={...b.ticketDay};for(const [d,n] of Object.entries(a.ticketDay||{}))days[d]=Math.max(days[d]||0,n);
- return {...b,...a,coins:max('coins'),xp:max('xp'),tickets:max('tickets'),done:{...b.done,...a.done},stops:{...b.stops,...a.stops},ticketDay:days,cards:set('cards'),owned:set('owned'),team:a.team||b.team||null,skin:a.skin||b.skin||null,actions:{...b.actions,...a.actions}};
+ return {...b,...a,points:max('points'),pointDay:{...b.pointDay,...a.pointDay},coins:max('coins'),xp:max('xp'),tickets:max('tickets'),done:{...b.done,...a.done},stops:{...b.stops,...a.stops},ticketDay:days,cards:set('cards'),owned:set('owned'),team:a.team||b.team||null,skin:a.skin||b.skin||null,actions:{...b.actions,...a.actions}};
 }
 export function mergeProgress(local={},remote={}){
  const legs=new Map();
