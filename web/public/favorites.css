@@ -32,7 +32,7 @@
  .stop-legend{flex-wrap:wrap;overflow:visible;gap:4px}.view-explore.mobile-search .stop-legend{top:6px;left:6px;max-width:calc(100% - 12px)}
  .stop-legend button{padding:3px 8px 3px 4px;font-size:11px;background:color-mix(in srgb,var(--panel) 82%,transparent)}
 }
-/* 모바일 정류장 모달 */
+/* 정류장 모달 */
 .stop-sheet{padding:12px}.stop-sheet .live-details{margin:0;padding:0;border:0}.stop-sheet .results-heading{margin-top:0;padding-right:52px;gap:6px}.stop-sheet .results-heading .tt-fav{margin-left:auto;background:#fff9;border-radius:50%}
 /* 챗봇 승차 카드와 버튼 */
 .chat-trip{display:flex;flex-direction:column;gap:8px;margin-top:9px}.chat-trip-option{padding:10px 11px;border-radius:13px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}.chat-trip-head{display:flex;align-items:center;gap:8px}.chat-trip-head .bus-face{width:44px;flex:none}.chat-trip-head strong{font-size:18px}.chat-trip-head small{color:var(--soft);font-size:12px}

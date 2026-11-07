@@ -197,9 +197,9 @@ function chatAction(a){
  setTimeout(()=>{if(a.kind==='stop'){state.view=state.view==='map'?'map':'explore';if(state.view==='explore')state.pane=phone()?'search':state.pane;render();mapStop(a.stop);}else if(a.kind==='live'){if(a.routeId)openLiveVariant(a.routeId,a.no);else openLive(a.no);}else if(a.kind==='timetable')showTimetable(a.no,a.towards||'');else if(a.kind==='journey')goPlace(a.to);},60);
 }
 const phone=()=>matchMedia('(max-width:760px),(max-width:1020px) and (max-height:500px)').matches;
-const mapStop=stop=>phone()?openStopSheet(stop):chooseStop(stop);
+const mapStop=stop=>openStopSheet(stop);
 function drawStopSheet(){showModal(`<div class="stop-sheet">${liveMarkup(true)}</div>`);}
-// 모바일: 지도에서 고른 정류장은 화면 밑이 아니라 모달로 연다.
+// 지도에서 고른 정류장은 패널 아래가 아니라 그 자리의 모달로 연다.
 async function openStopSheet(stop){const version=++selectionVersion;document.querySelector('.search-panel .live-details')?.remove();state.stop=stop;state.stopSheet=true;state.openRow=null;state.board=null;state.side=null;state.sideTo='';state.context=`stop:${stop.id}`;state.arrivals=[];state.liveAt=null;state.liveError=null;state.homeLine=null;drawStopSheet();loadReviewSummary();loadReports(stop.id);loadHomeLine();await refreshLive(version);}
 function closeStopSheet(){if(!state.stopSheet)return;state.stopSheet=false;dialog.innerHTML='';state.stop=null;state.board=null;state.homeLine=null;state.context=state.route?`route:${state.route.id}`:'general';++selectionVersion;render();}
 async function refreshHome(){if(document.hidden||state.view!=='home')return;const list=myStops();await Promise.allSettled(list.map(async s=>{state.homeBoards[s.id]=await api(`/api/board/stop?id=${encodeURIComponent(s.id)}`);}));if(state.view==='home'&&list.length)render();}
