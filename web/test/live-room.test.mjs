@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {encodeValue} from '../lib/firestore.mjs';
 import {aliasOf,bandOf,coarse,createKudos,createLiveRoom} from '../lib/live-room.mjs';
 import {kudosMarkup,nextFor,roomMarkup,soonest,topQuestion,waitPill} from '../public/community.js';
 
@@ -44,3 +45,4 @@ test('질문 한 줄은 10분 안의 가장 새로운 질문을 모두에게 보
  now+=601000;assert.equal((await room.top()).question,null);
  const e=String,t=k=>k,q={id:'1',alias:'나',text:'어디?'};assert.ok(topQuestion(q,'너',null,e,t).includes('어디?'));assert.equal(topQuestion(q,'나',null,e,t),'');assert.equal(topQuestion(q,'너','1',e,t),'');
 });
+test('Firestore에 소수 좌표를 소수로 저장한다',()=>{assert.deepEqual(encodeValue(33.512),{doubleValue:33.512});assert.deepEqual(encodeValue(3),{integerValue:'3'});});

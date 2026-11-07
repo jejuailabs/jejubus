@@ -5,7 +5,8 @@ import {setTimeout as delay} from 'node:timers/promises';
 
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const failure=(key='storageUnavailable',status=503)=>Object.assign(Error(key),{key,status});
-const encode=value=>value===null?{nullValue:null}:typeof value==='boolean'?{booleanValue:value}:typeof value==='number'?{integerValue:String(value)}:typeof value==='string'?{stringValue:value}:Array.isArray(value)?{arrayValue:{values:value.map(encode)}}:{mapValue:{fields:Object.fromEntries(Object.entries(value).map(([k,v])=>[k,encode(v)]))}};
+const encode=value=>value===null?{nullValue:null}:typeof value==='boolean'?{booleanValue:value}:typeof value==='number'?(Number.isInteger(value)?{integerValue:String(value)}:{doubleValue:value}):typeof value==='string'?{stringValue:value}:Array.isArray(value)?{arrayValue:{values:value.map(encode)}}:{mapValue:{fields:Object.fromEntries(Object.entries(value).map(([k,v])=>[k,encode(v)]))}};
+export const encodeValue=encode;
 const decode=value=>'nullValue'in value?null:'booleanValue'in value?value.booleanValue:'integerValue'in value?Number(value.integerValue):'doubleValue'in value?value.doubleValue:'stringValue'in value?value.stringValue:'arrayValue'in value?(value.arrayValue.values||[]).map(decode):Object.fromEntries(Object.entries(value.mapValue?.fields||{}).map(([k,v])=>[k,decode(v)]));
 
 // Construction is offline. Authentication and database requests start only on use.
