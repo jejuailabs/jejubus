@@ -27,3 +27,4 @@
 .reward{position:relative;margin:-1px;min-height:440px;padding:42px 22px 26px;background-size:cover;background-position:center;text-align:center;color:#2a2c33;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.reward .art{width:150px}.reward .art+.art{width:96px}.reward h2{margin:6px 0 0}.reward p{margin:0}
 .boot{height:100dvh;background:#f6ecd8 url(/art/brand/mascot-splash.webp) center bottom/cover no-repeat}
 @media(prefers-reduced-motion:no-preference){.reward .art:first-of-type{animation:stamp-in .35s ease-out}@keyframes stamp-in{from{transform:scale(1.4);opacity:0}}}
+.mode-route .sort-tabs,.mode-route .direct-filter,.mode-stop .sort-tabs,.mode-stop .direct-filter{display:none!important}
