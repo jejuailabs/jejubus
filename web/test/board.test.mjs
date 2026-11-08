@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {baseName,createNetwork,scheduleUrl} from '../lib/network.mjs';
 import {createBoard,todayState} from '../lib/board.mjs';
+import {ServiceError} from '../lib/catalog.mjs';
 import {gradeOf,sideResultMarkup,boardMarkup} from '../public/board.js';
 
 // 도로 하나: 북쪽 줄 A→B→C, 남쪽 줄 C'→B'→A'. 순환 노선 9는 B를 두 번 지난다.
@@ -86,4 +87,10 @@ test('정류장 노선 목록: 모든 번호를 한 줄씩 보여 주고 누르�
  const closed=boardMarkup({inNetwork:true,rows},e,t);assert.equal((closed.match(/data-row-toggle/g)||[]).length,2);assert.ok(!closed.includes('row-detail'));assert.ok(closed.includes('rowOff'));
  const open=boardMarkup({inNetwork:true,rows},e,t,{open:'201'});assert.equal((open.match(/row-detail/g)||[]).length,1);for(const x of ['detailRuns','factLast','data-timetable="201"','data-arrival-route','data-report-no'])assert.ok(open.includes(x),x);
  assert.ok(boardMarkup({inNetwork:true,rows},e,t,{open:'310'}).includes('detailOff'));
+});
+test('실시간 한도를 다 쓰면 보드는 시간표 기준으로 남고 다른 오류는 그대로 올린다',async()=>{
+ const out=createBoard({catalog:{arrivals:async()=>{throw new ServiceError('quotaReached',429);}},network:network(),now:()=>tue});
+ const t=(k,v)=>v?`${k}${JSON.stringify(v)}`:k,e=String;const r=await out.stop('b');assert.equal(r.liveOut,'quotaReached');assert.equal(r.arrivals.length,0);assert.ok(r.rows.some(x=>x.no==='201'));assert.ok(r.rows.every(x=>!x.arrivals.length));
+ assert.ok(boardMarkup(r,e,t).includes('board-quota'));assert.ok(!boardMarkup({rows:[],inNetwork:true},e,t).includes('board-quota'));
+ await assert.rejects(createBoard({catalog:{arrivals:async()=>{throw new ServiceError('providerUnavailable');}},network:network(),now:()=>tue}).stop('b'),{key:'providerUnavailable'});
 });

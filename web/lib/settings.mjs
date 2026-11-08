@@ -7,7 +7,7 @@ export function configuration(env){return {
   origin:env.APP_ORIGIN||`http://localhost:${Number(env.PORT)||3000}`,
   googleClientId:env.GOOGLE_CLIENT_ID||'',googleClientSecret:env.GOOGLE_CLIENT_SECRET||'',
   tagoKey:env.TAGO_SERVICE_KEY||'',cityCode:env.TAGO_CITY_CODE||'',stopId:env.TAGO_STOP_ID||'',transitMode:env.TAGO_SERVICE_KEY?'tago':env.TRANSIT_MODE||'demo',
-  tagoDailyLimit:Math.min(1000,Math.max(1,Number(env.TAGO_DAILY_LIMIT)||1000)),
+  tagoDailyLimit:Math.min(10000,Math.max(1,Number(env.TAGO_DAILY_LIMIT)||10000)),
   kakaoKey:env.KAKAO_REST_KEY||'',kakaoEnabled:env.KAKAO_ENABLED==='true',kakaoDailyLimit:100,
   navigationEnabled:env.NAVIGATION_ENABLED==='true'&&(env.NAVIGATION_FREE_QUOTA_VERIFIED==='true'||env.NAVIGATION_BILLING_APPROVED==='true'&&/^[\w-]{8,80}$/.test(env.NAVIGATION_APPROVAL_ID||'')&&Date.parse(env.NAVIGATION_APPROVAL_UNTIL)>Date.now()&&Date.parse(env.NAVIGATION_APPROVAL_UNTIL)<=Date.now()+7*86400000),navigationDailyLimit:Math.min(50,Math.max(1,Number(env.NAVIGATION_DAILY_LIMIT)||50)),
   navigationFreeVerified:env.NAVIGATION_FREE_QUOTA_VERIFIED==='true',navigationApprovalId:env.NAVIGATION_APPROVAL_ID||'',navigationApprovalUntil:env.NAVIGATION_APPROVAL_UNTIL||'',navigationPeriodLimit:Math.min(100,Math.max(1,Number(env.NAVIGATION_PERIOD_LIMIT)||100)),

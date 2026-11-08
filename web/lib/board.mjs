@@ -24,7 +24,7 @@ export function createBoard({catalog,network,noticesFor=async()=>[],timetable=nu
  return {
   async stop(stopId){
    if(typeof stopId!=='string'||!/^[\w:.-]{1,100}$/.test(stopId))throw new ServiceError('invalidRequest',400);
-   const [live,map]=await Promise.all([catalog.arrivals(stopId),network.stopDirections(stopId).catch(()=>null)]),profile=await network.stopProfile?.(stopId).catch(()=>null)||null;
+   const [live,map]=await Promise.all([catalog.arrivals(stopId).catch(error=>{if(error?.key!=='quotaReached')throw error;return {receivedAt:null,arrivals:[],liveOut:'quotaReached'};}),network.stopDirections(stopId).catch(()=>null)]),profile=await network.stopProfile?.(stopId).catch(()=>null)||null;
    const directions=map?.directions||[],byNo=new Map();
    const row=no=>{if(!byNo.has(no))byNo.set(no,{no,arrivals:[],directions:[],scheduleUrl:scheduleUrl(no)});return byNo.get(no);};
    for(const d of directions)row(d.no).directions.push({next:d.next,end:d.end,terminus:d.terminus,loop:d.loop,variantIds:d.variantIds});
@@ -35,7 +35,7 @@ export function createBoard({catalog,network,noticesFor=async()=>[],timetable=nu
     const first=r.arrivals[0]||null,notice=notices.get?.(r.no)?.[0]||null,direction=first?r.directions.find(d=>d.variantIds.includes(first.routeId))||null:null,ends=[...new Set(r.directions.map(d=>d.end))],only=direction||(ends.length===1?r.directions[0]:null),plan=timetable?await timetable.plan(r.no,{stopName:map?.stop?.name||null,towards:only?.end||null}).catch(()=>null):null;
     return {no:r.no,routeId:first?.routeId||r.directions[0]?.variantIds[0]||null,direction,directions:r.directions.map(({variantIds,...d})=>d),arrivals:r.arrivals.map(a=>({minutes:Math.max(1,Math.ceil(a.seconds/60)),remainingStops:a.remainingStops??null})),notice,scheduleUrl:r.scheduleUrl,plan:plan?{today:plan.today,first:plan.first||plan.firstTime||null,interval:plan.interval,last:plan.last,lastBase:plan.lastBase,next:plan.next||null}:null,today:todayState({notice,arrival:first,plan})};
    })).then(list=>list.sort((a,b)=>(a.arrivals[0]?.minutes??1e9)-(b.arrivals[0]?.minutes??1e9)||a.no.localeCompare(b.no,'ko',{numeric:true})));
-   return {stop:map?.stop||{id:stopId,name:live.arrivals[0]?.stop||''},receivedAt:live.receivedAt,builtAt:await network.builtAt().catch(()=>null),inNetwork:!!map,profile,partners:map?.partners||[],arrivals:live.arrivals,rows};
+   return {stop:map?.stop||{id:stopId,name:live.arrivals[0]?.stop||''},liveOut:live.liveOut||null,receivedAt:live.receivedAt,builtAt:await network.builtAt().catch(()=>null),inNetwork:!!map,profile,partners:map?.partners||[],arrivals:live.arrivals,rows};
   },
   // 목적지 기준: 바로 가는 번호와 도착 희망 시각에 맞는 회차. 시간표에 두 정류장이 다 있을 때만 회차를 말한다.
   async trip(stopId,name,by=null){

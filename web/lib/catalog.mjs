@@ -79,7 +79,7 @@ export function createCatalog(config,{fetchImpl=fetch,consume=()=>{},observe=asy
       url.search=new URLSearchParams({serviceKey:config.tagoKey,_type:'json',numOfRows:'100',pageNo:'1',...params});
       let data;
       for(let attempt=0;attempt<2;attempt++){
-        await consume('tago',config.tagoDailyLimit||1000);
+        await consume('tago',config.tagoDailyLimit||10000);
         try{
           data=await request(url);const code=String(data.response?.header?.resultCode);
           if(!['00','0'].includes(code))throw new ServiceError(['20','30','31'].includes(code)?'providerPermission':['22','23'].includes(code)?'quotaReached':'providerUnavailable');

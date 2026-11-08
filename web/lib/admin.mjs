@@ -7,8 +7,8 @@ const fail=(key,status=400)=>{throw new ServiceError(key,status);};
 export const ownerOf=(config,user)=>!!(user&&String(user.id).startsWith('google:')&&((config.adminSubjects||[]).includes(user.id.replace(/^google:/,''))||(user.email&&config.adminEmails?.includes(String(user.email).toLowerCase()))));
 export const adminOf=(config,user)=>!!(user&&(ownerOf(config,user)||user.role==='admin'));
 
-export function createAdminService(config,store,{now=Date.now,firestore=!!store.leasedQuota}={}){
- const cache=new Map(),leases=new Map(),LEASE=10;
+export function createAdminService(config,store,{now=Date.now,firestore=!!store.leasedQuota,notify=async()=>{}}={}){
+ const cache=new Map(),leases=new Map(),exhausted=new Map(),told=new Map(),LEASE=10;
  const definitions=()=>[
   {id:'tago',name:'TAGO',configured:!!config.tagoKey,available:!!config.tagoKey,max:config.tagoDailyLimit},
   {id:'kakao',name:'Kakao Places',configured:!!config.kakaoKey,available:!!(config.kakaoKey&&config.kakaoEnabled),max:config.kakaoDailyLimit},
@@ -19,9 +19,15 @@ export function createAdminService(config,store,{now=Date.now,firestore=!!store.
   {id:'ai',name:'OpenAI',configured:!!config.aiKey,available:chatConfigured(config,now()),max:config.aiDailyLimit},
  ];
  async function control(id){const entry=cache.get(id);if(entry?.until>now())return entry.value;const value=await store.control?.(id)||{};cache.set(id,{value,until:now()+10000});return value;}
+ async function reserve(provider,limit,period){const key=provider==='ai_budget'?'ai':provider==='navigation_budget'?'kakao-driving':provider,c=await control(key);if(c.enabled===false)fail('servicePaused',503);const effective=Math.min(limit,provider==='ai_budget'?c.periodLimit||limit:provider==='navigation_budget'?limit:c.dailyLimit||limit);if(store.leasedQuota&&provider==='tago'){const day=koreaDay(now()),lease=leases.get(provider);if(lease?.day===day&&lease.left>0){lease.left--;return;}try{await store.consumeApi(provider,effective,period,LEASE);leases.set(provider,{day,left:LEASE-1});return;}catch(error){if(error.key!=='quotaReached')throw error;}}return store.consumeApi(provider,effective,period);}
  return {
   async allowed(id){return (await control(id)).enabled!==false;},
-  async consume(provider,limit,period){const key=provider==='ai_budget'?'ai':provider==='navigation_budget'?'kakao-driving':provider,c=await control(key);if(c.enabled===false)fail('servicePaused',503);const effective=Math.min(limit,provider==='ai_budget'?c.periodLimit||limit:provider==='navigation_budget'?limit:c.dailyLimit||limit);if(store.leasedQuota&&provider==='tago'){const day=koreaDay(now()),lease=leases.get(provider);if(lease?.day===day&&lease.left>0){lease.left--;return;}try{await store.consumeApi(provider,effective,period,LEASE);leases.set(provider,{day,left:LEASE-1});return;}catch(error){if(error.key!=='quotaReached')throw error;}}return store.consumeApi(provider,effective,period);},
+  // 한도에 닿으면 60초 동안은 DB를 두드리지 않고 바로 거절하고, 관리자에게는 하루 한 번만 카카오톡으로 알린다. 손님 화면은 시간표 기준으로 바뀐다.
+  async consume(provider,limit,period){
+   const day=koreaDay(now()),block=exhausted.get(provider);if(block&&block.day===day&&block.until>now())fail('quotaReached',429);
+   try{return await reserve(provider,limit,period);}
+   catch(error){if(error.key==='quotaReached'){exhausted.set(provider,{day,until:now()+60000});if(told.get(provider)!==day){told.set(provider,day);const name=definitions().find(p=>p.id===provider)?.name||provider;Promise.resolve().then(()=>notify(`🚦 ${name} 오늘 호출 한도를 다 썼어요. 손님에게는 시간표 기준으로 안내해요. 한국 시간 자정에 다시 열려요.`)).catch(()=>{});}}throw error;}
+  },
   async dashboard(actor){
    if(!adminOf(config,actor))fail('forbidden',403);
    const [usage,metrics,users,controls,audit]=await Promise.all([store.usage(500),store.metrics(),store.adminUsers(),store.controls(),store.audit()]);

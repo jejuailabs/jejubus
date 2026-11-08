@@ -77,3 +77,7 @@ test('최근 검색은 계정과 합치고, 지운 항목은 되살리지 않는
  assert.deepEqual(mergeProgress({recent:[],favGone:{'recent:stop:s':30}},{recent:[a,b]}).recent.map(r=>r.key),['route:1']);
  assert.deepEqual(mergeProgress({favGone:{'recent:*':30}},{recent:[a,b]}).recent,[]);
 });
+test('실시간 한도를 다 쓴 날은 내 보드 위에 시간표 안내가 한 번 뜬다',()=>{
+ assert.ok(homeMarkup({stops:[{id:'a',name:'가'}],boards:{a:{liveOut:'quotaReached',rows:[]}},now:MON8},e,t).includes('board-quota'));
+ assert.ok(!homeMarkup({stops:[{id:'a',name:'가'}],boards:{a:{rows:[]}},now:MON8},e,t).includes('board-quota'));
+});

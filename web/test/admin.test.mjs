@@ -4,6 +4,7 @@ import {createStore} from '../lib/store.mjs';
 import {createApp} from '../server.mjs';
 import {createAdminService,ownerOf} from '../lib/admin.mjs';
 import {metricEvent,accumulateMetric} from '../lib/telemetry.mjs';
+import {configuration} from '../lib/settings.mjs';
 const baseConfig={adminSubjects:['owner'],adminEmails:['owner@example.com'],tagoKey:'SERVER-SECRET',tagoDailyLimit:1000,kakaoKey:'KAKAO-SECRET',kakaoEnabled:true,kakaoDailyLimit:100,odsayKey:'',odsayEnabled:false,odsayDailyLimit:25,aiKey:'OPENAI-SECRET',aiEnabled:true,aiModel:'gpt-5.4-mini',aiApprovalId:'approval-admin-test',aiApprovalUntil:new Date(Date.now()+86400000).toISOString(),aiDailyLimit:20,aiPeriodCalls:100};
 const owner={id:'google:owner',name:'Owner'},member={id:'google:member',name:'Member'};
 
@@ -61,4 +62,18 @@ test('dashboard HTTP API enforces server role and same-origin checks',async()=>{
   const denied=await request('/api/admin/providers/tago',ownerToken,{method:'PUT',headers:{Origin:'https://evil.example'},body:JSON.stringify({enabled:false,dailyLimit:1})});assert.equal(denied.status,403);
   assert.equal((await request('/api/admin/users/'+encodeURIComponent(member.id),memberToken,{method:'POST',body:JSON.stringify({action:'promote'})})).status,403);
  }finally{await new Promise(resolve=>app.server.close(resolve));store.close();}
+});
+
+test('한도에 닿으면 관리자에게 하루 한 번만 알리고 60초 동안은 DB 없이 바로 거절한다',async()=>{
+ const store=createStore(':memory:');try{
+  let now=Date.now();const sent=[];const a=createAdminService(baseConfig,store,{now:()=>now,notify:async m=>{sent.push(m);}});
+  await a.updateProvider(owner,'tago',{enabled:true,dailyLimit:1});await a.consume('tago',1000);
+  await assert.rejects(a.consume('tago',1000),{key:'quotaReached'});await assert.rejects(a.consume('tago',1000),{key:'quotaReached',status:429});
+  await new Promise(r=>setTimeout(r,0));assert.equal(sent.length,1);assert.match(sent[0],/TAGO/);
+  await a.updateProvider(owner,'tago',{enabled:true,dailyLimit:5});await assert.rejects(a.consume('tago',1000),{key:'quotaReached'});
+  now+=60001;await a.consume('tago',1000);await new Promise(r=>setTimeout(r,0));assert.equal(sent.length,1);
+ }finally{store.close();}
+});
+test('TAGO 하루 상한은 포털 개발계정 한도 10,000을 넘지 않는다',()=>{
+ assert.equal(configuration({}).tagoDailyLimit,10000);assert.equal(configuration({TAGO_DAILY_LIMIT:'50000'}).tagoDailyLimit,10000);assert.equal(configuration({TAGO_DAILY_LIMIT:'3000'}).tagoDailyLimit,3000);
 });

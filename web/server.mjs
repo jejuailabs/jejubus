@@ -47,9 +47,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   }
   const authOptions={fetchImpl,stateStore:store.putOAuth?store:null};
   let auth=createGoogleAuth(config,authOptions);
-  const administration=createAdminService(config,store);
-  const social=createSocialAuth(config,authOptions);
   const kakaoAlert=createKakaoAlert(config,store,{fetchImpl});
+  const administration=createAdminService(config,store,{notify:message=>kakaoAlert.send(message)});
+  const social=createSocialAuth(config,authOptions);
   const toss=createToss(config,{fetchImpl});
   const routeAdmin=createRouteAdmin(config,store);
   const feedback=createFeedback(config,store);
