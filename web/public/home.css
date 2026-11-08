@@ -1,0 +1,87 @@
+/* 내 보드: 진한 카드는 "지금 탈 버스" 하나, 경로는 흰 카드, 나머지는 칩·줄 */
+.hb{display:flex;flex-direction:column;gap:14px}
+.hb>*{flex-shrink:0}
+.hb>.eyebrow{display:none}
+.hb-greet{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.hb-greet h2{font-size:22px;letter-spacing:-.8px;line-height:1.25}
+.hb-greet p{font-size:13px;color:var(--muted);margin-top:2px}
+.hb-alert{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:color-mix(in srgb,#e5484d 12%,transparent);color:#c9383d;font-size:12px;font-weight:750;white-space:nowrap}
+.hb-alert .icon{width:14px;height:14px}
+.hb .home-notice{margin:0}
+
+.hb-hero{position:relative;overflow:hidden;padding:16px 16px 14px;border-radius:18px;background:linear-gradient(150deg,#22305c,#151d3b);color:#fff;box-shadow:0 10px 28px #151d3b38}
+.hb-hero:after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:#ffffff0d;pointer-events:none}
+.hb-why{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:#ffffff1c;color:#ffd9a8}
+.hb-hero-main{display:flex;align-items:center;gap:12px;margin:10px 0 4px}
+.hb-hero .bus-face{width:62px}
+.hb-hero .bus-face b{font-size:15px}
+.hb-min{font-size:52px;font-weight:850;letter-spacing:-2.5px;line-height:1}
+.hb-min small{font-size:19px;letter-spacing:0;margin-left:3px;font-weight:750}
+.hb-min-wait{font-size:15px;color:#d6dcf0}
+.hb-hero-stop{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-hero-stop span{color:#b9c3e6;font-weight:600}
+.hb-hero-left{display:block;font-size:12px;color:#b9c3e6;margin-top:1px}
+.hb-hero-act{display:flex;gap:8px;margin-top:12px}
+.hb-hero-act button{flex:1;min-height:42px;border-radius:12px;background:#ffffff1a;color:#fff;font-weight:750}
+.hb-hero-act .hb-rode{background:#f28c28;color:#1b1406;flex:1.4}
+.hb-hero-act button:hover{filter:brightness(1.08)}
+
+.hb-start{padding:16px;border-radius:18px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.hb-start .art{width:120px;margin:0 auto 6px}
+.hb-start>p{font-size:14px;font-weight:650}
+.hb-start-act{display:flex;gap:8px;margin:12px 0 4px}
+.hb-start-act button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;border-radius:12px;background:#c2540a;color:#fff;font-weight:750}
+.hb-start-act button+button{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.hb-start-act .icon{width:17px;height:17px}
+.hb-start h3{font-size:13px;margin:14px 0 8px;text-align:left}
+.hb-start .hb-chips{justify-content:flex-start}
+.hb-start-note{display:block;font-size:12px;color:var(--muted);margin-top:10px;text-align:left}
+
+.hb-sec h3{font-size:14px;font-weight:800;margin:0 0 8px}
+.hb-sec-head{display:flex;align-items:center;justify-content:space-between}
+.hb-sec-head button{font-size:12px;color:var(--muted);padding:4px 2px;margin-top:-8px}
+
+.hb-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin:0 -2px;scroll-snap-type:x proximity}
+.hb-strip::-webkit-scrollbar{display:none}
+.hb-fav{flex:0 0 auto;display:flex;align-items:center;gap:6px;min-height:46px;padding:5px 12px 5px 6px;border-radius:14px;background:var(--panel);border:1px solid var(--line);scroll-snap-align:start;max-width:170px}
+.hb-fav span{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-fav .bus-face{width:42px}
+.hb-fav-place .icon{width:17px;height:17px;color:#e5484d}
+.hb-fav-stop .art{width:22px}
+.hb-fav-add{padding:5px 12px;border-style:dashed;color:var(--soft)}
+.hb-fav-add .icon{width:16px;height:16px}
+
+.hb-routes{display:flex;flex-direction:column;gap:8px}
+.hb-route{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 2px 10px #6b4a1a0d}
+.hb-route .bus-face{width:44px;flex-shrink:0}
+.hb-route-text{flex:1;min-width:0}
+.hb-route-text strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-route-text small{font-size:12px;color:var(--muted)}
+.hb-route-min{font-size:12px;color:var(--soft);white-space:nowrap}
+.hb-route-min b{font-size:22px;font-weight:850;color:var(--ink);letter-spacing:-.8px;margin-right:1px}
+
+.hb-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hb-chip{display:inline-flex;align-items:center;max-width:100%;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.hb-chip button:first-child{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 4px 0 11px;font-size:13px;font-weight:600;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-start .hb-chip button:first-child{padding-right:12px}
+.hb-chip i{font-style:normal;font-size:12px}
+.hb-chip-x{min-width:30px;min-height:34px;color:var(--muted);font-size:16px;line-height:1}
+
+.hb-tickets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hb-ticket{position:relative;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:12px;background:color-mix(in srgb,#f5c46a 14%,var(--panel));border:1px solid color-mix(in srgb,#d9a441 30%,var(--line))}
+.hb-ticket:before{content:"";position:absolute;left:58px;top:6px;bottom:6px;border-left:2px dashed color-mix(in srgb,#d9a441 45%,transparent)}
+.hb-ticket .bus-face{width:40px;flex-shrink:0}
+.hb-tk-text{flex:1;min-width:0;padding-left:8px}
+.hb-ticket strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-ticket small{font-size:12px;color:var(--muted)}
+.hb-ticket button{flex-shrink:0;min-height:34px;padding:0 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;font-weight:750;color:var(--blue)}
+
+.hb-stopline{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:9px 12px;border-radius:12px;background:var(--surface);margin-bottom:6px}
+.hb-stopline strong{font-size:13px}
+.hb-stopline span{font-size:12.5px;color:var(--soft)}
+.hb-stopline b{color:var(--ink)}
+.hb .home-actions{margin:0}
+.hb .home-links{margin-top:6px}
+:root[data-theme=dark] .hb-hero{background:linear-gradient(150deg,#2a3a70,#111834)}
+:root[data-theme=dark] .hb-alert{color:#ff8a8d}
+html[data-simple=on] .hb-min{font-size:64px}

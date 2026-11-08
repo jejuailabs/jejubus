@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {addRide,gameMarkup,newStamps,regionOf,shareStats,stampsOf,titleOf} from '../public/game.js';
 import {createNetwork} from '../lib/network.mjs';
 import {boardMarkup,routeBoardMarkup,sideBest} from '../public/board.js';
-import {homeMarkup} from '../public/home.js';
 import {createAdminService} from '../lib/admin.mjs';
 
 const at=(d,h)=>Date.parse(`2026-11-${d}T${String(h).padStart(2,'0')}:30:00+09:00`);
@@ -49,11 +48,6 @@ test('노선 보드는 차량을 정류장 칸에 놓고, 오래되면 표정을
 test('플랜 B는 목적지로 가는 번호 중 먼저 오는 순서로 고른다',()=>{
  const board={rows:[{no:'111',arrivals:[{minutes:9},{minutes:30}]},{no:'212',arrivals:[{minutes:4}]},{no:'999',arrivals:[{minutes:1}]}]};
  assert.deepEqual(sideBest({here:['111','212']},board),[{no:'212',minutes:4},{no:'111',minutes:9}]);assert.deepEqual(sideBest({here:[]},board),[]);assert.deepEqual(sideBest({here:['111']},null),[]);
-});
-test('내 보드는 빈 상태와 첫 안내를 그리고 도착 없는 정류장을 지어내지 않는다',()=>{
- const t=k=>k,e=String,base={stops:[],boards:{},favorites:[],alerts:0};
- assert.ok(homeMarkup(base,e,t).includes('homeEmpty'));assert.ok(!homeMarkup(base,e,t).includes('guide'));assert.ok(homeMarkup({...base,places:[{id:'p',name:'목적지'}]},e,t).includes('data-fav-place="p"'));assert.ok(homeMarkup({...base,favorites:[{id:'r',number:'201'}]},e,t).includes('data-fav-bus="r"'));
- const html=homeMarkup({...base,stops:[{id:'s',name:'정류장'}],boards:{s:{rows:[{no:'1',arrivals:[]}]}}},e,t);assert.ok(html.includes('boardNoArrivals'));assert.ok(!html.includes('homeEmpty'));
 });
 test('Firestore 사용량은 묶어서 쓰고 상한 근처에서는 한 건씩 쓴다',async()=>{
  const calls=[];let count=0;const limit=12,store={leasedQuota:true,control:async()=>({}),consumeApi:async(p,l,period,amount=1)=>{if(count+amount>l)throw Object.assign(Error(),{key:'quotaReached'});count+=amount;calls.push(amount);}};

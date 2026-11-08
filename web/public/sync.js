@@ -1,5 +1,5 @@
 // 계정 저장: 로그인하면 기기 기록과 계정 기록을 합친다. 어느 쪽 기록도 버리지 않는다.
-export const SYNC_KEYS={quest:'jb.quest',trips:'jb.trips',rides:'jb.rides',myStops:'jb.myStops',homeStop:'jb.homeStop',ttRecent:'jb.ttRecent',places:'jb.places',favGone:'jb.favGone'};
+export const SYNC_KEYS={quest:'jb.quest',trips:'jb.trips',rides:'jb.rides',myStops:'jb.myStops',homeStop:'jb.homeStop',ttRecent:'jb.ttRecent',places:'jb.places',favGone:'jb.favGone',recent:'jb.recent'};
 const byKey=(lists,key)=>[...new Map(lists.flat().filter(Boolean).map(x=>[key(x),x])).values()];
 function mergeQuest(a,b){
  if(!a||!b)return a||b||null;
@@ -21,6 +21,7 @@ export function mergeProgress(local={},remote={}){
   places:alive(byKey([remote.places,local.places],p=>p.id),gone,'place:'),
   favGone:gone,
   homeStop:local.homeStop||remote.homeStop||null,
-  ttRecent:[...new Set([...(local.ttRecent||[]),...(remote.ttRecent||[])])].slice(0,8)
+  ttRecent:[...new Set([...(local.ttRecent||[]),...(remote.ttRecent||[])])].slice(0,8),
+  recent:byKey([remote.recent,local.recent],r=>r.key).filter(r=>(r.at||0)>=Math.max(gone['recent:*']||0,gone['recent:'+r.key]||0)).sort((x,y)=>y.at-x.at).slice(0,20)
  };
 }
