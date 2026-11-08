@@ -100,7 +100,7 @@ export function createFirestoreStore(client,{now=Date.now}={}){
     recordList:(kind,{field,value,limit=200}={})=>client.list(kind,{...(field?{field,value}:{}),limit}),
     async accountOf(id){const u=await get('users',id);return u?{created:u.created||null,lastLogin:u.lastLogin||null,visits:u.visits||0}:null;},
     async withdraw(id,name){
-     await client.atomic(async()=>{const prior=await client.get('users',id);if(!prior)throw failure('notFound',404);const {email,...rest}=prior.data;await client.commit([write('users',id,{...rest,name,status:'withdrawn',authVersion:(prior.data.authVersion||0)+1,updated:now()},prior),write('audit',randomUUID(),{actor:id,target:id,action:'withdraw',changes:{},created:now()},null)]);});
+     await client.atomic(async()=>{const prior=await client.get('users',id);if(!prior)throw failure('notFound',404);const {email,...rest}=prior.data;await client.commit([write('users',id,{...rest,name,status:'withdrawn',withdrawn:now(),authVersion:(prior.data.authVersion||0)+1,updated:now()},prior),write('audit',randomUUID(),{actor:id,target:id,action:'withdraw',changes:{},created:now()},null)]);});
      // 게시글과 답변에는 작성자 이름 사본이 있어 함께 바꾼다.
      for(const kind of ['posts','replies'])for(const row of await client.list(kind,{field:'user_id',value:id,limit:400}))await client.atomic(async()=>{const prior=await client.get(kind,row.id);if(prior)await client.commit([write(kind,row.id,{...prior.data,author:name},prior)]);});
     },

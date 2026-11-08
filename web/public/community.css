@@ -83,3 +83,14 @@
 .room-bar .room-box>strong{flex:none}
 .room-bar .room-people{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin:0}
 #wait-float .wait-chip{pointer-events:auto;background:color-mix(in srgb,var(--panel) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:color-mix(in srgb,var(--soft) 45%,transparent)}
+/* 개발자에게 바란다: 햄버거 밖에 늘 보이는 버튼과 안내 카드 */
+.ctabs .ctab-suggest{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:40px;padding:0 12px;border-radius:20px;background:var(--surface-blue);color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 35%,transparent);font-size:13px;font-weight:800}
+.ctab-suggest .icon{width:16px;height:16px}
+.suggest-intro{margin:4px 22px 10px;padding:14px;border-radius:16px;background:var(--surface-blue);border:1px solid color-mix(in srgb,var(--blue) 30%,transparent);display:flex;flex-direction:column;gap:10px}
+.suggest-intro b{display:flex;align-items:center;gap:6px;font-size:16px;color:var(--blue)}.suggest-intro b .icon{width:18px;height:18px}
+.suggest-intro p{margin:4px 0 0;font-size:13px;line-height:1.6;color:var(--ink)}
+.suggest-intro-actions{display:flex;gap:8px;flex-wrap:wrap}.suggest-intro-actions button{flex:1 1 140px;min-height:44px;border-radius:12px;font-weight:750;font-size:14px}
+.suggest-intro-actions button:not(.primary){background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+@media(max-width:760px){.suggest-intro{margin-inline:14px}}
+@media(max-width:420px){.ctabs .ctab-suggest{padding:0 10px}.ctabs .ctab-suggest .icon{display:none}}
+.community-tabs[hidden]{display:none}

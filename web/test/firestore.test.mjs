@@ -81,3 +81,15 @@ test('Firestore REST stays offline without approval and uses namespace and condi
   assert.equal(requests.length,0);await client.commit([{collection:'posts',id:'post',data:{title:'제주',likes:0,status:'published'},prior:null}]);
   const commit=JSON.parse(requests[1].options.body);assert.match(commit.writes[0].update.name,/\/jejubus_posts\/[a-f0-9]{64}$/);assert.deepEqual(commit.writes[0].currentDocument,{exists:false});assert.deepEqual(commit.writes[0].update.fields.likes,{integerValue:'0'});assert.equal(requests[1].options.headers.Authorization,'Bearer fixture-token');
 });
+
+test('Firestore: suggestion inbox finds suggest posts by category and withdrawal keeps its time',async()=>{
+ const {createFeedback}=await import('../lib/feedback.mjs');
+ const client=memoryClient(),at=Date.UTC(2026,10,8),store=createFirestoreStore(client,{now:()=>at});
+ await store.createSession('google:boss','Boss',{email:'boss@example.com'});await store.createSession('google:r','Rider');
+ const id=await store.createPost('google:r',{category:'suggest',route:'general',title:'글씨 크게',body:'지도 글씨를 키워 주세요'});
+ await store.createPost('google:r',{category:'question',route:'general',title:'질문',body:'언제 와요?'});
+ const feedback=createFeedback({adminEmails:['boss@example.com']},store,{now:()=>at}),boss={id:'google:boss',email:'boss@example.com'};
+ let list=await feedback.adminList(boss);assert.equal(list.total,1);assert.equal(list.suggestions[0].id,id);assert.equal(list.suggestions[0].author,'Rider');
+ await feedback.setStatus(boss,id,{status:'done',note:'반영함'});list=await feedback.adminList(boss);assert.equal(list.counts.done,1);assert.equal(list.suggestions[0].note,'반영함');
+ await store.withdraw('google:r','탈퇴 회원');const u=(await store.adminUsers()).find(x=>x.id==='google:r');assert.equal(u.status,'withdrawn');assert.equal(u.withdrawn,at);
+});

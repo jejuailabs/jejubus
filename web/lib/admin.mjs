@@ -1,11 +1,13 @@
 import {ServiceError} from './catalog.mjs';
 import {chatConfigured,CHAT_MODEL} from './bus-chat.mjs';
 import {koreaDay} from './telemetry.mjs';
+import {memberTrend,quotaBoard,chatStats} from './insights.mjs';
 const fail=(key,status=400)=>{throw new ServiceError(key,status);};
-export const ownerOf=(config,user)=>!!(user&&((config.adminSubjects||[]).includes(user.id.replace(/^google:/,''))||(user.email&&config.adminEmails?.includes(user.email.toLowerCase()))));
+// 이메일 관리자는 Google이 확인한 이메일(google: 계정)만 인정한다. 이메일 값은 환경변수 ADMIN_GOOGLE_EMAILS에만 둔다.
+export const ownerOf=(config,user)=>!!(user&&String(user.id).startsWith('google:')&&((config.adminSubjects||[]).includes(user.id.replace(/^google:/,''))||(user.email&&config.adminEmails?.includes(String(user.email).toLowerCase()))));
 export const adminOf=(config,user)=>!!(user&&(ownerOf(config,user)||user.role==='admin'));
 
-export function createAdminService(config,store,{now=Date.now}={}){
+export function createAdminService(config,store,{now=Date.now,firestore=!!store.leasedQuota}={}){
  const cache=new Map(),leases=new Map(),LEASE=10;
  const definitions=()=>[
   {id:'tago',name:'TAGO',configured:!!config.tagoKey,available:!!config.tagoKey,max:config.tagoDailyLimit},
@@ -30,6 +32,7 @@ export function createAdminService(config,store,{now=Date.now}={}){
    return {generatedAt:new Date(now()).toISOString(),today,actor:{id:actor.id,name:actor.name,owner:ownerOf(config,actor)},providers,metrics,usage,
     navigation:{expiresAt:config.navigationApprovalUntil,periodLimit:config.navigationPeriodLimit||100,periodCalls:usage.find(r=>r.provider==='navigation_budget'&&r.day===`approval:${config.navigationApprovalId}`)?.count||0,ceilingKrw:(config.navigationPeriodLimit||100)*8},
     ai:{model:CHAT_MODEL,approved:chatConfigured(config,now()),approvalId:config.aiApprovalId,expiresAt:config.aiApprovalUntil,periodLimit,periodCalls,remaining:Math.max(0,periodLimit-periodCalls),reservationMicroUsd:periodCalls*30000,approvedCeilingMicroUsd:config.aiPeriodCalls*30000,...stats},
+    members:memberTrend(users,{now:now()}),quotas:quotaBoard(providers,{config:{...config,firestore},usage,today}),chat:chatStats(metrics,{today,approvalId:config.aiApprovalId}),
     users:users.filter(u=>!u.id.startsWith('sample:')).map(u=>({id:u.id,name:u.name,email:u.email||'',role:ownerOf(config,u)?'owner':u.role||'member',status:u.status||'active',created:u.created||null,lastLogin:u.lastLogin||null,visits:u.visits||0,provider:String(u.id).split(':')[0]})),audit};
   },
   async updateUser(actor,id,body){

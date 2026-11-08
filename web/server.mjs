@@ -7,6 +7,7 @@ import {createGoogleAuth} from './lib/auth.mjs';
 import {createCatalog,ServiceError,coordinate} from './lib/catalog.mjs';
 import {configuration,createSettings} from './lib/settings.mjs';
 import {createAdminService,adminOf,ownerOf} from './lib/admin.mjs';
+import {createFeedback} from './lib/feedback.mjs';
 import {createBusChat} from './lib/bus-chat.mjs';
 import {createNavigation} from './lib/navigation.mjs';
 import {createMemberService} from './lib/member.mjs';
@@ -51,6 +52,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
   const kakaoAlert=createKakaoAlert(config,store,{fetchImpl});
   const toss=createToss(config,{fetchImpl});
   const routeAdmin=createRouteAdmin(config,store);
+  const feedback=createFeedback(config,store);
   const members=createMemberService(config,store,{notify:message=>kakaoAlert.send(message),toss});
   const blog=createBlog(config,{fetchImpl,consume:administration.consume});
   const navigation=createNavigation(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});
@@ -68,7 +70,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     const changed=next.googleClientId!==config.googleClientId||next.googleClientSecret!==config.googleClientSecret;
     Object.assign(config,{...next,origin:config.origin});if(config.showSamples)await store.seedSamples();if(changed)auth=createGoogleAuth(config,authOptions);catalog=createCatalog(config,{fetchImpl,consume:administration.consume,observe:store.recordMetric});busChat=createBusChat(config,{catalog,consume:administration.consume,observe:store.recordMetric,fetchImpl,data:chatData});
   }});
-  const liveRoom=createLiveRoom(store,{consume:administration.consume,ask:async(text,locale)=>busChat.enabled()?(await busChat.answer({locale,messages:[{role:'user',content:text}]})).answer:null}),kudos=createKudos(store,{consume:administration.consume}),teams=createTeams(store,{consume:administration.consume});
+  // 챗봇 질문 결과만 센다(내용은 저장하지 않음). answered=AI 답변, failed=AI 실패, fallback=고정 문구 응답.
+  const chatMetric=(channel,outcome,started)=>Promise.resolve(store.recordMetric({provider:'chat',period:`${channel}:${outcome}`,operation:channel,ok:outcome==='answered',durationMs:Date.now()-started})).catch(()=>console.warn('{"kind":"usageRecordingFailed","provider":"chat"}'));
+  async function askChat(channel,payload){const started=Date.now();try{const result=await busChat.answer(payload);await chatMetric(channel,'answered',started);return result;}catch(error){if(error.key!=='invalidRequest')await chatMetric(channel,'failed',started);throw error;}}
+  const liveRoom=createLiveRoom(store,{consume:administration.consume,ask:async(text,locale)=>{const started=Date.now();if(!busChat.enabled()){await chatMetric('room','fallback',started);return null;}try{const result=await busChat.answer({locale,messages:[{role:'user',content:text}]});await chatMetric('room','answered',started);return result.answer;}catch(error){await chatMetric('room','fallback',started);throw error;}}}),kudos=createKudos(store,{consume:administration.consume}),teams=createTeams(store,{consume:administration.consume});
   const limits=new Map(),contexts=new Map([['general',{id:'general',name:'Jeju',type:'general'}]]);
   async function remember(items,type){const values=(items||[]).filter(item=>item.id).map(item=>({id:`${type}:${item.id}`,name:(type==='route'?item.number:item.name)||item.id,type}));if(store.rememberContexts)await store.rememberContexts(values);else for(const c of values)await store.rememberContext(c);}
   function throttle(key,max){const now=Date.now();for(const [k,l]of limits)if(l.until<now)limits.delete(k);const l=limits.get(key)||{count:0,until:now+60000};l.count++;limits.set(key,l);if(l.count>max)fail('rateLimited',429);}
@@ -179,7 +184,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       }
       if(path==='/api/journeys'&&method==='POST'){const p=await jsonBody(req);if(!['fastest','distance','walking','transfers'].includes(p?.sort))fail('invalidRequest');return send(200,await catalog.journeys(p.from,p.to,p.sort));}
       if(path==='/api/intent'&&method==='POST'){const p=await jsonBody(req);if(typeof p?.input!=='string'||!p.input.trim()||p.input.length>500)fail('queryRequired');return send(200,await catalog.intent(p.input));}
-      if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,8);return send(200,await busChat.answer(await jsonBody(req)));}
+      if(path==='/api/chat'&&method==='POST'){if(!await administration.allowed('ai'))fail('servicePaused',503);if(!busChat.enabled())fail('aiNotEnabled',503);if(!user)fail('loginRequired',401);throttle(`chat:${user.id}`,8);return send(200,await askChat('assistant',await jsonBody(req)));}
       if(path==='/api/posts'&&method==='GET')return send(200,{posts:await Promise.all((await store.listPosts(user?.id,{includeSamples:config.showSamples})).map(async p=>({...p,routeNo:String(p.route).startsWith('route:')?await network.numberOf(p.route.slice(6)).catch(()=>null):null,contextName:(await store.context(p.route))?.name||null})))});
       if(path==='/api/posts'&&method==='POST'){if(!user)fail('loginRequired',401);throttle(`write:${user.id}`,10);const p=await validatePost(await jsonBody(req));return send(201,{id:await store.createPost(user.id,p)});}
       const post=path.match(/^\/api\/posts\/([\w-]+)(?:\/(replies|like|report|block))?$/);
@@ -238,6 +243,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(adminInquiry&&method==='POST')return send(200,await members.answerInquiry(user,adminInquiry[1],await jsonBody(req)));
       const reply=path.match(/^\/api\/replies\/([\w-]+)$/);
       if(reply&&method==='DELETE'){if(!user)fail('loginRequired',401);if(!await store.deleteReply(user.id,reply[1]))fail('forbidden',403);return send(200,{ok:true});}
+      if(path==='/api/admin/suggestions'&&method==='GET')return send(200,await feedback.adminList(user));
+      const suggestion=path.match(/^\/api\/admin\/suggestions\/([\w:-]{1,80})$/);
+      if(suggestion&&method==='POST')return send(200,await feedback.setStatus(user,suggestion[1],await jsonBody(req)));
       if(path==='/api/admin/dashboard'&&method==='GET')return send(200,await administration.dashboard(user));
       const member=path.match(/^\/api\/admin\/users\/(.+)$/);
       if(member&&method==='POST')return send(200,await administration.updateUser(user,decodeURIComponent(member[1]),await jsonBody(req)));
