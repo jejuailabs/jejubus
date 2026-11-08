@@ -4,6 +4,8 @@ import {readFile} from 'node:fs/promises';
 import {distanceMeters} from './catalog.mjs';
 import {gradeOf} from '../public/board.js';
 
+// 제주 대표 관광지와 그 정류장 이름(번호표 정류장 이름 기준)
+export const SPOTS=[['seongsan',/^성산일출봉입구/],['hyeopjae',/^협재해수욕장/],['hamdeok',/^함덕환승정류장/],['jungmun',/^중문관광단지입구/],['dongmun',/동문시장/],['cheonjiyeon',/^천지연폭포입구/],['woljeong',/^월정리/],['sanbang',/^산방산/]];
 const PARTNER_METERS=300,HUB_ROUTES=12,GRADE_ORDER=['express','trunk','branch','tour','other'];
 // 바로 갈 수 있는 곳으로 알려 줄 주요 지점
 const AREAS=[['제주공항',/^제주국제공항|^공항/],['제주버스터미널',/^제주버스터미널/],['제주시청',/^제주시청/],['제주대학교',/^제주대학교/],['서귀포버스터미널',/^서귀포버스터미널/],['중문',/^중문/],['성산',/^성산/],['함덕',/^함덕/],['한림',/^한림/],['표선',/^표선/],['대정·모슬포',/^(대정|모슬포|하모)/],['애월',/^애월/],['남원',/^남원/],['조천',/^조천/]];
@@ -52,6 +54,18 @@ export function createNetwork(load){
  }
  return {
   async builtAt(){return (await net()).builtAt;},
+  // 제주 대표 관광지 정류장과 그곳에 서는 버스. 공항을 지나 이 정류장에 오는 번호, 빠른 등급, 본 번호(가지 번호 아님) 순으로 3개 고른다.
+  async spots(list=SPOTS){
+   const n=await net(),airport=new Set(n.stops.filter(s=>/^제주국제공항/.test(s.name)).map(s=>s.i)),rank=g=>GRADE_ORDER.indexOf(g);
+   return list.map(([id,rule])=>{
+    const pool=n.stops.filter(s=>rule.test(s.name));if(!pool.length)return null;
+    const routes=new Map();
+    for(const s of pool)for(const v of n.byStop.get(s.i)||[]){const prior=routes.get(v.no),at=v.stops.indexOf(s.i),fly=v.stops.slice(0,at).some(i=>airport.has(i));routes.set(v.no,{no:v.no,airport:!!(prior?.airport||fly)});}
+    const stop=[...pool].sort((x,y)=>(n.byStop.get(y.i)||[]).length-(n.byStop.get(x.i)||[]).length)[0];
+    const top=[...routes.values()].sort((x,y)=>(y.airport-x.airport)||((x.no.split('-')[0].length>3)-(y.no.split('-')[0].length>3))||(rank(gradeOf(x.no))-rank(gradeOf(y.no)))||(x.no.includes('-')-y.no.includes('-'))||x.no.localeCompare(y.no,'ko',{numeric:true})).slice(0,3);
+    return {id,stop:{id:stop.id,name:stop.name,lat:stop.lat,lng:stop.lng},routes:top.map(r=>r.no),airport:top[0]?.airport||false,total:routes.size};
+   }).filter(Boolean);
+  },
   // 길찾기 결과의 정류장 이름을 번호표 정류장으로 잇는다. 같은 이름이면 좌표가 가까운 쪽을 고른다.
   async stopByName(name,point=null){
    const n=await net(),list=n.byBase.get(baseName(name))||[];if(!list.length)return null;

@@ -81,3 +81,14 @@ test('실시간 한도를 다 쓴 날은 내 보드 위에 시간표 안내가 �
  assert.ok(homeMarkup({stops:[{id:'a',name:'가'}],boards:{a:{liveOut:'quotaReached',rows:[]}},now:MON8},e,t).includes('board-quota'));
  assert.ok(!homeMarkup({stops:[{id:'a',name:'가'}],boards:{a:{rows:[]}},now:MON8},e,t).includes('board-quota'));
 });
+
+test('제주 여행 버스는 번호표에서 관광지 정류장과 서는 버스를 계산한다',async()=>{
+ const {fileNetwork}=await import('../lib/network.mjs');
+ const spots=await fileNetwork(new URL('../public/data/network.json',import.meta.url)).spots();
+ const by=Object.fromEntries(spots.map(s=>[s.id,s]));
+ assert.ok(by.seongsan.stop.name.startsWith('성산일출봉입구'));assert.ok(by.hamdeok.stop.name.startsWith('함덕환승정류장'));assert.ok(by.hyeopjae.stop.name.startsWith('협재해수욕장'));
+ for(const s of spots){assert.ok(s.routes.length>=1&&s.routes.length<=3);assert.ok(s.total>=s.routes.length);}
+ const {spotsMarkup}=await import('../public/home.js');
+ const html=spotsMarkup(spots,String,k=>k);assert.ok(html.includes('data-hb-spot="seongsan"'));assert.ok(html.includes(by.seongsan.routes[0]));
+ assert.equal(spotsMarkup(null,String,k=>k),'');
+});

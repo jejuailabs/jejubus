@@ -1,7 +1,7 @@
 // 내 보드: 앱을 열면 "지금 탈 버스"부터 보이게 한다.
 // 순서: 인사 → 지금 탈 버스 → 즐겨찾기 줄 → 자주 가는 경로 → 최근 검색 → 최근 탄 버스 → 내 정류장 도착판
 // 자주 타는 버스·경로는 탄 기록으로 기기 안에서 계산한다(home-data.js).
-import {busFace} from './board.js';
+import {busFace,chip} from './board.js';
 import {icon} from './icons.js';
 import {art} from './art.js';
 import {RECENT_SHOW,dayType,frequentRoutes,partOf,pickHero,recentRides,weekdayOf} from './home-data.js';
@@ -53,17 +53,22 @@ function stopLines(stops,boards,e,t){
  return `<section class="hb-sec"><h3>${t('hbStops')}</h3>${stops.map(s=>{const b=boards[s.id],rows=(b?.rows||[]).filter(r=>r.arrivals?.length).map(r=>({no:r.no,m:r.arrivals[0].minutes})).sort((x,y)=>x.m-y.m).slice(0,3);return `<button class="hb-stopline" data-hb-stop="${e(s.id)}"><strong>${e(s.name)}</strong><span>${!b?t('loading'):rows.length?rows.map(r=>`<b>${e(r.no)}</b> ${t('arrive',{n:r.m})}`).join(' · '):t('boardNoArrivals')}</span></button>`;}).join('')}</section>`;
 }
 
-function starterMarkup(e,t,full){
- return `<section class="hb-start">${full?art('scene/home-empty',120):''}<p>${t(full?'hbStartLead':'hbFindLead')}</p><div class="hb-start-act"><button data-action="home-nearby">${icon('pin')}${t('homeNearby')}</button><button data-action="hb-find">${icon('search')}${t('hbFindPlace')}</button></div>${full?`<h3>${t('hbPopular')}</h3><div class="hb-chips">${POPULAR.map(k=>`<span class="hb-chip"><button data-hb-query="${k}"><i aria-hidden="true">📍</i>${t(`hbPop_${k}`)}</button></span>`).join('')}</div><small class="hb-start-note">${t('hbStartNote')}</small>`:''}</section>`;
+// 제주 대표 관광지에 가는 버스(번호표로 계산, /api/spots)
+export function spotsMarkup(spots,e,t,title=true){
+ if(!spots?.length)return '';
+ return `<section class="hb-sec hb-spots-sec">${title?`<h3>${t('hbSpots')}</h3>`:''}<div class="hb-spots">${spots.map(s=>`<button class="hb-spot" data-hb-spot="${e(s.id)}"><strong>${t(`hbSpot_${s.id}`)}</strong><span class="hb-spot-nos">${s.routes.map(no=>chip(no,e,t)).join('')}</span><small>${s.airport?`✈ ${t('hbSpotAir')}`:e(s.stop.name)}</small></button>`).join('')}</div></section>`;
+}
+function starterMarkup(e,t,full,spots){
+ return `<section class="hb-start">${full?art('scene/home-empty',120):''}<p>${t(full?'hbStartLead':'hbFindLead')}</p><div class="hb-start-act"><button data-action="home-nearby">${icon('pin')}${t('homeNearby')}</button><button data-action="hb-find">${icon('search')}${t('hbFindPlace')}</button></div>${full&&spots?.length?`<h3>${t('hbSpots')}</h3>${spotsMarkup(spots,e,t,false)}<small class="hb-start-note">${t('hbStartNote')}</small>`:full?`<h3>${t('hbPopular')}</h3><div class="hb-chips">${POPULAR.map(k=>`<span class="hb-chip"><button data-hb-query="${k}"><i aria-hidden="true">📍</i>${t(`hbPop_${k}`)}</button></span>`).join('')}</div><small class="hb-start-note">${t('hbStartNote')}</small>`:''}</section>`;
 }
 
 // 실시간 한도를 다 쓴 날은 보드 위에 한 번만 알리고, 아래 줄들은 시간표 기준으로 보여 준다.
 const quotaMarkup=(boards,e,t)=>Object.values(boards).some(b=>b?.liveOut)?`<p class="live-stale art-note board-quota" role="status"><span>${t('boardQuotaPlan')} <a href="https://bus.jeju.go.kr/" target="_blank" rel="noopener noreferrer">${t('boardOfficial')}</a></span></p>`:'';
-export function homeMarkup({stops=[],boards={},favorites=[],places=[],alerts=0,homeStop=null,notice='',guest=false,legs=[],recent=[],wait=null,riding=false,locale='ko',now=Date.now()},e,t){
+export function homeMarkup({stops=[],boards={},favorites=[],places=[],alerts=0,homeStop=null,notice='',guest=false,legs=[],recent=[],wait=null,riding=false,spots=null,locale='ko',now=Date.now()},e,t){
  const hero=pickHero({wait,legs,homeStop,now}),routes=frequentRoutes(legs,now),rides=recentRides(legs);
  const lineStops=[...(homeStop?.id?[homeStop]:[]),...stops.filter(s=>s.id!==homeStop?.id)];
  const fresh=!legs.length&&!favorites.length&&!places.length&&!stops.length&&!recent.length&&!homeStop;
- return `<div class="today-board home-board hb">${greetMarkup(now,alerts,t)}${notice}${quotaMarkup(boards,e,t)}${hero?heroMarkup(hero,boards,riding,e,t):starterMarkup(e,t,fresh)}${favStrip({stops,favorites,places},e,t)}${routesMarkup(routes,boards,e,t)}${recentMarkup(recent,e,t)}${ridesMarkup(rides,now,locale,e,t)}${stopLines(lineStops,boards,e,t)}${guest&&legs.length?`<button class="save-login" data-action="login">${t('syncLogin')}</button>`:''}${hero?`<div class="home-actions"><button data-action="home-nearby">${t('homeNearby')}</button><button data-action="hb-find">${t('homeFind')}</button></div>`:''}<div class="home-links"><button data-view="community">${t('community')}</button><button data-view="favorites">${t('qTab')}</button><a href="/privacy">${t('privacyLink')}</a></div></div>`;
+ return `<div class="today-board home-board hb">${greetMarkup(now,alerts,t)}${notice}${quotaMarkup(boards,e,t)}${hero?heroMarkup(hero,boards,riding,e,t):starterMarkup(e,t,fresh,spots)}${favStrip({stops,favorites,places},e,t)}${routesMarkup(routes,boards,e,t)}${recentMarkup(recent,e,t)}${ridesMarkup(rides,now,locale,e,t)}${fresh?'':spotsMarkup(spots,e,t)}${stopLines(lineStops,boards,e,t)}${guest&&legs.length?`<button class="save-login" data-action="login">${t('syncLogin')}</button>`:''}${hero?`<div class="home-actions"><button data-action="home-nearby">${t('homeNearby')}</button><button data-action="hb-find">${t('homeFind')}</button></div>`:''}<div class="home-links"><button data-view="community">${t('community')}</button><button data-view="favorites">${t('qTab')}</button><a href="/privacy">${t('privacyLink')}</a></div></div>`;
 }
 
 // 히어로·경로 카드·정류장 줄에 도착 정보를 붙일 정류장들(최대 6곳)

@@ -174,6 +174,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/quest')return shared({...await teams.board(),totals:await network.regionTotals()},60);
         if(path==='/api/kudos')return shared(await kudos.get(url.searchParams.get('no')),60);
         if(path==='/api/board/next'){const no=url.searchParams.get('no')||'';if(!/^[\w-]{1,12}$/.test(no))fail('invalidRequest');return shared({stops:await network.stopsAfter(itemId(),no)},3600);}
+        if(path==='/api/spots')return shared({spots:await network.spots()},3600);
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/contexts'){const q=query(),[routes,stops]=await Promise.all([network.findRoutes(q,6),/^\d+$/.test(q)?[]:network.namedStops(q,8)]);const named=stops.map(s=>({...s,label:s.next?`${s.name} · 다음 ${s.next}`:s.name}));await remember(routes,'route');await remember(named.map(s=>({id:s.id,name:s.label})),'stop');return send(200,{routes,stops:named.map(({lat,lng,...s})=>s)});}

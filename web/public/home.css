@@ -85,3 +85,13 @@
 :root[data-theme=dark] .hb-hero{background:linear-gradient(150deg,#2a3a70,#111834)}
 :root[data-theme=dark] .hb-alert{color:#ff8a8d}
 html[data-simple=on] .hb-min{font-size:64px}
+
+/* 제주 여행 버스: 작은 카드 한 줄 */
+.hb-spots{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin:0 -2px;scroll-snap-type:x proximity}
+.hb-spots::-webkit-scrollbar{display:none}
+.hb-spot{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:5px;width:132px;padding:10px 11px;border-radius:14px;background:var(--panel);border:1px solid var(--line);text-align:left;scroll-snap-align:start}
+.hb-spot strong{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hb-spot-nos{display:flex;flex-wrap:wrap;gap:3px}
+.hb-spot-nos .grade-chip{font-size:11px}
+.hb-spot small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hb-start .hb-spots-sec{text-align:left}
