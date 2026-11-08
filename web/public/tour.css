@@ -60,3 +60,12 @@
 .hb-spot-all strong{color:var(--blue)}
 :root[data-theme=dark] .tr-sorts button.on{background:#3a4c8a;border-color:#3a4c8a}
 @media(min-width:900px){.tr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-items:start}.tr-group{grid-column:1/-1}.tr-sorts{max-width:520px}}
+
+/* 관광지 사진(비짓제주) */
+.tr-card.has-photo{padding-top:0;overflow:hidden}
+.tr-photo{position:relative;margin:0 -13px 10px -13px;height:132px;background:var(--surface)}
+.tr-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.tr-photo figcaption{position:absolute;right:8px;bottom:6px;font-size:10.5px}
+.tr-photo figcaption a{color:#fff;background:#0007;padding:2px 7px;border-radius:999px}
+.tr-card.has-photo .tr-card-top>i{margin-top:-30px;border:3px solid var(--panel);background:var(--panel);width:44px;height:44px;box-shadow:0 2px 8px #0002}
+@media(min-width:900px){.tr-photo{height:150px}}

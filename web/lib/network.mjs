@@ -13,6 +13,8 @@ export const TOUR=[
  ['dongmun','town',/동문시장/],['olle','town',/^매일올레시장/],['cheonjiyeon','town',/^천지연폭포입구/],['oedolgae','town',/^외돌개/],['jusangjeolli','town',/주상절리/],['sanbang','town',/^산방산/],['osulloc','town',/오설록/],['hallimpark','town',/^한림공원/],['seopjikoji','town',/^섭지코지/],['jungmun','town',/^중문관광단지입구/]
 ];
 // 첫 화면 카드 줄에 보이는 곳
+// 줄임말로 찾는 목적지
+const ALIAS={'공항':'제주국제공항','제주공항':'제주국제공항','터미널':'제주버스터미널','시외버스터미널':'제주버스터미널','시청':'제주시청','한라산':'성판악','우도':'성산항'};
 export const HOME_SPOTS=['seongsan','hyeopjae','hamdeok','jungmun','dongmun','cheonjiyeon','woljeong','sanbang'];
 const SPOTS=HOME_SPOTS.map(id=>TOUR.find(x=>x[0]===id));
 const PARTNER_METERS=300,HUB_ROUTES=12,GRADE_ORDER=['express','trunk','branch','tour','other'];
@@ -74,6 +76,20 @@ export function createNetwork(load){
     const top=[...routes.values()].sort((x,y)=>(y.airport-x.airport)||((x.no.split('-')[0].length>3)-(y.no.split('-')[0].length>3))||(rank(gradeOf(x.no))-rank(gradeOf(y.no)))||(x.no.includes('-')-y.no.includes('-'))||x.no.localeCompare(y.no,'ko',{numeric:true})).slice(0,3);
     return {id,theme,note:note||null,stop:{id:stop.id,name:stop.name,lat:stop.lat,lng:stop.lng},routes:top.map(r=>r.no),airport:top[0]?.airport||false,total:routes.size};
    }).filter(Boolean);
+  },
+  // 실시간 탭 목적지 검색: 이름으로 목적지 정류장을 찾고, 출발지가 있으면 직행 번호(탈 곳·방향 포함), 없으면 그곳에 서는 번호
+  async toward(query,from=null){
+   const n=await net(),raw=String(query||'').trim(),q=ALIAS[raw.replace(/\s/g,'')]||raw;if(q.length<2)return null;
+   const spot=TOUR.find(([id,,rule])=>rule.test(q)),named=spot?n.stops.filter(s=>spot[2].test(s.name)):[];
+   const hits=named.length?named:(await this.namedStops(q,40)).map(s=>n.byId.get(s.id)).filter(Boolean);if(!hits.length)return null;
+   // 이름이 검색어로 시작하는 곳 중 서는 번호가 가장 많은 곳(예: 함덕 → 함덕환승정류장)
+   const bases=new Map();for(const s of hits){const b=bases.get(s.base)||{base:s.base,nos:new Set(),head:s.base.startsWith(baseName(q))};for(const v of n.byStop.get(s.i)||[])b.nos.add(v.no);bases.set(s.base,b);}
+   const base=named.length?hits[0].base:[...bases.values()].sort((a,b)=>b.head-a.head||b.nos.size-a.nos.size)[0].base,targets=hits.filter(s=>s.base===base),to=[...targets].sort((x,y)=>(n.byStop.get(y.i)||[]).length-(n.byStop.get(x.i)||[]).length)[0];
+   const dest={id:to.id,name:to.name,lat:to.lat,lng:to.lng};
+   let trips=[];if(from){trips=await this.directTrips(from,dest,{limit:5});if(!trips.length)trips=await this.directTrips(from,dest,{walk:1500,limit:3});}
+   if(trips.length)return {to:dest,trips:trips.map(({no,variantId,stops,board,off})=>({no,variantId,stops,board,off})),routes:[]};
+   const rank=g=>GRADE_ORDER.indexOf(g),nos=[...new Set(targets.flatMap(s=>(n.byStop.get(s.i)||[]).map(v=>v.no)))];
+   return {to:dest,trips:[],routes:nos.sort((x,y)=>((x.split('-')[0].length>3)-(y.split('-')[0].length>3))||(rank(gradeOf(x))-rank(gradeOf(y)))||(x.includes('-')-y.includes('-'))||x.localeCompare(y,'ko',{numeric:true})).slice(0,8)};
   },
   // 출발지에서 관광지마다 직행 번호: 어느 정류장에서 몇 번을 타고 어디서 내리는지. 800m 안에 없으면 1.5km까지 본다.
   async tour(from=null){

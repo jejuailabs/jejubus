@@ -95,3 +95,6 @@ html[data-simple=on] .hb-min{font-size:64px}
 .hb-spot-nos .grade-chip{font-size:11px}
 .hb-spot small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .hb-start .hb-spots-sec{text-align:left}
+
+.hb-spot.has-photo{padding-top:0;overflow:hidden}
+.hb-spot-img{width:calc(100% + 22px);margin:0 -11px 2px;height:74px;object-fit:cover;display:block;background:var(--surface)}

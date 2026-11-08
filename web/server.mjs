@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {readFileSync} from 'node:fs';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname,join,resolve,extname} from 'node:path';
@@ -36,6 +37,12 @@ async function jsonBody(req,limit=16000){
   if(!req.headers['content-type']?.startsWith('application/json'))fail('invalidRequest',415);
   let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>limit)fail('invalidRequest',413);}
   try{return JSON.parse(body);}catch{fail('invalidRequest');}
+}
+// 관광지 사진: 비짓제주 OPEN API로 미리 받아 둔 주소(scripts/build-tour-photos.mjs). 실행 중에는 API를 부르지 않는다.
+let tourPhotos=null;
+function withPhotos(list){
+ tourPhotos??=(()=>{try{return JSON.parse(readFileSync(join(root,'public/data/tour-photos.json'),'utf8')).photos||{};}catch{return {};}})();
+ return list.map(s=>{const p=tourPhotos[s.id];return p?{...s,photo:{thumb:p.thumb,link:p.link}}:s;});
 }
 export async function createApp({env=process.env,store,fetchImpl=fetch,settingsFile=env===process.env?join(root,'.env.local'):null}={}){
   const config=configuration(env);
@@ -90,7 +97,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
     // 토스 결제창은 마이페이지에서만 열린다. 다른 화면의 정책은 넓히지 않는다.
     const payPage=(req.url||'').split('?')[0]==='/my';
-    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org${payPage?' https://*.tosspayments.com':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
+    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://api.cdn.visitjeju.net${payPage?' https://*.tosspayments.com':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
     const shared=(data,seconds)=>{res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':`public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=10`});res.end(JSON.stringify(data));};
     const redirect=url=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store'});res.end();};
@@ -174,8 +181,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
         if(path==='/api/quest')return shared({...await teams.board(),totals:await network.regionTotals()},60);
         if(path==='/api/kudos')return shared(await kudos.get(url.searchParams.get('no')),60);
         if(path==='/api/board/next'){const no=url.searchParams.get('no')||'';if(!/^[\w-]{1,12}$/.test(no))fail('invalidRequest');return shared({stops:await network.stopsAfter(itemId(),no)},3600);}
-        if(path==='/api/spots')return shared({spots:await network.spots()},3600);
-        if(path==='/api/tour'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),has=url.searchParams.has('lat');if(has&&!coordinate(lat,lng))fail('outsideJeju');return shared({spots:await network.tour(has?{lat:Math.round(lat*1000)/1000,lng:Math.round(lng*1000)/1000}:null)},has?300:3600);}
+        if(path==='/api/spots')return shared({spots:withPhotos(await network.spots())},3600);
+        if(path==='/api/live/to'){const q=query(),lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),has=url.searchParams.has('lat');if(has&&!coordinate(lat,lng))fail('outsideJeju');const result=await network.toward(q,has?{lat:Math.round(lat*1000)/1000,lng:Math.round(lng*1000)/1000}:null);if(!result)fail('notFound',404);return shared(result,has?300:3600);}
+        if(path==='/api/tour'){const lat=Number(url.searchParams.get('lat')),lng=Number(url.searchParams.get('lng')),has=url.searchParams.has('lat');if(has&&!coordinate(lat,lng))fail('outsideJeju');return shared({spots:withPhotos(await network.tour(has?{lat:Math.round(lat*1000)/1000,lng:Math.round(lng*1000)/1000}:null))},has?300:3600);}
         if(path==='/api/board/numbers')return shared({numbers:await network.numbers()},3600);
         if(path==='/api/board/trip'){const by=url.searchParams.get('by');if(by&&!/^\d{2}:\d{2}$/.test(by))fail('invalidRequest');const result=await board.trip(itemId(),query(),by||null);if(!result)fail('notFound',404);return send(200,result);}
         if(path==='/api/contexts'){const q=query(),[routes,stops]=await Promise.all([network.findRoutes(q,6),/^\d+$/.test(q)?[]:network.namedStops(q,8)]);const named=stops.map(s=>({...s,label:s.next?`${s.name} · 다음 ${s.next}`:s.name}));await remember(routes,'route');await remember(named.map(s=>({id:s.id,name:s.label})),'stop');return send(200,{routes,stops:named.map(({lat,lng,...s})=>s)});}
