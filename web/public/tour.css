@@ -1,0 +1,62 @@
+/* 관광노선: 출발지 → 정렬 → 주제 → 관광지 카드 */
+.view-tour>.community-panel{display:none}.view-tour{grid-template-columns:308px minmax(0,1fr)}
+@media(max-width:760px),(max-width:1020px) and (max-height:500px){.view-tour .map-panel{display:block}.view-tour .community-panel{display:none}}
+.tour-board{display:flex;flex-direction:column;gap:12px}
+.tour-board>*{flex-shrink:0}
+.tr-head h2{font-size:22px;letter-spacing:-.8px;margin-top:4px}
+.tr-head p{font-size:13px;color:var(--muted);margin-top:3px}
+
+.tr-from{border-radius:14px;background:var(--panel);border:1px solid var(--line);padding:10px 12px}
+.tr-from-row{display:flex;align-items:center;gap:8px}
+.tr-from-row>span{font-size:12px;color:var(--muted);flex-shrink:0}
+.tr-from-row strong{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-from-row button{flex-shrink:0;min-height:34px;padding:0 12px;border-radius:999px;background:var(--surface-blue);color:var(--blue);font-size:12px;font-weight:750}
+.tr-pick{margin-top:10px}
+.tr-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px}
+.tr-quick::-webkit-scrollbar{display:none}
+.tr-quick button{flex:0 0 auto;min-height:34px;padding:0 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:12.5px;font-weight:650;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-pick input{width:100%;height:42px;border:1px solid var(--line);background:var(--surface);padding:0 12px;border-radius:10px}
+.tr-hits{list-style:none;margin:6px 0 0;padding:0;max-height:240px;overflow:auto}
+.tr-hits button{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+.tr-hits strong{font-size:13.5px}.tr-hits small{font-size:12px;color:var(--muted)}
+.tr-error{font-size:12.5px;color:#d0453f}
+
+.tr-sorts{display:flex;gap:6px}
+.tr-sorts button{flex:1;min-height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:12.5px;font-weight:700;color:var(--soft)}
+.tr-sorts button.on{background:#22305c;color:#fff;border-color:#22305c}
+.tr-themes{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:-4px}
+.tr-themes::-webkit-scrollbar{display:none}
+.tr-themes button{flex:0 0 auto;min-height:32px;padding:0 12px;border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:650;color:var(--soft)}
+.tr-themes button.on{background:var(--surface-blue);color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+.tr-cards{display:flex;flex-direction:column;gap:10px}
+.tr-group{font-size:14px;margin:6px 0 0}
+.tr-wait{padding:20px 4px}
+.tr-card{position:relative;padding:12px 13px;border-radius:16px;background:var(--panel);border:1px solid var(--line);box-shadow:0 2px 12px #6b4a1a0d;border-left:5px solid var(--tc)}
+.tr-sea{--tc:#2f8fd8}.tr-oreum{--tc:#3d9a5b}.tr-town{--tc:#e08a2c}
+.tr-card.focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 45%,transparent)}
+.tr-card-top{display:flex;align-items:center;gap:10px}
+.tr-card-top>i{font-style:normal;font-size:22px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--tc) 13%,var(--panel));flex-shrink:0}
+.tr-card-top>div{flex:1;min-width:0}
+.tr-card-top h3{font-size:15.5px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-card-top small{font-size:12px;color:var(--muted)}
+.tr-soon{flex-shrink:0;font-size:12px;color:var(--soft);text-align:right}
+.tr-soon b{font-size:24px;font-weight:850;letter-spacing:-1px;color:var(--ink);margin-right:1px}
+.tr-soon-off{font-size:11px;color:var(--muted)}
+.tr-steps{list-style:none;margin:10px 0 0;padding:0 0 0 12px;border-left:2px dashed color-mix(in srgb,var(--tc) 55%,transparent);display:flex;flex-direction:column;gap:6px}
+.tr-steps li{display:flex;gap:8px;align-items:baseline;font-size:13px;position:relative}
+.tr-steps li:before{content:"";position:absolute;left:-18px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--panel);border:2px solid var(--tc)}
+.tr-steps b{flex-shrink:0;width:56px;font-size:11.5px;color:var(--muted);font-weight:700}
+.tr-steps span{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-weight:650}
+.tr-steps small{font-size:11.5px;color:var(--muted);font-weight:500}
+.tr-none,.tr-note{font-size:12.5px;color:var(--soft);margin-top:9px}
+.tr-note{color:#2f6fb0}
+.tr-act{display:flex;gap:6px;margin-top:10px}
+.tr-act button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;min-height:38px;border-radius:10px;background:var(--surface);font-size:12.5px;font-weight:700}
+.tr-act button:last-child{background:var(--surface-blue);color:var(--blue)}
+.tr-act .icon{width:15px;height:15px}
+.tr-foot{font-size:11.5px;color:var(--muted);line-height:1.6}
+.hb-spot-all{justify-content:center;background:var(--surface-blue);border-color:transparent}
+.hb-spot-all strong{color:var(--blue)}
+:root[data-theme=dark] .tr-sorts button.on{background:#3a4c8a;border-color:#3a4c8a}
+@media(min-width:900px){.tr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-items:start}.tr-group{grid-column:1/-1}.tr-sorts{max-width:520px}}
