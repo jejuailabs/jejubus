@@ -97,7 +97,9 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
     // 토스 결제창은 마이페이지에서만 열린다. 다른 화면의 정책은 넓히지 않는다.
     const payPage=(req.url||'').split('?')[0]==='/my';
-    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://api.cdn.visitjeju.net${payPage?' https://*.tosspayments.com':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
+    // 지도 실험 화면만 지도 타일 fetch를 허용한다.
+    const labPage=(req.url||'').split('?')[0]==='/map-lab';
+    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://api.cdn.visitjeju.net${payPage?' https://*.tosspayments.com':''}${labPage?' blob:':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''}${labPage?' https://tile.openstreetmap.org':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
     const shared=(data,seconds)=>{res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':`public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=10`});res.end(JSON.stringify(data));};
     const redirect=url=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store'});res.end();};
@@ -266,10 +268,10 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(report&&method==='POST'){if(!admin(user))fail('forbidden',403);const p=await jsonBody(req);if(typeof p?.hide!=='boolean')fail('invalidRequest');if(!await store.moderate(report[1],p.hide))fail('notFound',404);return send(200,{ok:true});}
       if(path.startsWith('/api/'))fail('notFound',404);
       if(!['GET','HEAD'].includes(method))fail('methodNotAllowed',405);
-      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/privacy'?'/privacy.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
+      const pathname=path==='/'?'/index.html':path==='/navigation'?'/navigation.html':path==='/admin'?'/admin.html':path==='/my'?'/my.html':path==='/privacy'?'/privacy.html':path==='/map-lab'?'/map-lab.html':path==='/setup'&&config.setupAllowed?'/setup.html':decodeURIComponent(path);
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
-      if(!mime[extname(file)])fail('notFound',404);
-      const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)],'Cache-Control':path.startsWith('/art/')?'public, max-age=604800, s-maxage=31536000':'no-cache'});res.end(method==='HEAD'?undefined:data);
+      const labData=path==='/data/network.json'||path==='/data/map-lab-shapes.json',type=labData?'application/json; charset=utf-8':mime[extname(file)];if(!type)fail('notFound',404);
+      const data=await readFile(file);res.writeHead(200,{'Content-Type':type,'Cache-Control':path.startsWith('/art/')?'public, max-age=604800, s-maxage=31536000':'no-cache'});res.end(method==='HEAD'?undefined:data);
     }catch(error){if((error.status||500)>=500&&error.code!=='ENOENT')console.warn(JSON.stringify({kind:'serviceFailure',key:error.key||'serverError',providerCode:error.providerCode||null}));send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
   };
   const server=http.createServer(handler);

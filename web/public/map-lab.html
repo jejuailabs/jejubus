@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>제주버스 지도 실험</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
+  <link rel="stylesheet" href="/map-lab.css">
+</head>
+<body>
+  <div id="map" role="region" aria-label="제주 버스 노선 지도"></div>
+  <header class="lab-top">
+    <form id="search" autocomplete="off">
+      <div class="end-row">
+        <span class="end-dot from" aria-hidden="true"></span>
+        <input id="from-input" aria-label="출발지" placeholder="출발지 · 장소나 정류장">
+        <button type="button" class="walk" id="from-walk"></button>
+      </div>
+      <div class="end-row">
+        <span class="end-dot to" aria-hidden="true"></span>
+        <input id="to-input" aria-label="목적지" placeholder="목적지 · 장소나 정류장">
+        <button type="button" class="walk" id="to-walk"></button>
+      </div>
+      <div class="find-row" id="find-row" hidden>
+        <button type="submit" id="find" disabled>경로 찾기</button>
+        <button type="button" id="reset">지우기</button>
+      </div>
+    </form>
+    <div id="quick" role="group" aria-label="노선 바로 보기"></div>
+    <div id="num-box" hidden>
+      <input id="num-input" inputmode="numeric" aria-label="버스 번호 검색" placeholder="버스 번호를 입력하세요">
+      <button type="button" id="num-close" aria-label="번호 검색 닫기">✕</button>
+    </div>
+    <ul id="suggest" hidden></ul>
+  </header>
+  <div class="lab-controls">
+    <a class="lab-home" href="/" aria-label="앱으로 돌아가기">홈</a>
+    <button id="zoom-in" aria-label="확대">+</button>
+    <button id="zoom-out" aria-label="축소">−</button>
+    <button id="locate" aria-label="내 위치 주변 보기">◎</button>
+  </div>
+  <div id="zoom-chip" aria-hidden="true"></div>
+  <section id="sheet" hidden aria-live="polite"></section>
+  <div id="toast" role="status" hidden></div>
+  <script src="/vendor/maplibre/maplibre-gl-csp.js"></script>
+  <script type="module" src="/map-lab.js"></script>
+</body>
+</html>

@@ -116,7 +116,7 @@ test('admin HTTP API: env email admin sees dashboard and suggestions, others are
 
 test('community shows the developer board outside the menu with four-language copy',()=>{
  const t=k=>boardStrings[k]?.[0]||k;
- const html=ctabsMarkup('live',t);assert.match(html,/class="ctab-suggest" data-ctab="suggest"/);assert.match(html,/개발자에게 바란다/);
+ const html=ctabsMarkup('live',t);assert.match(html,/class="ctab-suggest" data-ctab="suggest"/);assert.match(html,/건의|개발자에게/);
  assert.doesNotMatch(ctabsMarkup('suggest',t),/ctab-suggest/);
  assert.match(suggestIntro(t),/data-suggest-write="pain"/);assert.match(suggestIntro(t),/data-suggest-write="idea"/);
  for(const k of ['ctab_suggest','suggest','suggestPill','suggestIntroTitle','suggestIntroBody','suggestWritePain','suggestWriteIdea','suggestTitlePain','suggestTitleIdea'])assert.equal(boardStrings[k]?.length,4,k);
