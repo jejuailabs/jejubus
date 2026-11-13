@@ -1,6 +1,7 @@
 // 지도 실험 화면: 실제 지도 위 노선, 줌별 구체화, 도보 범위 확대 경로 찾기.
 import {indexNetwork,search,stopsWithin,numbersAt,radiusOf,distanceM,directionGroups,numberFamilies,searchNumbers,baseNumber} from './map-lab-search.js';
 import {gradeOf} from './board.js';
+if(new URLSearchParams(location.search).has('embed'))document.querySelector('.lab-home')?.remove();
 
 const maplibregl=window.maplibregl;
 maplibregl.setWorkerUrl('/vendor/maplibre/maplibre-gl-csp-worker.js');

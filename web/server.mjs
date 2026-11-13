@@ -94,12 +94,13 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
     return {...p,title:p.title.trim(),body:p.body.trim()};
   }
   const handler=async(req,res)=>{
-    res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
-    // 토스 결제창은 마이페이지에서만 열린다. 다른 화면의 정책은 넓히지 않는다.
+    res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');    // 토스 결제창은 마이페이지에서만 열린다. 다른 화면의 정책은 넓히지 않는다.
     const payPage=(req.url||'').split('?')[0]==='/my';
     // 지도 실험 화면만 지도 타일 fetch를 허용한다.
     const labPage=(req.url||'').split('?')[0]==='/map-lab';
-    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://api.cdn.visitjeju.net${payPage?' https://*.tosspayments.com':''}${labPage?' blob:':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''}${labPage?' https://tile.openstreetmap.org':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`);
+    // 전체 노선도는 앱 탭 안(같은 사이트)에서만 띄울 수 있다.
+    res.setHeader('X-Frame-Options',labPage?'SAMEORIGIN':'DENY');
+    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'${payPage?' https://js.tosspayments.com':''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://api.cdn.visitjeju.net${payPage?' https://*.tosspayments.com':''}${labPage?' blob:':''}; connect-src 'self'${payPage?' https://*.tosspayments.com':''}${labPage?' https://tile.openstreetmap.org':''};${payPage?' frame-src https://*.tosspayments.com;':''} object-src 'none'; base-uri 'none'; frame-ancestors ${labPage?"'self'":"'none'"}; form-action 'self'`);
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
     const shared=(data,seconds)=>{res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':`public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=10`});res.end(JSON.stringify(data));};
     const redirect=url=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store'});res.end();};
