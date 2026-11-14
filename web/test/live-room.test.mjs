@@ -27,6 +27,8 @@ test('버스봇은 물어봤을 때만 답하고 실패해도 대화가 끊기�
  let asked=0;const ok=createLiveRoom(memory(),{now:()=>1e12,ask:async()=>{asked++;return '201번은 시청에 섭니다';}});await ok.say({sid:a,text:'그냥 말'});assert.equal(asked,0);
  const r=await ok.say({sid:a,text:'201번 어디 서요',bot:true});assert.equal(r.bot.text,'201번은 시청에 섭니다');assert.equal((await ok.view({radius:0})).messages.at(-1).bot,true);
  const down=createLiveRoom(memory(),{now:()=>1e12,ask:async()=>{throw Error('x');}});assert.match((await down.say({sid:a,text:'질문',bot:true})).bot.text,/답하지 못해요/);
+ let puts=0;const base=memory(),flaky={...base,recordPut:async(...x)=>{if(++puts===2)throw Error('fetch failed');return base.recordPut(...x);}};
+ const saved=await createLiveRoom(flaky,{now:()=>1e12,ask:async()=>'답'}).say({sid:a,text:'질문',bot:true});assert.equal(saved.message.text,'질문');assert.equal(saved.bot,null);
 });
 test('원탭 평가는 개수만 남긴다',async()=>{
  const k=createKudos(memory());assert.equal((await k.add({routeNo:'201-1',type:'kind'})).counts.kind,1);assert.equal((await k.add({routeNo:'201',type:'kind'})).counts.kind,2);assert.equal((await k.get('201')).counts.kind,2);await assert.rejects(k.add({routeNo:'201',type:'name'}),{key:'invalidRequest'});

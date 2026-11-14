@@ -273,7 +273,7 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       const file=resolve(root,'public',`.${pathname}`);if(!file.startsWith(join(root,'public')+'/')&&!file.startsWith(join(root,'public')+'\\'))fail('forbidden',403);
       const labData=path==='/data/network.json'||path==='/data/map-lab-shapes.json',type=labData?'application/json; charset=utf-8':mime[extname(file)];if(!type)fail('notFound',404);
       const data=await readFile(file);res.writeHead(200,{'Content-Type':type,'Cache-Control':path.startsWith('/art/')?'public, max-age=604800, s-maxage=31536000':'no-cache'});res.end(method==='HEAD'?undefined:data);
-    }catch(error){if((error.status||500)>=500&&error.code!=='ENOENT')console.warn(JSON.stringify({kind:'serviceFailure',key:error.key||'serverError',providerCode:error.providerCode||null}));send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
+    }catch(error){if((error.status||500)>=500&&error.code!=='ENOENT')console.warn(JSON.stringify({kind:'serviceFailure',key:error.key||'serverError',providerCode:error.providerCode||null,...(error.key?{}:{name:error.name,detail:String(error.message).slice(0,200),at:String(error.stack||'').split(String.fromCharCode(10)).slice(1,4).map(l=>l.trim()).join(' | ')})}));send(error.status||(error.code==='ENOENT'?404:500),{error:error.key||(error.code==='ENOENT'?'notFound':'serverError')});}
   };
   const server=http.createServer(handler);
   return {server,handler,store,config};

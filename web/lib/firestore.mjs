@@ -30,7 +30,8 @@ export async function createFirestoreClient(env,{fetchImpl=fetch,now=Date.now}={
     })();try{return await tokenPending;}finally{tokenPending=null;}
   }
   async function request(suffix,body){
-    const response=await fetchImpl(base+suffix,{method:body===undefined?'GET':'POST',signal:AbortSignal.timeout(10000),headers:{Authorization:`Bearer ${await accessToken()}`,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});
+    // 연결이 끊기거나 시간이 넘으면 저장소 오류로 바꿔 atomic이 다시 시도하게 한다. 쓰기는 updateTime 조건이 있어 다시 보내도 겹치지 않는다.
+    let response;try{response=await fetchImpl(base+suffix,{method:body===undefined?'GET':'POST',signal:AbortSignal.timeout(10000),headers:{Authorization:`Bearer ${await accessToken()}`,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});}catch(cause){if(cause?.key)throw cause;throw Object.assign(failure(),{retryable:true,cause});}
     if(response.status===404&&body===undefined)return null;
     if(!response.ok){const error=failure();error.retryable=[409,412].includes(response.status);try{error.providerCode=(await response.json()).error?.status;}catch{}if(suffix===':commit'&&error.providerCode==='FAILED_PRECONDITION')error.retryable=true;throw error;}return response.json();
   }

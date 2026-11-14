@@ -93,3 +93,11 @@ test('Firestore: suggestion inbox finds suggest posts by category and withdrawal
  await feedback.setStatus(boss,id,{status:'done',note:'반영함'});list=await feedback.adminList(boss);assert.equal(list.counts.done,1);assert.equal(list.suggestions[0].note,'반영함');
  await store.withdraw('google:r','탈퇴 회원');const u=(await store.adminUsers()).find(x=>x.id==='google:r');assert.equal(u.status,'withdrawn');assert.equal(u.withdrawn,at);
 });
+
+test('Firestore: 연결이 한 번 끊겨도 atomic이 다시 시도해 저장한다',async()=>{
+  const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});const credential={project_id:'fixture-project',client_email:'fixture@fixture-project.iam.gserviceaccount.com',private_key:privateKey.export({type:'pkcs8',format:'pem'})};
+  let commits=0;const client=await createFirestoreClient({FIREBASE_BILLING_APPROVED:'true',FIREBASE_PROJECT_ID:'fixture-project',FIREBASE_SERVICE_ACCOUNT_JSON:JSON.stringify(credential)},{fetchImpl:async url=>{url=String(url);if(url.includes('oauth2.'))return {ok:true,json:async()=>({access_token:'t',expires_in:3600})};if(url.endsWith(':commit')&&++commits===1)throw new TypeError('fetch failed');if(url.endsWith(':commit'))return {ok:true,json:async()=>({})};return {ok:false,status:404,json:async()=>({})};}});
+  const store=createFirestoreStore(client);await store.recordPut('live_room','messages',{id:'messages',items:[]});assert.equal(commits,2);
+  const failing=await createFirestoreClient({FIREBASE_BILLING_APPROVED:'true',FIREBASE_PROJECT_ID:'fixture-project',FIREBASE_SERVICE_ACCOUNT_JSON:JSON.stringify(credential)},{fetchImpl:async url=>{if(String(url).includes('oauth2.'))return {ok:true,json:async()=>({access_token:'t',expires_in:3600})};throw new TypeError('fetch failed');}});
+  await assert.rejects(createFirestoreStore(failing).recordPut('live_room','messages',{id:'messages',items:[]}),e=>e.key==='storageUnavailable');
+});

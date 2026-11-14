@@ -44,7 +44,8 @@ export function createLiveRoom(store,{consume=async()=>{},ask=null,now=Date.now}
    const point=place(body),at=now(),mine=await post({id:`${at}-${body.sid.slice(0,8)}`,alias:aliasOf(body.sid,at),text,at,...(point?coarse(point):{}),reports:0});
    if(!body.bot)return {message:mine};
    let reply;try{reply=await ask?.(text,locale);}catch{reply=null;}
-   const bot=await post({id:`${now()}-bot`,alias:'버스봇',text:reply||'지금은 답하지 못해요. 잠시 뒤 다시 물어봐 주세요.',at:now(),bot:true,reports:0});
+   // 내 글은 이미 올라갔다. 봇 답 저장이 실패해도 보내기 자체를 실패로 돌리지 않는다(다시 보내면 글이 두 번 올라간다).
+   let bot=null;try{bot=await post({id:`${now()}-bot`,alias:'버스봇',text:reply||'지금은 답하지 못해요. 잠시 뒤 다시 물어봐 주세요.',at:now(),bot:true,reports:0});}catch(error){console.warn(JSON.stringify({kind:'roomBotSaveFailed',key:error.key||error.name||'unknown'}));}
    return {message:mine,bot};
   },
   async adminList(){return {messages:(await load('messages')).items.slice(-80).reverse().map(({id,alias,text,at,bot,hidden,reporters})=>({id,alias,text,at,bot:!!bot,hidden:!!hidden,reports:reporters?.length||0}))};},
