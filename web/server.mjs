@@ -148,7 +148,8 @@ export async function createApp({env=process.env,store,fetchImpl=fetch,settingsF
       if(path==='/api/cron/notices'&&method==='GET'){if(!process.env.CRON_SECRET||req.headers.authorization!==`Bearer ${process.env.CRON_SECRET}`)fail('forbidden',403);return send(200,await noticeWatch.check());}
       if(path==='/api/field-reports'&&method==='POST'){throttle(`field:${req.socket.remoteAddress}`,6);return send(200,await fieldReports.submit(await jsonBody(req),user));}
       if(path==='/api/room/ping'&&method==='POST'){throttle(`room-ping:${req.socket.remoteAddress}`,6);return send(200,await liveRoom.ping(await jsonBody(req)));}
-      if(path==='/api/room/say'&&method==='POST'){throttle(`room-say:${req.socket.remoteAddress}`,8);const b=await jsonBody(req);if(b?.bot)throttle(`room-bot:${req.socket.remoteAddress}`,2);return send(200,await liveRoom.say(b,{locale:typeof b?.locale==='string'&&['ko','en','zh','ja'].includes(b.locale)?b.locale:'ko'}));}
+      if(path==='/api/room/say'&&method==='POST'){throttle(`room-say:${req.socket.remoteAddress}`,8);// Vercel에서는 본문을 읽고 나면 req.socket이 비므로 주소를 먼저 잡아 둔다.
+        const ip=req.socket?.remoteAddress,b=await jsonBody(req);if(b?.bot)throttle(`room-bot:${ip}`,2);return send(200,await liveRoom.say(b,{locale:typeof b?.locale==='string'&&['ko','en','zh','ja'].includes(b.locale)?b.locale:'ko'}));}
       if(path==='/api/room/report'&&method==='POST'){throttle(`room-report:${req.socket.remoteAddress}`,5);return send(200,await liveRoom.report(await jsonBody(req)));}
       if(path==='/api/quest/points'&&method==='POST'){throttle(`quest:${req.socket.remoteAddress}`,10);return send(200,await teams.add(await jsonBody(req)));}
       if(path==='/api/kudos'&&method==='POST'){throttle(`kudos:${req.socket.remoteAddress}`,20);return send(200,await kudos.add(await jsonBody(req)));}
